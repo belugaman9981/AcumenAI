@@ -1,3 +1,4 @@
+
 # 🤖 Local AI Coding Agent
 
 A fully **local** AI coding agent powered by [Ollama](https://ollama.com).  
@@ -176,3 +177,4 @@ User: "Find the best async Python frameworks"
 ## License
 
 MIT — do whatever you want with it.
+

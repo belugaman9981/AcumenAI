@@ -1,3 +1,4 @@
+
 """
 main.py — Entry point for the Local AI Coding Agent.
 
@@ -247,3 +248,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
