@@ -1,0 +1,249 @@
+"""
+main.py — Entry point for the Local AI Coding Agent.
+
+Usage:
+    python main.py                         # Interactive chat
+    python main.py --model qwen2.5-coder:7b
+    python main.py --no-background         # Disable idle GitHub crawler
+    python main.py --discoveries           # Show what the crawler found
+    python main.py --list-models           # Show installed Ollama models
+"""
+
+from __future__ import annotations
+
+import argparse
+import threading
+import sys
+
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
+from rich.prompt import Prompt
+from rich import box
+
+import config
+from agent import CodingAgent
+from background import BackgroundCrawler, get_recent_discoveries
+
+console = Console()
+
+
+# ── Banner ─────────────────────────────────────────────────────────────────────
+
+BANNER = """
+ ██████╗ ██████╗ ██████╗ ███████╗    █████╗  ██████╗ ███████╗███╗   ██╗████████╗
+██╔════╝██╔═══██╗██╔══██╗██╔════╝   ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝
+██║     ██║   ██║██║  ██║█████╗     ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║   
+██║     ██║   ██║██║  ██║██╔══╝     ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║   
+╚██████╗╚██████╔╝██████╔╝███████╗   ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║   
+ ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝  
+"""
+
+
+def print_banner(model: str):
+    console.print(Text(BANNER, style="bold cyan"), highlight=False)
+    console.print(
+        Panel(
+            f"[bold]Model:[/bold] [green]{model}[/green]  |  "
+            f"[bold]Ollama:[/bold] [green]{config.OLLAMA_BASE_URL}[/green]  |  "
+            f"[bold]Tools:[/bold] web search · web scrape · GitHub\n\n"
+            "[dim]Commands:  /help  /reset  /discoveries  /models  /quit[/dim]",
+            title="[bold white]Local AI Coding Agent[/bold white]",
+            border_style="cyan",
+        )
+    )
+
+
+# ── /help ──────────────────────────────────────────────────────────────────────
+
+HELP_TEXT = """
+[bold cyan]Available commands:[/bold cyan]
+
+  [yellow]/help[/yellow]           Show this help message
+  [yellow]/reset[/yellow]          Clear conversation history and start fresh
+  [yellow]/discoveries[/yellow]    Show what the background crawler found on GitHub
+  [yellow]/models[/yellow]         List Ollama models available on this machine
+  [yellow]/model <name>[/yellow]   Switch to a different Ollama model mid-session
+  [yellow]/quit[/yellow]           Exit the agent
+
+[bold cyan]Tips:[/bold cyan]
+  • Ask the agent to search for code examples, docs, or GitHub repos.
+  • The background crawler runs silently while you're not chatting.
+  • Set GITHUB_TOKEN in config.py for 5 000 GitHub API calls/hour.
+"""
+
+
+# ── /discoveries ───────────────────────────────────────────────────────────────
+
+def show_discoveries(limit: int = 20):
+    rows = get_recent_discoveries(limit)
+    if not rows:
+        console.print("[dim]No discoveries yet. The background crawler will populate this.[/dim]")
+        return
+
+    table = Table(
+        title="🕷  Background Crawler Discoveries",
+        box=box.ROUNDED,
+        border_style="cyan",
+        show_lines=True,
+    )
+    table.add_column("Repo", style="bold", min_width=25)
+    table.add_column("Stars", justify="right", style="yellow")
+    table.add_column("Source", style="dim")
+    table.add_column("Summary", max_width=55)
+    table.add_column("Time", style="dim", min_width=10)
+
+    for row in rows:
+        table.add_row(
+            row["repo"],
+            f"⭐ {row['stars']:,}" if row["stars"] else "?",
+            row["source"],
+            row["summary"] or "",
+            row["ts"][:16].replace("T", " "),
+        )
+
+    console.print(table)
+
+
+# ── /models ────────────────────────────────────────────────────────────────────
+
+def show_models(agent: CodingAgent):
+    models = agent.client.list_models()
+    if not models:
+        console.print(
+            "[yellow]Could not fetch models. Is Ollama running?[/yellow]\n"
+            "Try:  [bold]ollama serve[/bold]"
+        )
+        return
+    console.print("[bold cyan]Installed Ollama models:[/bold cyan]")
+    for m in models:
+        marker = " ◀ current" if m.startswith(agent.model) else ""
+        console.print(f"  • {m}{marker}")
+
+
+# ── Command handler ────────────────────────────────────────────────────────────
+
+def handle_command(cmd: str, agent: CodingAgent) -> bool:
+    """Returns True if we should continue, False to quit."""
+    parts = cmd.strip().split(maxsplit=1)
+    name  = parts[0].lower()
+    arg   = parts[1] if len(parts) > 1 else ""
+
+    if name in ("/quit", "/exit", "/q"):
+        return False
+    elif name == "/help":
+        console.print(HELP_TEXT)
+    elif name == "/reset":
+        agent.reset()
+    elif name == "/discoveries":
+        show_discoveries()
+    elif name == "/models":
+        show_models(agent)
+    elif name == "/model":
+        if arg:
+            agent.model = arg
+            agent.client.model = arg
+            console.print(f"[green]Switched to model: {arg}[/green]")
+        else:
+            console.print("[yellow]Usage: /model <model-name>[/yellow]")
+    else:
+        console.print(f"[yellow]Unknown command '{name}'. Type /help for help.[/yellow]")
+    return True
+
+
+# ── Main ───────────────────────────────────────────────────────────────────────
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Local AI Coding Agent — powered by Ollama"
+    )
+    parser.add_argument(
+        "--model", default=config.DEFAULT_MODEL,
+        help=f"Ollama model (default: {config.DEFAULT_MODEL})"
+    )
+    parser.add_argument(
+        "--no-background", action="store_true",
+        help="Disable the background GitHub crawler"
+    )
+    parser.add_argument(
+        "--discoveries", action="store_true",
+        help="Show crawler discoveries and exit"
+    )
+    parser.add_argument(
+        "--list-models", action="store_true",
+        help="List available Ollama models and exit"
+    )
+    args = parser.parse_args()
+
+    # ── One-shot flags ───────────────────────────────────────────────────────
+    if args.discoveries:
+        show_discoveries()
+        return
+
+    agent = CodingAgent(model=args.model)
+
+    if args.list_models:
+        show_models(agent)
+        return
+
+    # ── Check Ollama connection ──────────────────────────────────────────────
+    if not agent.client.check_connection():
+        console.print(
+            Panel(
+                "[red bold]Cannot connect to Ollama![/red bold]\n\n"
+                "Make sure Ollama is running:\n"
+                "  [cyan]ollama serve[/cyan]\n\n"
+                f"Then pull a model if you haven't:\n"
+                f"  [cyan]ollama pull {args.model}[/cyan]",
+                title="Connection Error",
+                border_style="red",
+            )
+        )
+        sys.exit(1)
+
+    # ── Background crawler ───────────────────────────────────────────────────
+    crawler = None
+    if not args.no_background:
+        crawler = BackgroundCrawler(agent=agent)
+        bg_thread = threading.Thread(target=crawler.run, daemon=True)
+        bg_thread.start()
+
+    # ── Banner ───────────────────────────────────────────────────────────────
+    print_banner(args.model)
+
+    # ── Chat loop ────────────────────────────────────────────────────────────
+    while True:
+        try:
+            user_input = Prompt.ask("\n[bold blue]You[/bold blue]").strip()
+        except (KeyboardInterrupt, EOFError):
+            console.print("\n[dim]Interrupted. Goodbye![/dim]")
+            break
+
+        if not user_input:
+            continue
+
+        # Handle slash commands
+        if user_input.startswith("/"):
+            if not handle_command(user_input, agent):
+                break
+            continue
+
+        # Pause background crawler while user is active
+        if crawler:
+            crawler.set_busy()
+
+        try:
+            agent.chat(user_input)
+        except KeyboardInterrupt:
+            console.print("\n[dim]Interrupted.[/dim]")
+        finally:
+            # Resume crawler after response
+            if crawler:
+                crawler.set_idle()
+
+    console.print("\n[dim cyan]Agent shut down. Goodbye! 👋[/dim cyan]")
+
+
+if __name__ == "__main__":
+    main()
