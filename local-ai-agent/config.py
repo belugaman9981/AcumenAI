@@ -1,3 +1,4 @@
+
 """
 config.py — Configuration for the Local AI Coding Agent
 Edit these values to customize your setup.
@@ -41,3 +42,4 @@ MIN_STARS = 1_000
 # ── Display ───────────────────────────────────────────────────────────────────
 SHOW_TOOL_CALLS = True    # Print tool name + args as the agent runs
 SHOW_THOUGHTS   = True    # Print the agent's reasoning steps
+
