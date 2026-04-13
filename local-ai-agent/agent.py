@@ -1,3 +1,4 @@
+
 """
 agent.py — ReAct-style coding agent backed by a local Ollama model.
 
