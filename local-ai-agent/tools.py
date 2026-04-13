@@ -1,3 +1,4 @@
+
 """
 tools.py — All tools available to the coding agent.
 
@@ -383,3 +384,4 @@ TOOLS: dict[str, dict] = {
         ),
     },
 }
+
