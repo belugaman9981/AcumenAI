@@ -1,3 +1,4 @@
+
 """
 background.py — Background GitHub crawler.
 
@@ -257,3 +258,4 @@ class BackgroundCrawler:
             f"[dim]🕷  Found: [bold]{name}[/bold] "
             f"⭐{stars:,} — {summary[:80]}[/dim]"
         )
+
