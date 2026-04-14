@@ -305,3 +305,4 @@ class CodingAgent:
         ]
         return self.client.chat(messages, stream=False)
 
+
