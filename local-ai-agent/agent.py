@@ -304,5 +304,3 @@ class CodingAgent:
             {"role": "user", "content": prompt},
         ]
         return self.client.chat(messages, stream=False)
-
-
