@@ -4,10 +4,15 @@ config.py — Configuration for the Local AI Coding Agent
 Edit these values to customize your setup.
 """
 
-# ── Ollama ────────────────────────────────────────────────────────────────────
-OLLAMA_BASE_URL = "http://localhost:11434"
-DEFAULT_MODEL   = "llama3.2"        # Change to any model you have pulled
-# Popular choices: llama3.2, qwen2.5-coder:7b, deepseek-coder-v2, codellama
+# ── OpenAI / OpenAI-compatible API ────────────────────────────────────────────
+# Set your API key here, or via the OPENAI_API_KEY environment variable.
+# For OpenAI:        leave OPENAI_BASE_URL empty (or set to "https://api.openai.com/v1")
+# For LM Studio:     set OPENAI_BASE_URL = "http://localhost:1234/v1" and any key
+# For Groq:          set OPENAI_BASE_URL = "https://api.groq.com/openai/v1"
+OPENAI_API_KEY  = ""                # or set env var OPENAI_API_KEY
+OPENAI_BASE_URL = ""                # leave empty to use the official OpenAI endpoint
+DEFAULT_MODEL   = "gpt-4o-mini"     # Change to any model supported by your provider
+# Popular choices: gpt-4o, gpt-4o-mini, gpt-3.5-turbo
 
 # ── Agent behaviour ───────────────────────────────────────────────────────────
 MAX_TOOL_CALLS   = 10     # Max tool calls per user message before giving up
