@@ -4,10 +4,10 @@ main.py — Entry point for the Local AI Coding Agent.
 
 Usage:
     python main.py                         # Interactive chat
-    python main.py --model qwen2.5-coder:7b
+    python main.py --model gpt-4o
     python main.py --no-background         # Disable idle GitHub crawler
     python main.py --discoveries           # Show what the crawler found
-    python main.py --list-models           # Show installed Ollama models
+    python main.py --list-models           # List models available on the endpoint
 """
 
 from __future__ import annotations
@@ -47,7 +47,6 @@ def print_banner(model: str):
     console.print(
         Panel(
             f"[bold]Model:[/bold] [green]{model}[/green]  |  "
-            f"[bold]Ollama:[/bold] [green]{config.OLLAMA_BASE_URL}[/green]  |  "
             f"[bold]Tools:[/bold] web search · web scrape · GitHub\n\n"
             "[dim]Commands:  /help  /reset  /discoveries  /models  /quit[/dim]",
             title="[bold white]Local AI Coding Agent[/bold white]",
@@ -64,8 +63,8 @@ HELP_TEXT = """
   [yellow]/help[/yellow]           Show this help message
   [yellow]/reset[/yellow]          Clear conversation history and start fresh
   [yellow]/discoveries[/yellow]    Show what the background crawler found on GitHub
-  [yellow]/models[/yellow]         List Ollama models available on this machine
-  [yellow]/model <name>[/yellow]   Switch to a different Ollama model mid-session
+  [yellow]/models[/yellow]         List models available on the current API endpoint
+  [yellow]/model <name>[/yellow]   Switch to a different model mid-session
   [yellow]/quit[/yellow]           Exit the agent
 
 [bold cyan]Tips:[/bold cyan]
@@ -113,11 +112,10 @@ def show_models(agent: CodingAgent):
     models = agent.client.list_models()
     if not models:
         console.print(
-            "[yellow]Could not fetch models. Is Ollama running?[/yellow]\n"
-            "Try:  [bold]ollama serve[/bold]"
+            "[yellow]Could not fetch models. Check your API key and endpoint in config.py.[/yellow]"
         )
         return
-    console.print("[bold cyan]Installed Ollama models:[/bold cyan]")
+    console.print("[bold cyan]Available models:[/bold cyan]")
     for m in models:
         marker = " ◀ current" if m.startswith(agent.model) else ""
         console.print(f"  • {m}{marker}")
@@ -157,11 +155,11 @@ def handle_command(cmd: str, agent: CodingAgent) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Local AI Coding Agent — powered by Ollama"
+        description="Local AI Coding Agent — powered by OpenAI-compatible API"
     )
     parser.add_argument(
         "--model", default=config.DEFAULT_MODEL,
-        help=f"Ollama model (default: {config.DEFAULT_MODEL})"
+        help=f"Model name (default: {config.DEFAULT_MODEL})"
     )
     parser.add_argument(
         "--no-background", action="store_true",
@@ -173,7 +171,7 @@ def main():
     )
     parser.add_argument(
         "--list-models", action="store_true",
-        help="List available Ollama models and exit"
+        help="List available models and exit"
     )
     args = parser.parse_args()
 
