@@ -1,6 +1,6 @@
 
 """
-agent.py — ReAct-style coding agent backed by a local Ollama model.
+agent.py — ReAct-style coding agent backed by an OpenAI-compatible model.
 
 The agent follows the classic Thought → Action → Observation loop:
   1. The LLM outputs a "Thought" (reasoning) and, optionally, a tool call.
@@ -17,11 +17,12 @@ Tool calls are expressed in a simple JSON block the LLM is trained to produce:
 from __future__ import annotations
 
 import json
+import os
 import re
 import textwrap
 from typing import Optional
 
-import requests
+from openai import OpenAI, APIConnectionError, AuthenticationError
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
@@ -42,7 +43,6 @@ def _build_system_prompt() -> str:
 
     return textwrap.dedent(f"""
         You are an expert local AI coding agent running on the user's machine.
-        You are powered by Ollama — no cloud services are used.
 
         Your job is to help with coding questions, code reviews, debugging,
         architecture decisions, and software research.  You can browse the web,
@@ -76,87 +76,80 @@ def _build_system_prompt() -> str:
     """).strip()
 
 
-# ── Ollama client ──────────────────────────────────────────────────────────────
+# ── OpenAI client ──────────────────────────────────────────────────────────────
 
-class OllamaClient:
+def _make_openai_client() -> OpenAI:
+    api_key  = config.OPENAI_API_KEY or os.environ.get("OPENAI_API_KEY", "")
+    base_url = config.OPENAI_BASE_URL or None
+    kwargs: dict = {"api_key": api_key or "not-needed"}
+    if base_url:
+        kwargs["base_url"] = base_url
+    return OpenAI(**kwargs)
+
+
+class OpenAIClient:
     def __init__(self, model: str):
-        self.model = model
-        self.base_url = config.OLLAMA_BASE_URL
+        self.model  = model
+        self._client = _make_openai_client()
 
     def check_connection(self) -> bool:
         try:
-            r = requests.get(f"{self.base_url}/api/tags", timeout=5)
-            return r.ok
+            self._client.models.list()
+            return True
+        except AuthenticationError:
+            return True   # reachable but auth will fail — let the user know later
         except Exception:
             return False
 
     def list_models(self) -> list[str]:
         try:
-            r = requests.get(f"{self.base_url}/api/tags", timeout=5)
-            if r.ok:
-                return [m["name"] for m in r.json().get("models", [])]
+            return [m.id for m in self._client.models.list().data]
         except Exception:
-            pass
-        return []
+            return []
 
     def chat(self, messages: list[dict], stream: bool = True) -> str:
-        """Send messages to Ollama and return the full assistant reply."""
-        payload = {
-            "model": self.model,
-            "messages": messages,
-            "stream": stream,
-            "options": {
-                "temperature": 0.4,
-                "num_ctx": 8192,
-            },
-        }
+        """Send messages and return the full assistant reply."""
         try:
             if stream:
-                return self._stream_chat(payload)
+                return self._stream_chat(messages)
             else:
-                r = requests.post(
-                    f"{self.base_url}/api/chat",
-                    json=payload,
-                    timeout=120,
+                resp = self._client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                    temperature=0.4,
                 )
-                r.raise_for_status()
-                return r.json()["message"]["content"]
-        except requests.ConnectionError:
-            return "[ERROR] Cannot connect to Ollama. Is it running? Try: ollama serve"
+                return resp.choices[0].message.content or ""
+        except AuthenticationError:
+            return "[ERROR] Invalid API key. Set OPENAI_API_KEY in config.py or as an environment variable."
+        except APIConnectionError as exc:
+            return f"[ERROR] Cannot connect to the API endpoint: {exc}"
         except Exception as exc:
-            return f"[ERROR] Ollama error: {exc}"
+            return f"[ERROR] API error: {exc}"
 
-    def _stream_chat(self, payload: dict) -> str:
-        """Stream tokens from Ollama, printing them as they arrive."""
+    def _stream_chat(self, messages: list[dict]) -> str:
+        """Stream tokens, printing them as they arrive."""
         full = []
         console.print()
 
-        # We'll accumulate and render at the end for markdown, but stream raw
-        with console.status("", spinner="dots"):
-            pass  # just to keep flow clean
-
         try:
-            with requests.post(
-                f"{self.base_url}/api/chat",
-                json=payload,
+            with self._client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=0.4,
                 stream=True,
-                timeout=180,
-            ) as resp:
-                resp.raise_for_status()
+            ) as stream:
                 console.print("[bold cyan]Assistant:[/bold cyan] ", end="")
-                for line in resp.iter_lines():
-                    if not line:
-                        continue
-                    try:
-                        data = json.loads(line)
-                        token = data.get("message", {}).get("content", "")
-                        if token:
-                            full.append(token)
-                            print(token, end="", flush=True)
-                        if data.get("done"):
-                            break
-                    except json.JSONDecodeError:
-                        continue
+                for chunk in stream:
+                    token = chunk.choices[0].delta.content or ""
+                    if token:
+                        full.append(token)
+                        print(token, end="", flush=True)
+        except AuthenticationError:
+            console.print("\n[red]Invalid API key. Set OPENAI_API_KEY in config.py or as an environment variable.[/red]")
+            return "[ERROR] Invalid API key."
+        except APIConnectionError as exc:
+            console.print(f"\n[red]Connection error: {exc}[/red]")
+            return f"[ERROR] Cannot connect to the API endpoint: {exc}"
         except Exception as exc:
             console.print(f"\n[red]Stream error: {exc}[/red]")
 
@@ -209,7 +202,7 @@ def _run_tool(call: dict) -> str:
 class CodingAgent:
     def __init__(self, model: str = config.DEFAULT_MODEL):
         self.model = model
-        self.client = OllamaClient(model)
+        self.client = OpenAIClient(model)
         self.history: list[dict] = []
         self.system_prompt = _build_system_prompt()
 
