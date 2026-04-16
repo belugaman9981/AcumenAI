@@ -1,2 +1,4 @@
 # AcumenAI
-random thingy test
+
+Try out AcumenAI at:
+https://belugaman9981.github.io/AcumenAI/#quickstart
