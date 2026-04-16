@@ -1,14 +1,14 @@
 
 # 🤖 Local AI Coding Agent
 
-A fully **local** AI coding agent powered by [Ollama](https://ollama.com).  
-No OpenAI, no Anthropic, no cloud — everything runs on your machine.
+A coding agent that works with any **OpenAI-compatible API**.  
+Use OpenAI, OpenRouter, LM Studio, or another compatible endpoint.
 
 ## Features
 
 | Feature | Details |
 |---|---|
-| 🧠 Local LLM | Any Ollama model (llama3.2, qwen2.5-coder, deepseek-coder-v2, codellama…) |
+| 🧠 Model backend | Any OpenAI-compatible model or local server |
 | 🔍 Web search | DuckDuckGo — no API key needed |
 | 🌐 Web scraping | Fetches & cleans any public URL |
 | 🐙 GitHub search | Search repos by stars, forks, language |
@@ -20,36 +20,39 @@ No OpenAI, no Anthropic, no cloud — everything runs on your machine.
 
 ## Quick Start
 
-### 1 — Install Ollama
-
-```bash
-# macOS / Linux
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Windows: download from https://ollama.com/download
-```
-
-### 2 — Pull a model
-
-```bash
-# General purpose (good default)
-ollama pull llama3.2
-
-# Best for coding tasks
-ollama pull qwen2.5-coder:7b
-
-# Larger / smarter
-ollama pull deepseek-coder-v2
-```
-
-### 3 — Install Python dependencies
+### 1 — Install Python dependencies
 
 ```bash
 cd local-ai-agent
 pip install -r requirements.txt
 ```
 
-### 4 — Run!
+### 2 — Pick a provider
+
+Open [config.py](local-ai-agent/config.py) and set one of these:
+
+OpenAI:
+```python
+OPENAI_API_KEY = "your-api-key"
+OPENAI_BASE_URL = ""
+DEFAULT_MODEL = "gpt-4o-mini"
+```
+
+OpenRouter:
+```python
+OPENAI_API_KEY = "your-api-key"
+OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_MODEL = "openrouter/auto"
+```
+
+LM Studio:
+```python
+OPENAI_API_KEY = "lm-studio"
+OPENAI_BASE_URL = "http://localhost:1234/v1"
+DEFAULT_MODEL = "local-model-name"
+```
+
+### 3 — Run
 
 ```bash
 python main.py
@@ -63,10 +66,10 @@ python main.py
 python main.py [OPTIONS]
 
 Options:
-  --model <name>       Ollama model to use  (default: llama3.2)
+       --model <name>       Model to use  (default: value from config.py)
   --no-background      Disable the idle GitHub crawler
   --discoveries        Print crawler discoveries and exit
-  --list-models        List available Ollama models and exit
+       --list-models        List available models on the current API endpoint and exit
 ```
 
 ### In-session commands
@@ -76,7 +79,7 @@ Options:
 | `/help` | Show help |
 | `/reset` | Clear conversation history |
 | `/discoveries` | Show what the crawler found |
-| `/models` | List installed Ollama models |
+| `/models` | List models on the current API endpoint |
 | `/model <name>` | Switch model mid-session |
 | `/quit` | Exit |
 
@@ -101,7 +104,7 @@ You: Search for how async/await works in Zig.
 Edit `config.py` to customise:
 
 ```python
-DEFAULT_MODEL = "qwen2.5-coder:7b"   # Your preferred model
+DEFAULT_MODEL = "gpt-4o-mini"   # Your preferred model
 
 # Add your GitHub PAT for 5,000 API calls/hour instead of 60
 GITHUB_TOKEN = "ghp_xxxxxxxxxxxx"
@@ -120,7 +123,7 @@ CRAWLER_SLEEP_SECONDS = 300
 ```
 local-ai-agent/
 ├── main.py          # CLI entry point & chat loop
-├── agent.py         # ReAct loop + Ollama client
+├── agent.py         # ReAct loop + API client
 ├── tools.py         # Web search, scraping, GitHub API
 ├── background.py    # Idle GitHub crawler
 ├── config.py        # All configuration
@@ -137,7 +140,7 @@ User: "Find the best async Python frameworks"
          │
          ▼
   ┌─────────────┐
-  │  Ollama LLM │  ← Thought: I should search GitHub for async Python frameworks
+       │ API model    │  ← Thought: I should search GitHub for async Python frameworks
   └──────┬──────┘
          │  tool_call: github_search(query="async python framework", sort="stars")
          ▼
@@ -147,7 +150,7 @@ User: "Find the best async Python frameworks"
          │  Observation fed back to LLM
          ▼
   ┌─────────────┐
-  │  Ollama LLM │  ← Thought: Let me also check web_search for benchmarks
+       │ API model    │  ← Thought: Let me also check web_search for benchmarks
   └──────┬──────┘
          │  tool_call: web_search(query="async python framework benchmark 2024")
          ▼
@@ -157,7 +160,7 @@ User: "Find the best async Python frameworks"
          │  Observation fed back to LLM
          ▼
   ┌─────────────┐
-  │  Ollama LLM │  → Final answer with citations ✅
+       │ API model    │  → Final answer with citations ✅
   └─────────────┘
 ```
 
@@ -167,10 +170,10 @@ User: "Find the best async Python frameworks"
 
 | Task | Model |
 |---|---|
-| General coding help | `qwen2.5-coder:7b` |
-| Code review / architecture | `deepseek-coder-v2` |
-| Fastest responses | `llama3.2:3b` |
-| Best overall quality | `llama3.3:70b` (needs ~40 GB RAM) |
+| General coding help | `gpt-4o-mini` or `openrouter/auto` |
+| Code review / architecture | `gpt-4o` |
+| Local desktop setup | Your LM Studio model name |
+| Best overall quality | Provider-dependent |
 
 ---
 
