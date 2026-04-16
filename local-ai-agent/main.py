@@ -62,13 +62,16 @@ HELP_TEXT = """
 
   [yellow]/help[/yellow]           Show this help message
   [yellow]/reset[/yellow]          Clear conversation history and start fresh
+  [yellow]/newsession[/yellow]     Start a brand-new session file
   [yellow]/discoveries[/yellow]    Show what the background crawler found on GitHub
   [yellow]/models[/yellow]         List models available on the current API endpoint
   [yellow]/model <name>[/yellow]   Switch to a different model mid-session
+  [yellow]/usage[/yellow]          Show token usage for this session
   [yellow]/quit[/yellow]           Exit the agent
 
 [bold cyan]Tips:[/bold cyan]
   • Ask the agent to search for code examples, docs, or GitHub repos.
+  • The agent can read/write local files and run code snippets.
   • The background crawler runs silently while you're not chatting.
   • Set GITHUB_TOKEN in config.py for 5 000 GitHub API calls/hour.
 """
@@ -135,17 +138,20 @@ def handle_command(cmd: str, agent: CodingAgent) -> bool:
         console.print(HELP_TEXT)
     elif name == "/reset":
         agent.reset()
+    elif name == "/newsession":
+        agent.reset()
+        console.print("[green]New session started.[/green]")
     elif name == "/discoveries":
         show_discoveries()
     elif name == "/models":
         show_models(agent)
     elif name == "/model":
         if arg:
-            agent.model = arg
-            agent.client.model = arg
-            console.print(f"[green]Switched to model: {arg}[/green]")
+            agent.switch_model(arg)
         else:
             console.print("[yellow]Usage: /model <model-name>[/yellow]")
+    elif name == "/usage":
+        console.print(f"[cyan]{agent.client.usage_summary()}[/cyan]")
     else:
         console.print(f"[yellow]Unknown command '{name}'. Type /help for help.[/yellow]")
     return True
