@@ -186,15 +186,19 @@ def main():
         show_models(agent)
         return
 
-    # ── Check Ollama connection ──────────────────────────────────────────────
+    # ── Check API connection ─────────────────────────────────────────────────
     if not agent.client.check_connection():
         console.print(
             Panel(
-                "[red bold]Cannot connect to Ollama![/red bold]\n\n"
-                "Make sure Ollama is running:\n"
-                "  [cyan]ollama serve[/cyan]\n\n"
-                f"Then pull a model if you haven't:\n"
-                f"  [cyan]ollama pull {args.model}[/cyan]",
+                "[red bold]Cannot connect to the configured API endpoint.[/red bold]\n\n"
+                "Check your settings in config.py:\n"
+                "  [cyan]OPENAI_API_KEY[/cyan]\n"
+                "  [cyan]OPENAI_BASE_URL[/cyan]\n"
+                "  [cyan]DEFAULT_MODEL[/cyan]\n\n"
+                "Examples:\n"
+                "  [cyan]OpenAI[/cyan]: leave OPENAI_BASE_URL empty\n"
+                "  [cyan]OpenRouter[/cyan]: https://openrouter.ai/api/v1\n"
+                "  [cyan]LM Studio[/cyan]: http://localhost:1234/v1",
                 title="Connection Error",
                 border_style="red",
             )

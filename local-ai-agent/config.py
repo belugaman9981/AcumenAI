@@ -7,12 +7,12 @@ Edit these values to customize your setup.
 # ── OpenAI / OpenAI-compatible API ────────────────────────────────────────────
 # Set your API key here, or via the OPENAI_API_KEY environment variable.
 # For OpenAI:        leave OPENAI_BASE_URL empty (or set to "https://api.openai.com/v1")
+# For OpenRouter:    set OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
 # For LM Studio:     set OPENAI_BASE_URL = "http://localhost:1234/v1" and any key
-# For Groq:          set OPENAI_BASE_URL = "https://api.groq.com/openai/v1"
-OPENAI_API_KEY  = ""                # or set env var OPENAI_API_KEY
-OPENAI_BASE_URL = ""                # leave empty to use the official OpenAI endpoint
-DEFAULT_MODEL   = "gpt-4o-mini"     # Change to any model supported by your provider
-# Popular choices: gpt-4o, gpt-4o-mini, gpt-3.5-turbo
+OPENAI_API_KEY  = "your own api key"# or set env var OPENAI_API_KEY
+OPENAI_BASE_URL = "https://openrouter.ai/api/v1"   # OpenRouter default
+DEFAULT_MODEL   = "anthropic/claude-3.5-sonnet"    # Change to any model supported by your provider
+# Popular choices: openrouter/auto, openai/gpt-4o-mini, anthropic/claude-3.5-sonnet
 
 # ── Agent behaviour ───────────────────────────────────────────────────────────
 MAX_TOOL_CALLS   = 10     # Max tool calls per user message before giving up
