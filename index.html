@@ -1,19 +1,296 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Site</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AcumenAI</title>
     <style>
-        body { font-family: Arial; max-width: 800px; margin: 40px auto; padding: 0 20px; background: #0d1117; color: #e6edf3; }
-        h1 { color: #58a6ff; }
-        a { color: #58a6ff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* Animated gradient background */
+        .bg-glow {
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+            animation: drift 20s ease-in-out infinite;
+            z-index: 0;
+        }
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-30px, 20px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Nav */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .nav-links a {
+            color: #888;
+            text-decoration: none;
+            margin-left: 28px;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: #e0e0e0; }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 100px 0 60px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1.5px;
+        }
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.15rem;
+            color: #888;
+            max-width: 520px;
+            margin: 0 auto 36px;
+            line-height: 1.6;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: #fff;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(59,130,246,0.3); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #ccc;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+        /* Features */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            padding: 40px 0 60px;
+        }
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 28px;
+            transition: all 0.25s;
+        }
+        .card:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-3px);
+        }
+        .card-icon {
+            width: 42px; height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+        }
+        .card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .card p {
+            font-size: 0.88rem;
+            color: #777;
+            line-height: 1.5;
+        }
+        .icon-blue { background: rgba(59,130,246,0.12); }
+        .icon-purple { background: rgba(139,92,246,0.12); }
+        .icon-green { background: rgba(34,197,94,0.12); }
+        .icon-orange { background: rgba(249,115,22,0.12); }
+        .icon-pink { background: rgba(236,72,153,0.12); }
+        .icon-cyan { background: rgba(6,182,212,0.12); }
+
+        /* Code block */
+        .code-section {
+            padding: 20px 0 60px;
+            text-align: center;
+        }
+        .code-section h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .code-section .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+        .code-block {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 24px 28px;
+            text-align: left;
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.88rem;
+            line-height: 1.7;
+            overflow-x: auto;
+        }
+        .code-block .comment { color: #555; }
+        .code-block .cmd { color: #22c55e; }
+        .code-block .flag { color: #60a5fa; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            color: #444;
+            font-size: 0.85rem;
+        }
+        footer a { color: #60a5fa; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <h1>Welcome</h1>
-    <p>Check out my projects below.</p>
-    <h2>Projects</h2>
-    <ul>
-        <li><a href="https://github.com/yourusername/AcumenAI">AcumenAI</a> — Local AI Coding Agent</li>
-    </ul>
+    <div class="bg-glow"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">AcumenAI</div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#quickstart">Get Started</a>
+                <a href="https://github.com/yourusername/AcumenAI" target="_blank">GitHub</a>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <div class="badge">Open Source AI Agent</div>
+            <h1>Your own <span class="gradient">AI coding agent</span><br>that actually works</h1>
+            <p>A local AI assistant that searches the web, explores GitHub, reads your files, and runs code — powered by any OpenAI-compatible API.</p>
+            <div class="btn-group">
+                <a href="https://github.com/yourusername/AcumenAI" class="btn btn-primary" target="_blank">
+                    &#9733; View on GitHub
+                </a>
+                <a href="#quickstart" class="btn btn-secondary">
+                    &#8594; Quick Start
+                </a>
+            </div>
+        </section>
+
+        <section class="features" id="features">
+            <div class="card">
+                <div class="card-icon icon-blue">&#129504;</div>
+                <h3>Any Model Backend</h3>
+                <p>Works with OpenAI, OpenRouter, LM Studio, or any compatible API. Your choice.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon icon-purple">&#128269;</div>
+                <h3>Web Search</h3>
+                <p>DuckDuckGo search built in. No API key needed. Find docs, examples, and answers.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon icon-green">&#128025;</div>
+                <h3>GitHub Explorer</h3>
+                <p>Search repos, browse notable coders, read code files — all from the chat.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon icon-orange">&#128196;</div>
+                <h3>File Read & Write</h3>
+                <p>Read, write, and list local files. The agent works directly with your code.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon icon-pink">&#9889;</div>
+                <h3>Code Execution</h3>
+                <p>Run Python and JavaScript snippets in a sandboxed subprocess with a 15s timeout.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon icon-cyan">&#128375;</div>
+                <h3>Background Crawler</h3>
+                <p>Silently explores trending GitHub repos while you're idle. Discoveries saved to SQLite.</p>
+            </div>
+        </section>
+
+        <section class="code-section" id="quickstart">
+            <h2>Get started in 30 seconds</h2>
+            <p class="subtitle">Clone, configure, run.</p>
+            <div class="code-block">
+                <span class="comment"># Clone the repo</span><br>
+                <span class="cmd">git clone</span> https://github.com/yourusername/AcumenAI.git<br>
+                <span class="cmd">cd</span> AcumenAI/local-ai-agent<br><br>
+                <span class="comment"># Install dependencies</span><br>
+                <span class="cmd">pip install</span> <span class="flag">-r</span> requirements.txt<br><br>
+                <span class="comment"># Set your API key in config.py, then run</span><br>
+                <span class="cmd">python</span> main.py
+            </div>
+        </section>
+
+        <footer>
+            Built with &#128156; &mdash; <a href="https://github.com/yourusername/AcumenAI" target="_blank">Source on GitHub</a>
+        </footer>
+    </div>
 </body>
 </html>
