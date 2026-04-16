@@ -9,9 +9,12 @@ returns a plain-text string (so the LLM can read the output directly).
 from __future__ import annotations
 
 import json
+import os
 import re
+import subprocess
 import textwrap
 import time
+from pathlib import Path
 from typing import Optional
 from urllib.parse import urljoin, urlparse
 
@@ -20,6 +23,10 @@ from bs4 import BeautifulSoup
 from duckduckgo_search import DDGS
 
 import config
+
+# ── Safety: restrict file operations to a working directory ────────────────────
+WORKDIR = Path.cwd()
+_BLOCKED_EXTENSIONS = {".exe", ".bat", ".cmd", ".ps1", ".sh", ".vbs", ".msi"}
 
 # ── Shared helpers ─────────────────────────────────────────────────────────────
 
@@ -326,6 +333,138 @@ def analyze_code(code: str, language: str = "auto") -> str:
     )
 
 
+# ── Tool: read_file ────────────────────────────────────────────────────────────
+
+def _safe_path(path_str: str) -> Path:
+    """Resolve a path and ensure it's within the working directory."""
+    p = (WORKDIR / path_str).resolve()
+    if not str(p).startswith(str(WORKDIR)):
+        raise ValueError(f"Path escapes working directory: {path_str}")
+    if p.suffix.lower() in _BLOCKED_EXTENSIONS:
+        raise ValueError(f"Blocked file extension: {p.suffix}")
+    return p
+
+
+def read_file(path: str, start_line: int = 1, end_line: int = 0) -> str:
+    """
+    Read a file from the local filesystem.
+    path is relative to the current working directory.
+    Optionally specify start_line and end_line (1-based) to read a range.
+    """
+    try:
+        p = _safe_path(path)
+        if not p.exists():
+            return f"File not found: {path}"
+        text = p.read_text(encoding="utf-8", errors="replace")
+        lines = text.splitlines()
+        if end_line > 0:
+            lines = lines[max(0, start_line - 1):end_line]
+        elif start_line > 1:
+            lines = lines[start_line - 1:]
+        result = "\n".join(f"{i+start_line:4d} | {l}" for i, l in enumerate(lines))
+        return _truncate(result, 8000)
+    except ValueError as exc:
+        return str(exc)
+    except Exception as exc:
+        return f"read_file error: {exc}"
+
+
+def write_file(path: str, content: str) -> str:
+    """
+    Write content to a file. Creates parent directories if needed.
+    path is relative to the current working directory.
+    """
+    try:
+        p = _safe_path(path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content, encoding="utf-8")
+        return f"Successfully wrote {len(content)} chars to {path}"
+    except ValueError as exc:
+        return str(exc)
+    except Exception as exc:
+        return f"write_file error: {exc}"
+
+
+def list_files(path: str = ".", pattern: str = "*") -> str:
+    """
+    List files and directories at the given path.
+    Optionally filter by glob pattern.
+    """
+    try:
+        p = _safe_path(path)
+        if not p.is_dir():
+            return f"Not a directory: {path}"
+        entries = sorted(p.glob(pattern))[:50]
+        if not entries:
+            return f"No files matching '{pattern}' in {path}"
+        lines = []
+        for e in entries:
+            rel = e.relative_to(WORKDIR)
+            icon = "📁" if e.is_dir() else "📄"
+            size = f"  ({e.stat().st_size:,} bytes)" if e.is_file() else ""
+            lines.append(f"{icon} {rel}{size}")
+        return "\n".join(lines)
+    except ValueError as exc:
+        return str(exc)
+    except Exception as exc:
+        return f"list_files error: {exc}"
+
+
+# ── Tool: run_code ─────────────────────────────────────────────────────────────
+
+def run_code(code: str, language: str = "python") -> str:
+    """
+    Execute a code snippet in a subprocess and return stdout + stderr.
+    Supported: python, node (JavaScript).
+    Timeout: 15 seconds. No network or file-system side effects encouraged.
+    """
+    cmds = {
+        "python": ["python", "-c", code],
+        "node": ["node", "-e", code],
+        "javascript": ["node", "-e", code],
+    }
+    lang = language.lower()
+    if lang not in cmds:
+        return f"Unsupported language '{language}'. Supported: {', '.join(cmds)}"
+    try:
+        result = subprocess.run(
+            cmds[lang],
+            capture_output=True,
+            text=True,
+            timeout=15,
+            cwd=str(WORKDIR),
+        )
+        output = ""
+        if result.stdout:
+            output += f"STDOUT:\n{result.stdout}"
+        if result.stderr:
+            output += f"\nSTDERR:\n{result.stderr}"
+        if result.returncode != 0:
+            output += f"\nExit code: {result.returncode}"
+        return _truncate(output.strip() or "(no output)", 5000)
+    except subprocess.TimeoutExpired:
+        return "Code execution timed out (15s limit)."
+    except FileNotFoundError:
+        return f"'{language}' interpreter not found on this system."
+    except Exception as exc:
+        return f"run_code error: {exc}"
+
+
+# ── Tool: clipboard ────────────────────────────────────────────────────────────
+
+def clipboard_read() -> str:
+    """Read the current system clipboard content."""
+    try:
+        result = subprocess.run(
+            ["powershell", "-command", "Get-Clipboard"],
+            capture_output=True, text=True, timeout=5,
+        )
+        text = result.stdout.strip()
+        return _truncate(text, 5000) if text else "(clipboard is empty)"
+    except Exception as exc:
+        return f"clipboard_read error: {exc}"
+
+
 # ── Tool registry ──────────────────────────────────────────────────────────────
 
 TOOLS: dict[str, dict] = {
@@ -381,6 +520,41 @@ TOOLS: dict[str, dict] = {
             "Statically analyze a code snippet (line count, functions, "
             "imports, complexity).\n"
             "Args: code (str), language (str, default 'auto')"
+        ),
+    },
+    "read_file": {
+        "fn": read_file,
+        "description": (
+            "Read a file from the local filesystem (relative to working dir).\n"
+            "Args: path (str), start_line (int, optional), end_line (int, optional)"
+        ),
+    },
+    "write_file": {
+        "fn": write_file,
+        "description": (
+            "Write content to a local file. Creates parent dirs if needed.\n"
+            "Args: path (str), content (str)"
+        ),
+    },
+    "list_files": {
+        "fn": list_files,
+        "description": (
+            "List files and directories. Optionally filter by glob pattern.\n"
+            "Args: path (str, default '.'), pattern (str, default '*')"
+        ),
+    },
+    "run_code": {
+        "fn": run_code,
+        "description": (
+            "Execute a code snippet and return the output. 15s timeout.\n"
+            "Args: code (str), language (str, default 'python')"
+        ),
+    },
+    "clipboard_read": {
+        "fn": clipboard_read,
+        "description": (
+            "Read the current system clipboard content.\n"
+            "Args: (none)"
         ),
     },
 }
