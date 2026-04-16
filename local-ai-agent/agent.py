@@ -20,6 +20,8 @@ import json
 import os
 import re
 import textwrap
+import time
+from pathlib import Path
 from typing import Optional
 
 from openai import OpenAI, APIConnectionError, AuthenticationError
@@ -88,9 +90,15 @@ def _make_openai_client() -> OpenAI:
 
 
 class OpenAIClient:
+    MAX_RETRIES = 3
+    RETRY_BACKOFF = [1, 3, 8]  # seconds
+
     def __init__(self, model: str):
         self.model  = model
         self._client = _make_openai_client()
+        # Token tracking
+        self.total_prompt_tokens = 0
+        self.total_completion_tokens = 0
 
     def check_connection(self) -> bool:
         try:
@@ -107,22 +115,51 @@ class OpenAIClient:
         except Exception:
             return []
 
+    def usage_summary(self) -> str:
+        total = self.total_prompt_tokens + self.total_completion_tokens
+        return (
+            f"Tokens used — prompt: {self.total_prompt_tokens:,}  "
+            f"completion: {self.total_completion_tokens:,}  "
+            f"total: {total:,}"
+        )
+
+    def _retry(self, fn, *args, **kwargs):
+        """Call fn with exponential backoff on transient errors."""
+        last_exc = None
+        for attempt in range(self.MAX_RETRIES):
+            try:
+                return fn(*args, **kwargs)
+            except (APIConnectionError, TimeoutError) as exc:
+                last_exc = exc
+                wait = self.RETRY_BACKOFF[min(attempt, len(self.RETRY_BACKOFF) - 1)]
+                console.print(f"[dim yellow]Retry {attempt+1}/{self.MAX_RETRIES} in {wait}s…[/dim yellow]")
+                time.sleep(wait)
+            except AuthenticationError:
+                raise
+            except Exception:
+                raise
+        raise last_exc  # type: ignore
+
     def chat(self, messages: list[dict], stream: bool = True) -> str:
         """Send messages and return the full assistant reply."""
         try:
             if stream:
                 return self._stream_chat(messages)
             else:
-                resp = self._client.chat.completions.create(
+                resp = self._retry(
+                    self._client.chat.completions.create,
                     model=self.model,
                     messages=messages,
                     temperature=0.4,
                 )
+                if resp.usage:
+                    self.total_prompt_tokens += resp.usage.prompt_tokens
+                    self.total_completion_tokens += resp.usage.completion_tokens
                 return resp.choices[0].message.content or ""
         except AuthenticationError:
             return "[ERROR] Invalid API key. Set OPENAI_API_KEY in config.py or as an environment variable."
         except APIConnectionError as exc:
-            return f"[ERROR] Cannot connect to the API endpoint: {exc}"
+            return f"[ERROR] Cannot connect to the API endpoint after {self.MAX_RETRIES} retries: {exc}"
         except Exception as exc:
             return f"[ERROR] API error: {exc}"
 
@@ -132,23 +169,29 @@ class OpenAIClient:
         console.print()
 
         try:
-            with self._client.chat.completions.create(
+            stream_resp = self._retry(
+                self._client.chat.completions.create,
                 model=self.model,
                 messages=messages,
                 temperature=0.4,
                 stream=True,
-            ) as stream:
+            )
+            with stream_resp as stream:
                 console.print("[bold cyan]Assistant:[/bold cyan] ", end="")
                 for chunk in stream:
                     token = chunk.choices[0].delta.content or ""
                     if token:
                         full.append(token)
                         print(token, end="", flush=True)
+                    # Track usage from the final chunk if available
+                    if hasattr(chunk, 'usage') and chunk.usage:
+                        self.total_prompt_tokens += chunk.usage.prompt_tokens
+                        self.total_completion_tokens += chunk.usage.completion_tokens
         except AuthenticationError:
             console.print("\n[red]Invalid API key. Set OPENAI_API_KEY in config.py or as an environment variable.[/red]")
             return "[ERROR] Invalid API key."
         except APIConnectionError as exc:
-            console.print(f"\n[red]Connection error: {exc}[/red]")
+            console.print(f"\n[red]Connection error after retries: {exc}[/red]")
             return f"[ERROR] Cannot connect to the API endpoint: {exc}"
         except Exception as exc:
             console.print(f"\n[red]Stream error: {exc}[/red]")
@@ -199,12 +242,47 @@ def _run_tool(call: dict) -> str:
 
 # ── Main agent class ───────────────────────────────────────────────────────────
 
+HISTORY_DIR = Path(__file__).parent / "chat_history"
+
+
 class CodingAgent:
     def __init__(self, model: str = config.DEFAULT_MODEL):
         self.model = model
         self.client = OpenAIClient(model)
         self.history: list[dict] = []
         self.system_prompt = _build_system_prompt()
+        self._session_file: Optional[Path] = None
+        self._load_last_session()
+
+    # ── History persistence ─────────────────────────────────────────────────────
+
+    def _load_last_session(self):
+        """Load the most recent session file if it exists."""
+        HISTORY_DIR.mkdir(exist_ok=True)
+        files = sorted(HISTORY_DIR.glob("session_*.json"), reverse=True)
+        if files:
+            try:
+                data = json.loads(files[0].read_text(encoding="utf-8"))
+                self.history = data.get("messages", [])
+                self._session_file = files[0]
+                console.print(f"[dim]Resumed session: {files[0].name} ({len(self.history)} messages)[/dim]")
+            except Exception:
+                self._new_session_file()
+        else:
+            self._new_session_file()
+
+    def _new_session_file(self):
+        HISTORY_DIR.mkdir(exist_ok=True)
+        ts = time.strftime("%Y%m%d_%H%M%S")
+        self._session_file = HISTORY_DIR / f"session_{ts}.json"
+
+    def _save_history(self):
+        if self._session_file:
+            data = {"model": self.model, "messages": self.history}
+            self._session_file.write_text(
+                json.dumps(data, indent=2, ensure_ascii=False),
+                encoding="utf-8",
+            )
 
     # ── Public API ──────────────────────────────────────────────────────────────
 
@@ -214,12 +292,21 @@ class CodingAgent:
         Side effects: prints progress to the terminal.
         """
         self.history.append({"role": "user", "content": user_message})
-        return self._react_loop()
+        reply = self._react_loop()
+        self._save_history()
+        return reply
 
     def reset(self):
-        """Clear conversation history."""
+        """Clear conversation history and start a new session file."""
         self.history = []
-        console.print("[dim]Conversation cleared.[/dim]")
+        self._new_session_file()
+        console.print("[dim]Conversation cleared. New session started.[/dim]")
+
+    def switch_model(self, new_model: str):
+        """Switch the model mid-session."""
+        self.model = new_model
+        self.client.model = new_model
+        console.print(f"[green]Switched to model: {new_model}[/green]")
 
     # ── ReAct loop ──────────────────────────────────────────────────────────────
 
