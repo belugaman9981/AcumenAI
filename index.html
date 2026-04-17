@@ -637,6 +637,40 @@
     </div>
 </div>
 
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal-card" style="max-width:440px;text-align:left">
+        <button class="modal-close" onclick="document.getElementById('settingsModal').classList.remove('active')">&times;</button>
+        <div class="modal-logo" style="text-align:center">Settings</div>
+        <div class="modal-sub" style="text-align:center">Configure your AI provider to chat from the browser.</div>
+        <div class="input-group">
+            <label>API Provider</label>
+            <select id="settingsProvider" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.92rem">
+                <option value="openrouter">OpenRouter</option>
+                <option value="openai">OpenAI</option>
+                <option value="local">Local (LM Studio / Ollama)</option>
+            </select>
+        </div>
+        <div class="input-group" id="apiKeyGroup">
+            <label>API Key</label>
+            <div class="input-wrap-field">
+                <input type="password" id="settingsApiKey" placeholder="sk-or-... or sk-...">
+                <button class="eye-btn" onclick="togglePass('settingsApiKey', this)" type="button">&#128065;</button>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Model</label>
+            <input type="text" id="settingsModel" placeholder="anthropic/claude-3.5-sonnet" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.92rem">
+        </div>
+        <div class="input-group" id="localUrlGroup" style="display:none">
+            <label>Base URL</label>
+            <input type="text" id="settingsBaseUrl" placeholder="http://localhost:1234/v1" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.92rem">
+        </div>
+        <button class="auth-btn" onclick="saveSettings()" style="margin-top:10px">Save Settings</button>
+        <div id="settingsStatus" style="margin-top:10px;font-size:.82rem;color:var(--text3);text-align:center"></div>
+    </div>
+</div>
+
 <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â• APP SHELL â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div class="app" id="app">
     <div class="sidebar">
@@ -657,6 +691,7 @@
         <div class="main-header">
             <span id="chatTitle">New chat</span>
             <span class="model-badge">AcumenAI</span>
+            <button id="settingsBtn" style="margin-left:auto;background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer;padding:6px 10px;border-radius:8px;transition:all .2s" title="Settings">&#9881;</button>
         </div>
         <div class="messages" id="messages">
             <div class="welcome-screen" id="welcomeScreen">
@@ -956,21 +991,107 @@ function sendMessage() {
     });
 }
 
-// -- AI Replies via backend API --
-const API_URL = "http://localhost:5820";
+// -- Settings --
+const PROVIDER_URLS = {
+    openrouter: 'https://openrouter.ai/api/v1/chat/completions',
+    openai: 'https://api.openai.com/v1/chat/completions',
+    local: null,
+};
+const DEFAULT_MODELS = {
+    openrouter: 'anthropic/claude-3.5-sonnet',
+    openai: 'gpt-4o',
+    local: 'default',
+};
+function loadSettings() {
+    return {
+        provider: localStorage.getItem('acumen_provider') || 'openrouter',
+        apiKey: localStorage.getItem('acumen_apikey') || '',
+        model: localStorage.getItem('acumen_model') || '',
+        baseUrl: localStorage.getItem('acumen_baseurl') || 'http://localhost:1234/v1',
+    };
+}
+function saveSettings() {
+    const provider = $('settingsProvider').value;
+    const apiKey = $('settingsApiKey').value.trim();
+    const model = $('settingsModel').value.trim();
+    const baseUrl = $('settingsBaseUrl').value.trim();
+    localStorage.setItem('acumen_provider', provider);
+    localStorage.setItem('acumen_apikey', apiKey);
+    if (model) localStorage.setItem('acumen_model', model);
+    if (baseUrl) localStorage.setItem('acumen_baseurl', baseUrl);
+    $('settingsStatus').textContent = 'Settings saved!';
+    $('settingsModal').classList.remove('active');
+}
+function openSettings() {
+    const s = loadSettings();
+    $('settingsProvider').value = s.provider;
+    $('settingsApiKey').value = s.apiKey;
+    $('settingsModel').value = s.model || DEFAULT_MODELS[s.provider] || '';
+    $('settingsBaseUrl').value = s.baseUrl;
+    toggleProviderFields();
+    $('settingsModal').classList.add('active');
+}
+function toggleProviderFields() {
+    const p = $('settingsProvider').value;
+    $('apiKeyGroup').style.display = p === 'local' ? 'none' : 'block';
+    $('localUrlGroup').style.display = p === 'local' ? 'block' : 'none';
+    const modelEl = $('settingsModel');
+    if (!modelEl.value || Object.values(DEFAULT_MODELS).includes(modelEl.value)) {
+        modelEl.value = DEFAULT_MODELS[p] || '';
+    }
+}
+$('settingsBtn').addEventListener('click', openSettings);
+$('settingsProvider').addEventListener('change', toggleProviderFields);
+$('settingsModal').addEventListener('click', e => {
+    if (e.target === $('settingsModal')) $('settingsModal').classList.remove('active');
+});
 
+let conversationHistory = [];
+function resetConversation() { conversationHistory = []; }
+
+// -- AI Replies via direct API call --
 async function generateReply(msg) {
+    const s = loadSettings();
+    if (!s.apiKey && s.provider !== 'local') {
+        openSettings();
+        return 'Please set your API key in Settings (click the \u2699 gear icon) to start chatting.';
+    }
+    const model = s.model || DEFAULT_MODELS[s.provider] || 'anthropic/claude-3.5-sonnet';
+    let url;
+    if (s.provider === 'local') {
+        url = (s.baseUrl || 'http://localhost:1234/v1').replace(/\/+$/, '') + '/chat/completions';
+    } else {
+        url = PROVIDER_URLS[s.provider];
+    }
+    conversationHistory.push({ role: 'user', content: msg });
+    if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
+    const messages = [
+        { role: 'system', content: 'You are AcumenAI, an expert coding assistant. Be concise but thorough. Format code with markdown fences.' },
+        ...conversationHistory
+    ];
     try {
-        const resp = await fetch(API_URL + "/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: msg }),
+        const headers = { 'Content-Type': 'application/json' };
+        if (s.apiKey) headers['Authorization'] = 'Bearer ' + s.apiKey;
+        if (s.provider === 'openrouter') headers['HTTP-Referer'] = window.location.href;
+        const resp = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ model, messages, temperature: 0.4 }),
         });
-        if (!resp.ok) throw new Error("HTTP " + resp.status);
+        if (!resp.ok) {
+            const err = await resp.text();
+            throw new Error('HTTP ' + resp.status + ': ' + err.slice(0, 200));
+        }
         const data = await resp.json();
-        return data.reply || "(empty response)";
+        const reply = (data.choices && data.choices[0] && data.choices[0].message) ? data.choices[0].message.content : '(empty response)';
+        conversationHistory.push({ role: 'assistant', content: reply });
+        return reply;
     } catch (e) {
-        return "Could not reach AcumenAI backend. Start it with:\n\n```\ncd local-ai-agent\npip install flask flask-cors\npython api_server.py\n```\n\nThen refresh this page and try again.";
+        conversationHistory.pop();
+        if (e.message.includes('401') || e.message.includes('403')) {
+            return 'Invalid API key. Click the \u2699 gear icon to update your settings.';
+        }
+        return 'Error: ' + e.message + '\nClick the \u2699 gear icon to check your settings.';
     }
 }
 
