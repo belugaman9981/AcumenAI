@@ -660,7 +660,7 @@
         </div>
         <div class="input-group">
             <label>Model</label>
-            <input type="text" id="settingsModel" placeholder="anthropic/claude-3.5-sonnet" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.92rem">
+            <input type="text" id="settingsModel" placeholder="google/gemma-4-31b-it:free" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.92rem">
         </div>
         <div class="input-group" id="localUrlGroup" style="display:none">
             <label>Base URL</label>
@@ -998,7 +998,7 @@ const PROVIDER_URLS = {
     local: null,
 };
 const DEFAULT_MODELS = {
-    openrouter: 'anthropic/claude-3.5-sonnet',
+    openrouter: 'google/gemma-4-31b-it:free',
     openai: 'gpt-4o',
     local: 'default',
 };
@@ -1056,7 +1056,7 @@ async function generateReply(msg) {
         openSettings();
         return 'Please set your API key in Settings (click the \u2699 gear icon) to start chatting.';
     }
-    const model = s.model || DEFAULT_MODELS[s.provider] || 'anthropic/claude-3.5-sonnet';
+    const model = s.model || DEFAULT_MODELS[s.provider] || 'google/gemma-4-31b-it:free';
     let url;
     if (s.provider === 'local') {
         url = (s.baseUrl || 'http://localhost:1234/v1').replace(/\/+$/, '') + '/chat/completions';
@@ -1076,7 +1076,7 @@ async function generateReply(msg) {
         const resp = await fetch(url, {
             method: 'POST',
             headers,
-            body: JSON.stringify({ model, messages, temperature: 0.4 }),
+            body: JSON.stringify({ model, messages, temperature: 0.4, max_tokens: 2048 }),
         });
         if (!resp.ok) {
             const err = await resp.text();
