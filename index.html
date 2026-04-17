@@ -504,6 +504,8 @@
 
 <!-- Theme Toggle -->
 <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">&#9790;</button>
+<!-- Settings Toggle (always visible) -->
+<button class="theme-toggle" id="settingsBtnGlobal" title="Settings" style="right:64px">&#9881;</button>
 
 <div class="bg-glow"></div>
 
@@ -1041,6 +1043,7 @@ function toggleProviderFields() {
     }
 }
 $('settingsBtn').addEventListener('click', openSettings);
+$('settingsBtnGlobal').addEventListener('click', openSettings);
 $('settingsProvider').addEventListener('change', toggleProviderFields);
 $('settingsModal').addEventListener('click', e => {
     if (e.target === $('settingsModal')) $('settingsModal').classList.remove('active');
