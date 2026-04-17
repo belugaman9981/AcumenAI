@@ -31,6 +31,7 @@ from rich.panel import Panel
 from rich.text import Text
 
 import config
+from brain import EvolutionBrain
 from tools import TOOLS
 
 console = Console()
@@ -251,6 +252,9 @@ class CodingAgent:
         self.client = OpenAIClient(model)
         self.history: list[dict] = []
         self.system_prompt = _build_system_prompt()
+        self.brain = EvolutionBrain(Path(config.BRAIN_STATE_FILE))
+        self._last_user_message: str = ""
+        self._last_reply: str = ""
         self._session_file: Optional[Path] = None
         self._load_last_session()
 
@@ -291,10 +295,47 @@ class CodingAgent:
         Process a user message through the ReAct loop and return the final reply.
         Side effects: prints progress to the terminal.
         """
+        self._last_user_message = user_message
         self.history.append({"role": "user", "content": user_message})
         reply = self._react_loop()
+        self._last_reply = reply
         self._save_history()
         return reply
+
+    def feedback_last_reply(self, liked: bool) -> str:
+        if not self._last_user_message or not self._last_reply:
+            return "No previous exchange to rate yet."
+        self.brain.record_feedback(self._last_user_message, self._last_reply, liked=liked)
+        verdict = "liked" if liked else "disliked"
+        return f"Saved feedback: {verdict}."
+
+    def brain_status(self) -> str:
+        return self.brain.status()
+
+    def brain_init(self, population: int) -> str:
+        self.brain.init_population(population)
+        return f"Brain initialized with {max(4, int(population))} bots."
+
+    def brain_add_image(self, label: str, file_path: str) -> str:
+        return self.brain.add_image_sample(label=label, file_path=file_path)
+
+    def brain_add_text(self, file_path: str) -> str:
+        return self.brain.add_text_file(file_path=file_path)
+
+    def brain_train(self, generations: int) -> str:
+        stats = self.brain.train(generations=generations)
+        hist = ", ".join(f"{v:.4f}" for v in stats["history"][-5:])
+        return (
+            f"Training complete: generations={stats['generations']}, "
+            f"best={stats['best_score']:.4f}, avg={stats['avg_score']:.4f}, "
+            f"population={stats['population']}, recent_history=[{hist}]"
+        )
+
+    def brain_guess(self, file_path: str) -> str:
+        return self.brain.guess_image(file_path=file_path)
+
+    def brain_next(self, prefix: str, out_len: int = 80) -> str:
+        return self.brain.predict_next_text(prefix=prefix, out_len=out_len)
 
     def reset(self):
         """Clear conversation history and start a new session file."""
@@ -311,8 +352,15 @@ class CodingAgent:
     # ── ReAct loop ──────────────────────────────────────────────────────────────
 
     def _react_loop(self) -> str:
+        style_hint = self.brain.style_hint(self._last_user_message)
+        runtime_prompt = (
+            self.system_prompt
+            + "\n\n## Learned user preference hint\n"
+            + style_hint
+            + "\nUse this as a soft preference, not a hard constraint."
+        )
         messages = [
-            {"role": "system", "content": self.system_prompt},
+            {"role": "system", "content": runtime_prompt},
             *self.history,
         ]
 
