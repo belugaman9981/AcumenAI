@@ -41,6 +41,9 @@ from wiki_ingest import (
 from screenshot import screenshot_and_read, extract_text_from_file, analyze_screenshot
 from voice import speak, speak_async, listen, check_voice_available
 from multi_agent import MultiAgentDebate, list_personas
+from plugins import load_plugins, reload_plugins, list_plugins
+from codebase_index import CodebaseIndex
+from self_improve import PromptEvolver
 from tools import TOOLS
 
 console = Console()
@@ -262,9 +265,14 @@ class CodingAgent:
         self.history: list[dict] = []
         self.system_prompt = _build_system_prompt()
         self.brain = EvolutionBrain(Path(config.BRAIN_STATE_FILE))
+        self.codebase = CodebaseIndex()
         self._last_user_message: str = ""
         self._last_reply: str = ""
         self._session_file: Optional[Path] = None
+        # Load plugins into the shared TOOLS dict
+        load_plugins(TOOLS)
+        # Self-improving prompt evolver (initialized after client is ready)
+        self._prompt_evolver: Optional[PromptEvolver] = None
         self._load_last_session()
 
     # ── History persistence ─────────────────────────────────────────────────────
@@ -315,6 +323,7 @@ class CodingAgent:
         if not self._last_user_message or not self._last_reply:
             return "No previous exchange to rate yet."
         self.brain.record_feedback(self._last_user_message, self._last_reply, liked=liked)
+        self.prompt_evolver.record_feedback(liked, self._last_user_message, self._last_reply)
         verdict = "liked" if liked else "disliked"
         return f"Saved feedback: {verdict}."
 
@@ -398,6 +407,65 @@ class CodingAgent:
         d = MultiAgentDebate(client=self.client, panel=panel)
         return d.quick_vote(question)
 
+    # ── Prompt evolver (lazy init) ──────────────────────────────────────────────
+
+    @property
+    def prompt_evolver(self) -> PromptEvolver:
+        if self._prompt_evolver is None:
+            self._prompt_evolver = PromptEvolver(
+                default_prompt=self.system_prompt,
+                client=self.client._client,
+            )
+        return self._prompt_evolver
+
+    # ── Codebase index ──────────────────────────────────────────────────────────
+
+    def index_codebase(self, path: str) -> str:
+        return self.codebase.index_directory(path)
+
+    def search_codebase(self, query: str) -> str:
+        return self.codebase.search(query)
+
+    def search_symbols(self, query: str) -> str:
+        return self.codebase.search_symbols(query)
+
+    def codebase_tree(self) -> str:
+        return self.codebase.tree()
+
+    def codebase_stats(self) -> str:
+        return self.codebase.stats()
+
+    def codebase_file(self, rel_path: str) -> str:
+        return self.codebase.file_summary(rel_path)
+
+    # ── Plugins ─────────────────────────────────────────────────────────────────
+
+    def reload_plugins(self) -> str:
+        loaded = reload_plugins(TOOLS)
+        if loaded:
+            self.system_prompt = _build_system_prompt()  # rebuild with new tools
+            return f"Reloaded plugins: {', '.join(loaded)}"
+        return "No plugins found."
+
+    def list_plugins(self) -> str:
+        return list_plugins()
+
+    # ── Self-improving prompts ──────────────────────────────────────────────────
+
+    def evolve_prompt(self) -> str:
+        return self.prompt_evolver.evolve_prompt()
+
+    def prompt_status(self) -> str:
+        return self.prompt_evolver.status()
+
+    def prompt_rollback(self, version: int | None = None) -> str:
+        result = self.prompt_evolver.rollback(version)
+        self.system_prompt = self.prompt_evolver.get_prompt()
+        return result
+
+    def show_prompt(self) -> str:
+        return self.prompt_evolver.show_prompt()
+
     def reset(self):
         """Clear conversation history and start a new session file."""
         self.history = []
@@ -414,8 +482,10 @@ class CodingAgent:
 
     def _react_loop(self) -> str:
         style_hint = self.brain.style_hint(self._last_user_message)
+        # Use the evolved prompt if available, otherwise the base system prompt
+        base_prompt = self.prompt_evolver.get_prompt() if self._prompt_evolver else self.system_prompt
         runtime_prompt = (
-            self.system_prompt
+            base_prompt
             + "\n\n## Learned user preference hint\n"
             + style_hint
             + "\nUse this as a soft preference, not a hard constraint."
