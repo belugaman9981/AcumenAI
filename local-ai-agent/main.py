@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import threading
 import sys
+import shlex
 
 from rich.console import Console
 from rich.panel import Panel
@@ -26,6 +27,7 @@ from rich import box
 import config
 from agent import CodingAgent
 from background import BackgroundCrawler, get_recent_discoveries
+from multi_agent import list_personas
 
 console = Console()
 
@@ -48,7 +50,7 @@ def print_banner(model: str):
         Panel(
             f"[bold]Model:[/bold] [green]{model}[/green]  |  "
             f"[bold]Tools:[/bold] web search · web scrape · GitHub\n\n"
-            "[dim]Commands:  /help  /reset  /discoveries  /models  /quit[/dim]",
+            "[dim]Commands:  /help  /reset  /brain  /like  /dislike  /discoveries  /models  /quit[/dim]",
             title="[bold white]Local AI Coding Agent[/bold white]",
             border_style="cyan",
         )
@@ -67,6 +69,17 @@ HELP_TEXT = """
   [yellow]/models[/yellow]         List models available on the current API endpoint
   [yellow]/model <name>[/yellow]   Switch to a different model mid-session
   [yellow]/usage[/yellow]          Show token usage for this session
+    [yellow]/like[/yellow]           Mark the last reply as good (preference learning)
+    [yellow]/dislike[/yellow]        Mark the last reply as bad (preference learning)
+    [yellow]/brain ...[/yellow]      Control local evolutionary learning brain
+    [yellow]/screenshot[/yellow]     Capture screen and extract text via OCR
+    [yellow]/ocr <path>[/yellow]     Extract text from an image file
+    [yellow]/speak[/yellow]          Read the last reply aloud
+    [yellow]/voice[/yellow]          Speak your next message via microphone
+    [yellow]/voice-status[/yellow]   Check voice feature availability
+    [yellow]/debate <question>[/yellow]  Multi-agent debate (2 rounds, 3 agents)
+    [yellow]/vote <question>[/yellow]    Quick multi-agent vote (1 sentence each)
+    [yellow]/personas[/yellow]       List available debate personas
   [yellow]/quit[/yellow]           Exit the agent
 
 [bold cyan]Tips:[/bold cyan]
@@ -74,6 +87,19 @@ HELP_TEXT = """
   • The agent can read/write local files and run code snippets.
   • The background crawler runs silently while you're not chatting.
   • Set GITHUB_TOKEN in config.py for 5 000 GitHub API calls/hour.
+
+[bold cyan]/brain commands:[/bold cyan]
+    [yellow]/brain status[/yellow]
+    [yellow]/brain init <population>[/yellow]
+    [yellow]/brain add-image <label> <path>[/yellow]
+    [yellow]/brain add-text <path>[/yellow]
+    [yellow]/brain train <generations>[/yellow]
+    [yellow]/brain guess <path>[/yellow]
+    [yellow]/brain next <prefix text>[/yellow]
+    [yellow]/brain wiki <title>[/yellow]          Ingest one Wikipedia article
+    [yellow]/brain wiki-search <query>[/yellow]    Search & ingest top Wikipedia results
+    [yellow]/brain wiki-random [count][/yellow]    Ingest random Wikipedia articles
+    [yellow]/brain wiki-crawl [rounds][/yellow]    Auto-crawl Wikipedia and train
 """
 
 
@@ -124,6 +150,109 @@ def show_models(agent: CodingAgent):
         console.print(f"  • {m}{marker}")
 
 
+def handle_brain_command(arg: str, agent: CodingAgent):
+    try:
+        parts = shlex.split(arg)
+    except ValueError as exc:
+        console.print(f"[yellow]Could not parse /brain command: {exc}[/yellow]")
+        return
+
+    if not parts:
+        console.print("[yellow]Usage: /brain <status|init|add-image|add-text|train|guess|next> ...[/yellow]")
+        return
+
+    cmd = parts[0].lower()
+    if cmd == "status":
+        console.print(f"[cyan]{agent.brain_status()}[/cyan]")
+        return
+
+    if cmd == "init":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain init <population>[/yellow]")
+            return
+        console.print(f"[green]{agent.brain_init(int(parts[1]))}[/green]")
+        return
+
+    if cmd == "add-image":
+        if len(parts) < 3:
+            console.print("[yellow]Usage: /brain add-image <label> <path>[/yellow]")
+            return
+        label = parts[1]
+        path = " ".join(parts[2:])
+        console.print(f"[green]{agent.brain_add_image(label, path)}[/green]")
+        return
+
+    if cmd == "add-text":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain add-text <path>[/yellow]")
+            return
+        path = " ".join(parts[1:])
+        console.print(f"[green]{agent.brain_add_text(path)}[/green]")
+        return
+
+    if cmd == "train":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain train <generations>[/yellow]")
+            return
+        with console.status("[dim]Training evolutionary brain...[/dim]"):
+            out = agent.brain_train(int(parts[1]))
+        console.print(f"[green]{out}[/green]")
+        return
+
+    if cmd == "guess":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain guess <path>[/yellow]")
+            return
+        path = " ".join(parts[1:])
+        console.print(f"[green]{agent.brain_guess(path)}[/green]")
+        return
+
+    if cmd == "next":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain next <prefix text>[/yellow]")
+            return
+        prefix = " ".join(parts[1:])
+        console.print(f"[cyan]{agent.brain_next(prefix, out_len=90)}[/cyan]")
+        return
+
+    if cmd == "wiki":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain wiki <article title>[/yellow]")
+            return
+        title = " ".join(parts[1:])
+        with console.status(f"[dim]Fetching Wikipedia: {title}…[/dim]"):
+            out = agent.brain_wiki_article(title)
+        console.print(f"[green]{out}[/green]")
+        return
+
+    if cmd == "wiki-search":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain wiki-search <query>[/yellow]")
+            return
+        query = " ".join(parts[1:])
+        with console.status(f"[dim]Searching Wikipedia: {query}…[/dim]"):
+            out = agent.brain_wiki_search(query, max_articles=5)
+        console.print(f"[green]{out}[/green]")
+        return
+
+    if cmd == "wiki-random":
+        count = int(parts[1]) if len(parts) > 1 else 5
+        with console.status(f"[dim]Fetching {count} random Wikipedia articles…[/dim]"):
+            out = agent.brain_wiki_random(count=count)
+        console.print(f"[green]{out}[/green]")
+        return
+
+    if cmd == "wiki-crawl":
+        rounds = int(parts[1]) if len(parts) > 1 else 10
+        per_round = int(parts[2]) if len(parts) > 2 else 5
+        console.print(f"[cyan]Starting wiki crawl: {rounds} rounds, {per_round} articles each…[/cyan]")
+        out = agent.brain_wiki_crawl(rounds=rounds, per_round=per_round)
+        console.print(f"[green]{out}[/green]")
+        return
+
+    console.print(f"[yellow]Unknown /brain command '{cmd}'. Type /help for options.[/yellow]")
+
+
 # ── Command handler ────────────────────────────────────────────────────────────
 
 def handle_command(cmd: str, agent: CodingAgent) -> bool:
@@ -152,6 +281,54 @@ def handle_command(cmd: str, agent: CodingAgent) -> bool:
             console.print("[yellow]Usage: /model <model-name>[/yellow]")
     elif name == "/usage":
         console.print(f"[cyan]{agent.client.usage_summary()}[/cyan]")
+    elif name == "/like":
+        console.print(f"[green]{agent.feedback_last_reply(True)}[/green]")
+    elif name == "/dislike":
+        console.print(f"[yellow]{agent.feedback_last_reply(False)}[/yellow]")
+    elif name == "/brain":
+        handle_brain_command(arg, agent)
+    elif name == "/screenshot":
+        with console.status("[dim]Capturing screen...[/dim]"):
+            out = agent.take_screenshot()
+        console.print(f"[green]{out}[/green]")
+    elif name == "/ocr":
+        if not arg:
+            console.print("[yellow]Usage: /ocr <image path>[/yellow]")
+        else:
+            out = agent.read_image_text(arg.strip())
+            console.print(f"[green]{out}[/green]")
+    elif name == "/speak":
+        console.print(f"[cyan]{agent.speak_last_reply()}[/cyan]")
+    elif name == "/voice":
+        console.print("[cyan]Listening via microphone...[/cyan]")
+        text = agent.voice_input()
+        if text.startswith("[VOICE_ERROR]"):
+            console.print(f"[red]{text}[/red]")
+        else:
+            console.print(f"[bold blue]You (voice):[/bold blue] {text}")
+            if crawler:
+                crawler.set_busy()
+            try:
+                agent.chat(text)
+            except KeyboardInterrupt:
+                console.print("[dim]Interrupted.[/dim]")
+            finally:
+                if crawler:
+                    crawler.set_idle()
+    elif name == "/voice-status":
+        console.print(f"[cyan]{agent.voice_status()}[/cyan]")
+    elif name == "/debate":
+        if not arg:
+            console.print("[yellow]Usage: /debate <question>[/yellow]")
+        else:
+            agent.debate(arg)
+    elif name == "/vote":
+        if not arg:
+            console.print("[yellow]Usage: /vote <question>[/yellow]")
+        else:
+            agent.quick_vote(arg)
+    elif name == "/personas":
+        console.print(f"[cyan]{list_personas()}[/cyan]")
     else:
         console.print(f"[yellow]Unknown command '{name}'. Type /help for help.[/yellow]")
     return True

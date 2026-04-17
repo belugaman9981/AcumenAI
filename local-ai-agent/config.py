@@ -48,3 +48,7 @@ MIN_STARS = 1_000
 SHOW_TOOL_CALLS = True    # Print tool name + args as the agent runs
 SHOW_THOUGHTS   = True    # Print the agent's reasoning steps
 
+# ── Evolutionary brain ───────────────────────────────────────────────────────
+BRAIN_STATE_FILE = "brain_state.json"
+DEFAULT_BRAIN_POPULATION = 24
+

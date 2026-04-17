@@ -6,3 +6,13 @@ duckduckgo-search>=6.1.0
 openai>=1.0.0
 lxml>=5.1.0
 
+# Screenshot analyzer
+Pillow>=10.0.0
+mss>=9.0.0
+pytesseract>=0.3.10
+
+# Voice mode (optional — install for /voice and /speak)
+pyttsx3>=2.90
+SpeechRecognition>=3.10.0
+# pyaudio>=0.2.14  # uncomment if you want mic input; may need: pipwin install pyaudio
+
