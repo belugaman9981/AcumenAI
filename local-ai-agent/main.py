@@ -80,6 +80,18 @@ HELP_TEXT = """
     [yellow]/debate <question>[/yellow]  Multi-agent debate (2 rounds, 3 agents)
     [yellow]/vote <question>[/yellow]    Quick multi-agent vote (1 sentence each)
     [yellow]/personas[/yellow]       List available debate personas
+    [yellow]/index <path>[/yellow]     Index a codebase directory
+    [yellow]/search <query>[/yellow]   Search indexed codebase
+    [yellow]/symbols <query>[/yellow]  Search functions/classes in codebase
+    [yellow]/tree[/yellow]            Show indexed codebase tree
+    [yellow]/codestats[/yellow]       Show codebase index statistics
+    [yellow]/file <path>[/yellow]      Summarize an indexed file
+    [yellow]/plugins[/yellow]         List loaded plugins
+    [yellow]/reload-plugins[/yellow]  Reload all plugins
+    [yellow]/evolve[/yellow]          Auto-evolve system prompt from feedback
+    [yellow]/prompt-status[/yellow]   Show prompt evolution status
+    [yellow]/prompt-rollback[/yellow] Roll back to previous prompt version
+    [yellow]/show-prompt[/yellow]     Display current system prompt
   [yellow]/quit[/yellow]           Exit the agent
 
 [bold cyan]Tips:[/bold cyan]
@@ -329,6 +341,47 @@ def handle_command(cmd: str, agent: CodingAgent) -> bool:
             agent.quick_vote(arg)
     elif name == "/personas":
         console.print(f"[cyan]{list_personas()}[/cyan]")
+    elif name == "/index":
+        if not arg:
+            console.print("[yellow]Usage: /index <directory path>[/yellow]")
+        else:
+            with console.status("[dim]Indexing codebase...[/dim]"):
+                out = agent.index_codebase(arg.strip())
+            console.print(f"[green]{out}[/green]")
+    elif name == "/search":
+        if not arg:
+            console.print("[yellow]Usage: /search <query>[/yellow]")
+        else:
+            console.print(f"[cyan]{agent.search_codebase(arg.strip())}[/cyan]")
+    elif name == "/symbols":
+        if not arg:
+            console.print("[yellow]Usage: /symbols <query>[/yellow]")
+        else:
+            console.print(f"[cyan]{agent.search_symbols(arg.strip())}[/cyan]")
+    elif name == "/tree":
+        console.print(f"[cyan]{agent.codebase_tree()}[/cyan]")
+    elif name == "/codestats":
+        console.print(f"[cyan]{agent.codebase_stats()}[/cyan]")
+    elif name == "/file":
+        if not arg:
+            console.print("[yellow]Usage: /file <relative path>[/yellow]")
+        else:
+            console.print(f"[cyan]{agent.codebase_file(arg.strip())}[/cyan]")
+    elif name == "/plugins":
+        console.print(f"[cyan]{agent.list_plugins()}[/cyan]")
+    elif name == "/reload-plugins":
+        console.print(f"[green]{agent.reload_plugins()}[/green]")
+    elif name == "/evolve":
+        with console.status("[dim]Evolving system prompt from feedback...[/dim]"):
+            out = agent.evolve_prompt()
+        console.print(f"[green]{out}[/green]")
+    elif name == "/prompt-status":
+        console.print(f"[cyan]{agent.prompt_status()}[/cyan]")
+    elif name == "/prompt-rollback":
+        version = int(arg) if arg.strip().isdigit() else None
+        console.print(f"[green]{agent.prompt_rollback(version)}[/green]")
+    elif name == "/show-prompt":
+        console.print(f"[cyan]{agent.show_prompt()}[/cyan]")
     else:
         console.print(f"[yellow]Unknown command '{name}'. Type /help for help.[/yellow]")
     return True
