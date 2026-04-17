@@ -87,6 +87,10 @@ HELP_TEXT = """
     [yellow]/brain train <generations>[/yellow]
     [yellow]/brain guess <path>[/yellow]
     [yellow]/brain next <prefix text>[/yellow]
+    [yellow]/brain wiki <title>[/yellow]          Ingest one Wikipedia article
+    [yellow]/brain wiki-search <query>[/yellow]    Search & ingest top Wikipedia results
+    [yellow]/brain wiki-random [count][/yellow]    Ingest random Wikipedia articles
+    [yellow]/brain wiki-crawl [rounds][/yellow]    Auto-crawl Wikipedia and train
 """
 
 
@@ -200,6 +204,41 @@ def handle_brain_command(arg: str, agent: CodingAgent):
             return
         prefix = " ".join(parts[1:])
         console.print(f"[cyan]{agent.brain_next(prefix, out_len=90)}[/cyan]")
+        return
+
+    if cmd == "wiki":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain wiki <article title>[/yellow]")
+            return
+        title = " ".join(parts[1:])
+        with console.status(f"[dim]Fetching Wikipedia: {title}…[/dim]"):
+            out = agent.brain_wiki_article(title)
+        console.print(f"[green]{out}[/green]")
+        return
+
+    if cmd == "wiki-search":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain wiki-search <query>[/yellow]")
+            return
+        query = " ".join(parts[1:])
+        with console.status(f"[dim]Searching Wikipedia: {query}…[/dim]"):
+            out = agent.brain_wiki_search(query, max_articles=5)
+        console.print(f"[green]{out}[/green]")
+        return
+
+    if cmd == "wiki-random":
+        count = int(parts[1]) if len(parts) > 1 else 5
+        with console.status(f"[dim]Fetching {count} random Wikipedia articles…[/dim]"):
+            out = agent.brain_wiki_random(count=count)
+        console.print(f"[green]{out}[/green]")
+        return
+
+    if cmd == "wiki-crawl":
+        rounds = int(parts[1]) if len(parts) > 1 else 10
+        per_round = int(parts[2]) if len(parts) > 2 else 5
+        console.print(f"[cyan]Starting wiki crawl: {rounds} rounds, {per_round} articles each…[/cyan]")
+        out = agent.brain_wiki_crawl(rounds=rounds, per_round=per_round)
+        console.print(f"[green]{out}[/green]")
         return
 
     console.print(f"[yellow]Unknown /brain command '{cmd}'. Type /help for options.[/yellow]")

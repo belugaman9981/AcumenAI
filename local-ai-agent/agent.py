@@ -32,6 +32,12 @@ from rich.text import Text
 
 import config
 from brain import EvolutionBrain
+from wiki_ingest import (
+    ingest_article_to_brain,
+    ingest_search_to_brain,
+    ingest_random_to_brain,
+    auto_crawl_wiki,
+)
 from tools import TOOLS
 
 console = Console()
@@ -336,6 +342,18 @@ class CodingAgent:
 
     def brain_next(self, prefix: str, out_len: int = 80) -> str:
         return self.brain.predict_next_text(prefix=prefix, out_len=out_len)
+
+    def brain_wiki_article(self, title: str) -> str:
+        return ingest_article_to_brain(self.brain, title)
+
+    def brain_wiki_search(self, query: str, max_articles: int = 5) -> str:
+        return ingest_search_to_brain(self.brain, query, max_articles=max_articles)
+
+    def brain_wiki_random(self, count: int = 5) -> str:
+        return ingest_random_to_brain(self.brain, count=count)
+
+    def brain_wiki_crawl(self, rounds: int = 10, per_round: int = 5) -> str:
+        return auto_crawl_wiki(self.brain, rounds=rounds, per_round=per_round)
 
     def reset(self):
         """Clear conversation history and start a new session file."""
