@@ -947,30 +947,31 @@ function sendMessage() {
     $('typingIndicator').classList.add('active');
     $('sendBtn').disabled = true;
 
-    setTimeout(() => {
-        const reply = generateReply(text);
+    generateReply(text).then(reply => {
         chat.messages.push({ role: 'ai', text: reply });
         $('typingIndicator').classList.remove('active');
         appendMessage('ai', reply);
         saveChats();
         $('sendBtn').disabled = false;
-    }, 800 + Math.random() * 1200);
+    });
 }
 
-// â”€â”€ Simulated Replies â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function generateReply(msg) {
-    const lower = msg.toLowerCase();
-    if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey'))
-        return "Hey! How can I help you today? I can write code, debug issues, search the web, or explore GitHub repos.";
-    if (lower.includes('python'))
-        return "Python is great! What would you like to build? I can help with scripts, web apps (Flask/Django), data analysis, automation, and more.\n\nJust describe what you need and I'll write the code for you.";
-    if (lower.includes('debug') || lower.includes('fix') || lower.includes('error'))
-        return "I'd be happy to help debug! Paste the code and the error message, and I'll track down the issue for you.";
-    if (lower.includes('github') || lower.includes('repo'))
-        return "I can search GitHub for you! I'll look for trending repos, explore notable developers, or fetch specific repository details.\n\nWhat are you looking for?";
-    if (lower.includes('async') || lower.includes('await'))
-        return "**async/await** lets you write asynchronous code that looks synchronous.\n\n```python\nimport asyncio\n\nasync def fetch_data():\n    await asyncio.sleep(1)\n    return \"data ready\"\n\nasync def main():\n    result = await fetch_data()\n    print(result)\n\nasyncio.run(main())\n```\n\nThe `async` keyword marks a function as a coroutine. `await` pauses execution until the awaited task completes, without blocking other tasks.";
-    return "I can help with that! To get the best results, connect this interface to the AcumenAI backend \u2014 it has web search, GitHub integration, file tools, and code execution built in.\n\nFor now, this is a UI preview. The full agent runs via `python main.py` in the local-ai-agent directory.";
+// -- AI Replies via backend API --
+const API_URL = "http://localhost:5820";
+
+async function generateReply(msg) {
+    try {
+        const resp = await fetch(API_URL + "/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: msg }),
+        });
+        if (!resp.ok) throw new Error("HTTP " + resp.status);
+        const data = await resp.json();
+        return data.reply || "(empty response)";
+    } catch (e) {
+        return "Could not reach AcumenAI backend. Start it with:\n\n```\ncd local-ai-agent\npip install flask flask-cors\npython api_server.py\n```\n\nThen refresh this page and try again.";
+    }
 }
 
 // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
