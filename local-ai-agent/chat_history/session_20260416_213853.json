@@ -4,6 +4,10 @@
     {
       "role": "user",
       "content": "hello"
+    },
+    {
+      "role": "user",
+      "content": "whats up"
     }
   ]
 }
