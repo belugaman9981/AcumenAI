@@ -15,6 +15,10 @@ Use OpenAI, OpenRouter, LM Studio, or another compatible endpoint.
 | 👤 Notable coders | Browse repos from Torvalds, Karpathy, Evan You… |
 | 🕷  Background crawler | Silently explores GitHub while you're away |
 | 💾 Discoveries DB | SQLite log of everything the crawler finds |
+| 🧬 Evolutionary brain | Population of bots, survivor selection, mutation/crossover |
+| 🖼 Image classifier training | Teach labels (bee/cow/etc.) from your own images |
+| ✍ Local next-text learner | Character-map learning from local text corpora |
+| 👍 Preference adaptation | Learns style from /like and /dislike feedback |
 
 ---
 
@@ -81,7 +85,34 @@ Options:
 | `/discoveries` | Show what the crawler found |
 | `/models` | List models on the current API endpoint |
 | `/model <name>` | Switch model mid-session |
+| `/like` | Mark last reply as good (preference learning) |
+| `/dislike` | Mark last reply as bad (preference learning) |
+| `/brain ...` | Control evolutionary brain |
 | `/quit` | Exit |
+
+### `/brain` commands
+
+```text
+/brain status
+/brain init <population>
+/brain add-image <label> <path>
+/brain add-text <path>
+/brain train <generations>
+/brain guess <path>
+/brain next <prefix text>
+```
+
+Example workflow:
+
+```text
+/brain init 100
+/brain add-image bee "C:/data/bee1.jpg"
+/brain add-image cow "C:/data/cow1.jpg"
+/brain train 40
+/brain guess "C:/data/test.jpg"
+```
+
+This keeps top-performing bots each generation and recycles weaker ones by replacing them with mutated/crossover descendants.
 
 ---
 

@@ -31,6 +31,16 @@ from rich.panel import Panel
 from rich.text import Text
 
 import config
+from brain import EvolutionBrain
+from wiki_ingest import (
+    ingest_article_to_brain,
+    ingest_search_to_brain,
+    ingest_random_to_brain,
+    auto_crawl_wiki,
+)
+from screenshot import screenshot_and_read, extract_text_from_file, analyze_screenshot
+from voice import speak, speak_async, listen, check_voice_available
+from multi_agent import MultiAgentDebate, list_personas
 from tools import TOOLS
 
 console = Console()
@@ -251,6 +261,9 @@ class CodingAgent:
         self.client = OpenAIClient(model)
         self.history: list[dict] = []
         self.system_prompt = _build_system_prompt()
+        self.brain = EvolutionBrain(Path(config.BRAIN_STATE_FILE))
+        self._last_user_message: str = ""
+        self._last_reply: str = ""
         self._session_file: Optional[Path] = None
         self._load_last_session()
 
@@ -291,10 +304,99 @@ class CodingAgent:
         Process a user message through the ReAct loop and return the final reply.
         Side effects: prints progress to the terminal.
         """
+        self._last_user_message = user_message
         self.history.append({"role": "user", "content": user_message})
         reply = self._react_loop()
+        self._last_reply = reply
         self._save_history()
         return reply
+
+    def feedback_last_reply(self, liked: bool) -> str:
+        if not self._last_user_message or not self._last_reply:
+            return "No previous exchange to rate yet."
+        self.brain.record_feedback(self._last_user_message, self._last_reply, liked=liked)
+        verdict = "liked" if liked else "disliked"
+        return f"Saved feedback: {verdict}."
+
+    def brain_status(self) -> str:
+        return self.brain.status()
+
+    def brain_init(self, population: int) -> str:
+        self.brain.init_population(population)
+        return f"Brain initialized with {max(4, int(population))} bots."
+
+    def brain_add_image(self, label: str, file_path: str) -> str:
+        return self.brain.add_image_sample(label=label, file_path=file_path)
+
+    def brain_add_text(self, file_path: str) -> str:
+        return self.brain.add_text_file(file_path=file_path)
+
+    def brain_train(self, generations: int) -> str:
+        stats = self.brain.train(generations=generations)
+        hist = ", ".join(f"{v:.4f}" for v in stats["history"][-5:])
+        return (
+            f"Training complete: generations={stats['generations']}, "
+            f"best={stats['best_score']:.4f}, avg={stats['avg_score']:.4f}, "
+            f"population={stats['population']}, recent_history=[{hist}]"
+        )
+
+    def brain_guess(self, file_path: str) -> str:
+        return self.brain.guess_image(file_path=file_path)
+
+    def brain_next(self, prefix: str, out_len: int = 80) -> str:
+        return self.brain.predict_next_text(prefix=prefix, out_len=out_len)
+
+    def brain_wiki_article(self, title: str) -> str:
+        return ingest_article_to_brain(self.brain, title)
+
+    def brain_wiki_search(self, query: str, max_articles: int = 5) -> str:
+        return ingest_search_to_brain(self.brain, query, max_articles=max_articles)
+
+    def brain_wiki_random(self, count: int = 5) -> str:
+        return ingest_random_to_brain(self.brain, count=count)
+
+    def brain_wiki_crawl(self, rounds: int = 10, per_round: int = 5) -> str:
+        return auto_crawl_wiki(self.brain, rounds=rounds, per_round=per_round)
+
+    # ── Screenshot ──────────────────────────────────────────────────────────────
+
+    def take_screenshot(self) -> str:
+        return screenshot_and_read(save=True)
+
+    def read_image_text(self, file_path: str) -> str:
+        return extract_text_from_file(file_path)
+
+    # ── Voice ───────────────────────────────────────────────────────────────────
+
+    def voice_status(self) -> str:
+        s = check_voice_available()
+        return (
+            f"TTS (text-to-speech): {'available' if s['tts'] else 'not installed (pip install pyttsx3)'}\n"
+            f"STT (speech-to-text): {'available' if s['stt'] else 'not installed (pip install SpeechRecognition pyaudio)'}\n"
+            f"Microphone: {'detected' if s['mic'] else 'not found'}"
+        )
+
+    def speak_last_reply(self) -> str:
+        if not self._last_reply:
+            return "No reply to speak yet."
+        speak_async(self._last_reply)
+        return "Speaking..."
+
+    def voice_input(self) -> str:
+        text = listen()
+        if text.startswith("[VOICE_ERROR]"):
+            return text
+        return text
+
+    # ── Multi-Agent Debate ──────────────────────────────────────────────────────
+
+    def debate(self, question: str, rounds: int = 2, panel: list[str] | None = None) -> str:
+        d = MultiAgentDebate(client=self.client, panel=panel)
+        return d.debate(question, rounds=rounds)
+
+    def quick_vote(self, question: str, panel: list[str] | None = None) -> str:
+        d = MultiAgentDebate(client=self.client, panel=panel)
+        return d.quick_vote(question)
 
     def reset(self):
         """Clear conversation history and start a new session file."""
@@ -311,8 +413,15 @@ class CodingAgent:
     # ── ReAct loop ──────────────────────────────────────────────────────────────
 
     def _react_loop(self) -> str:
+        style_hint = self.brain.style_hint(self._last_user_message)
+        runtime_prompt = (
+            self.system_prompt
+            + "\n\n## Learned user preference hint\n"
+            + style_hint
+            + "\nUse this as a soft preference, not a hard constraint."
+        )
         messages = [
-            {"role": "system", "content": self.system_prompt},
+            {"role": "system", "content": runtime_prompt},
             *self.history,
         ]
 
