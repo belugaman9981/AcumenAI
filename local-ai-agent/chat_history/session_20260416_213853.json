@@ -1,0 +1,9 @@
+{
+  "model": "anthropic/claude-3.5-sonnet",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello"
+    }
+  ]
+}
