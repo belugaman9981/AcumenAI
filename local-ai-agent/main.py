@@ -27,6 +27,7 @@ from rich import box
 import config
 from agent import CodingAgent
 from background import BackgroundCrawler, get_recent_discoveries
+from multi_agent import list_personas
 
 console = Console()
 
@@ -71,6 +72,14 @@ HELP_TEXT = """
     [yellow]/like[/yellow]           Mark the last reply as good (preference learning)
     [yellow]/dislike[/yellow]        Mark the last reply as bad (preference learning)
     [yellow]/brain ...[/yellow]      Control local evolutionary learning brain
+    [yellow]/screenshot[/yellow]     Capture screen and extract text via OCR
+    [yellow]/ocr <path>[/yellow]     Extract text from an image file
+    [yellow]/speak[/yellow]          Read the last reply aloud
+    [yellow]/voice[/yellow]          Speak your next message via microphone
+    [yellow]/voice-status[/yellow]   Check voice feature availability
+    [yellow]/debate <question>[/yellow]  Multi-agent debate (2 rounds, 3 agents)
+    [yellow]/vote <question>[/yellow]    Quick multi-agent vote (1 sentence each)
+    [yellow]/personas[/yellow]       List available debate personas
   [yellow]/quit[/yellow]           Exit the agent
 
 [bold cyan]Tips:[/bold cyan]
@@ -278,6 +287,48 @@ def handle_command(cmd: str, agent: CodingAgent) -> bool:
         console.print(f"[yellow]{agent.feedback_last_reply(False)}[/yellow]")
     elif name == "/brain":
         handle_brain_command(arg, agent)
+    elif name == "/screenshot":
+        with console.status("[dim]Capturing screen...[/dim]"):
+            out = agent.take_screenshot()
+        console.print(f"[green]{out}[/green]")
+    elif name == "/ocr":
+        if not arg:
+            console.print("[yellow]Usage: /ocr <image path>[/yellow]")
+        else:
+            out = agent.read_image_text(arg.strip())
+            console.print(f"[green]{out}[/green]")
+    elif name == "/speak":
+        console.print(f"[cyan]{agent.speak_last_reply()}[/cyan]")
+    elif name == "/voice":
+        console.print("[cyan]Listening via microphone...[/cyan]")
+        text = agent.voice_input()
+        if text.startswith("[VOICE_ERROR]"):
+            console.print(f"[red]{text}[/red]")
+        else:
+            console.print(f"[bold blue]You (voice):[/bold blue] {text}")
+            if crawler:
+                crawler.set_busy()
+            try:
+                agent.chat(text)
+            except KeyboardInterrupt:
+                console.print("[dim]Interrupted.[/dim]")
+            finally:
+                if crawler:
+                    crawler.set_idle()
+    elif name == "/voice-status":
+        console.print(f"[cyan]{agent.voice_status()}[/cyan]")
+    elif name == "/debate":
+        if not arg:
+            console.print("[yellow]Usage: /debate <question>[/yellow]")
+        else:
+            agent.debate(arg)
+    elif name == "/vote":
+        if not arg:
+            console.print("[yellow]Usage: /vote <question>[/yellow]")
+        else:
+            agent.quick_vote(arg)
+    elif name == "/personas":
+        console.print(f"[cyan]{list_personas()}[/cyan]")
     else:
         console.print(f"[yellow]Unknown command '{name}'. Type /help for help.[/yellow]")
     return True

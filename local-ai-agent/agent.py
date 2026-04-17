@@ -38,6 +38,9 @@ from wiki_ingest import (
     ingest_random_to_brain,
     auto_crawl_wiki,
 )
+from screenshot import screenshot_and_read, extract_text_from_file, analyze_screenshot
+from voice import speak, speak_async, listen, check_voice_available
+from multi_agent import MultiAgentDebate, list_personas
 from tools import TOOLS
 
 console = Console()
@@ -354,6 +357,46 @@ class CodingAgent:
 
     def brain_wiki_crawl(self, rounds: int = 10, per_round: int = 5) -> str:
         return auto_crawl_wiki(self.brain, rounds=rounds, per_round=per_round)
+
+    # ── Screenshot ──────────────────────────────────────────────────────────────
+
+    def take_screenshot(self) -> str:
+        return screenshot_and_read(save=True)
+
+    def read_image_text(self, file_path: str) -> str:
+        return extract_text_from_file(file_path)
+
+    # ── Voice ───────────────────────────────────────────────────────────────────
+
+    def voice_status(self) -> str:
+        s = check_voice_available()
+        return (
+            f"TTS (text-to-speech): {'available' if s['tts'] else 'not installed (pip install pyttsx3)'}\n"
+            f"STT (speech-to-text): {'available' if s['stt'] else 'not installed (pip install SpeechRecognition pyaudio)'}\n"
+            f"Microphone: {'detected' if s['mic'] else 'not found'}"
+        )
+
+    def speak_last_reply(self) -> str:
+        if not self._last_reply:
+            return "No reply to speak yet."
+        speak_async(self._last_reply)
+        return "Speaking..."
+
+    def voice_input(self) -> str:
+        text = listen()
+        if text.startswith("[VOICE_ERROR]"):
+            return text
+        return text
+
+    # ── Multi-Agent Debate ──────────────────────────────────────────────────────
+
+    def debate(self, question: str, rounds: int = 2, panel: list[str] | None = None) -> str:
+        d = MultiAgentDebate(client=self.client, panel=panel)
+        return d.debate(question, rounds=rounds)
+
+    def quick_vote(self, question: str, panel: list[str] | None = None) -> str:
+        d = MultiAgentDebate(client=self.client, panel=panel)
+        return d.quick_vote(question)
 
     def reset(self):
         """Clear conversation history and start a new session file."""
