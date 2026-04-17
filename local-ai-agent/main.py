@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import threading
 import sys
+import shlex
 
 from rich.console import Console
 from rich.panel import Panel
@@ -48,7 +49,7 @@ def print_banner(model: str):
         Panel(
             f"[bold]Model:[/bold] [green]{model}[/green]  |  "
             f"[bold]Tools:[/bold] web search · web scrape · GitHub\n\n"
-            "[dim]Commands:  /help  /reset  /discoveries  /models  /quit[/dim]",
+            "[dim]Commands:  /help  /reset  /brain  /like  /dislike  /discoveries  /models  /quit[/dim]",
             title="[bold white]Local AI Coding Agent[/bold white]",
             border_style="cyan",
         )
@@ -67,6 +68,9 @@ HELP_TEXT = """
   [yellow]/models[/yellow]         List models available on the current API endpoint
   [yellow]/model <name>[/yellow]   Switch to a different model mid-session
   [yellow]/usage[/yellow]          Show token usage for this session
+    [yellow]/like[/yellow]           Mark the last reply as good (preference learning)
+    [yellow]/dislike[/yellow]        Mark the last reply as bad (preference learning)
+    [yellow]/brain ...[/yellow]      Control local evolutionary learning brain
   [yellow]/quit[/yellow]           Exit the agent
 
 [bold cyan]Tips:[/bold cyan]
@@ -74,6 +78,15 @@ HELP_TEXT = """
   • The agent can read/write local files and run code snippets.
   • The background crawler runs silently while you're not chatting.
   • Set GITHUB_TOKEN in config.py for 5 000 GitHub API calls/hour.
+
+[bold cyan]/brain commands:[/bold cyan]
+    [yellow]/brain status[/yellow]
+    [yellow]/brain init <population>[/yellow]
+    [yellow]/brain add-image <label> <path>[/yellow]
+    [yellow]/brain add-text <path>[/yellow]
+    [yellow]/brain train <generations>[/yellow]
+    [yellow]/brain guess <path>[/yellow]
+    [yellow]/brain next <prefix text>[/yellow]
 """
 
 
@@ -124,6 +137,74 @@ def show_models(agent: CodingAgent):
         console.print(f"  • {m}{marker}")
 
 
+def handle_brain_command(arg: str, agent: CodingAgent):
+    try:
+        parts = shlex.split(arg)
+    except ValueError as exc:
+        console.print(f"[yellow]Could not parse /brain command: {exc}[/yellow]")
+        return
+
+    if not parts:
+        console.print("[yellow]Usage: /brain <status|init|add-image|add-text|train|guess|next> ...[/yellow]")
+        return
+
+    cmd = parts[0].lower()
+    if cmd == "status":
+        console.print(f"[cyan]{agent.brain_status()}[/cyan]")
+        return
+
+    if cmd == "init":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain init <population>[/yellow]")
+            return
+        console.print(f"[green]{agent.brain_init(int(parts[1]))}[/green]")
+        return
+
+    if cmd == "add-image":
+        if len(parts) < 3:
+            console.print("[yellow]Usage: /brain add-image <label> <path>[/yellow]")
+            return
+        label = parts[1]
+        path = " ".join(parts[2:])
+        console.print(f"[green]{agent.brain_add_image(label, path)}[/green]")
+        return
+
+    if cmd == "add-text":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain add-text <path>[/yellow]")
+            return
+        path = " ".join(parts[1:])
+        console.print(f"[green]{agent.brain_add_text(path)}[/green]")
+        return
+
+    if cmd == "train":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain train <generations>[/yellow]")
+            return
+        with console.status("[dim]Training evolutionary brain...[/dim]"):
+            out = agent.brain_train(int(parts[1]))
+        console.print(f"[green]{out}[/green]")
+        return
+
+    if cmd == "guess":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain guess <path>[/yellow]")
+            return
+        path = " ".join(parts[1:])
+        console.print(f"[green]{agent.brain_guess(path)}[/green]")
+        return
+
+    if cmd == "next":
+        if len(parts) < 2:
+            console.print("[yellow]Usage: /brain next <prefix text>[/yellow]")
+            return
+        prefix = " ".join(parts[1:])
+        console.print(f"[cyan]{agent.brain_next(prefix, out_len=90)}[/cyan]")
+        return
+
+    console.print(f"[yellow]Unknown /brain command '{cmd}'. Type /help for options.[/yellow]")
+
+
 # ── Command handler ────────────────────────────────────────────────────────────
 
 def handle_command(cmd: str, agent: CodingAgent) -> bool:
@@ -152,6 +233,12 @@ def handle_command(cmd: str, agent: CodingAgent) -> bool:
             console.print("[yellow]Usage: /model <model-name>[/yellow]")
     elif name == "/usage":
         console.print(f"[cyan]{agent.client.usage_summary()}[/cyan]")
+    elif name == "/like":
+        console.print(f"[green]{agent.feedback_last_reply(True)}[/green]")
+    elif name == "/dislike":
+        console.print(f"[yellow]{agent.feedback_last_reply(False)}[/yellow]")
+    elif name == "/brain":
+        handle_brain_command(arg, agent)
     else:
         console.print(f"[yellow]Unknown command '{name}'. Type /help for help.[/yellow]")
     return True
