@@ -9,7 +9,7 @@ Edit these values to customize your setup.
 # For OpenAI:        leave OPENAI_BASE_URL empty (or set to "https://api.openai.com/v1")
 # For OpenRouter:    set OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
 # For LM Studio:     set OPENAI_BASE_URL = "http://localhost:1234/v1" and any key
-OPENAI_API_KEY  = "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"# or set env var OPENAI_API_KEY
+OPENAI_API_KEY  = "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"# or set env var OPENAI_API_KEY
 OPENAI_BASE_URL = "https://openrouter.ai/api/v1"   # OpenRouter default
 DEFAULT_MODEL   = "anthropic/claude-3.5-sonnet"    # Change to any model supported by your provider
 # Popular choices: openrouter/auto, openai/gpt-4o-mini, anthropic/claude-3.5-sonnet
