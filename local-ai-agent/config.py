@@ -66,3 +66,4 @@ SHOW_THOUGHTS   = True    # Print the agent's reasoning steps
 BRAIN_STATE_FILE = "brain_state.json"
 DEFAULT_BRAIN_POPULATION = 24
 
+
