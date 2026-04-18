@@ -25,7 +25,7 @@ DEFAULT_MODEL   = "anthropic/claude-3.5-sonnet"    # Change to any model support
 # Only used when PROVIDER = "claude".
 # Get your key at https://console.anthropic.com/
 # Can also be set via the ANTHROPIC_API_KEY environment variable.
-CLAUDE_API_KEY = ""   # e.g. "sk-ant-xxxxxxxxxxxx"
+CLAUDE_API_KEY = "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"   # e.g. "sk-ant-xxxxxxxxxxxx"
 CLAUDE_MODEL   = "claude-4-6-sonnet-20241022"   # or claude-3-opus-20240229, claude-3-5-haiku-20241022
 
 # ── Agent behaviour ───────────────────────────────────────────────────────────
