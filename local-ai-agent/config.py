@@ -10,11 +10,13 @@ Edit these values to customize your setup.
 PROVIDER = "openai"
 
 # ── OpenAI / OpenAI-compatible API ────────────────────────────────────────────
-# Set your API key here, or via the OPENAI_API_KEY environment variable.
+# Keys are read from environment variables. Set them in your shell:
+#   $env:OPENAI_API_KEY = "sk-..."        (PowerShell)
+#   export OPENAI_API_KEY="sk-..."         (bash/zsh)
 # For OpenAI:        leave OPENAI_BASE_URL empty (or set to "https://api.openai.com/v1")
 # For OpenRouter:    set OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
 # For LM Studio:     set OPENAI_BASE_URL = "http://localhost:1234/v1" and any key
-OPENAI_API_KEY  = "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"# or set env var OPENAI_API_KEY
+OPENAI_API_KEY  = ""  # leave empty — uses OPENAI_API_KEY env var
 OPENAI_BASE_URL = "https://openrouter.ai/api/v1"   # OpenRouter default
 DEFAULT_MODEL   = "anthropic/claude-3.5-sonnet"    # Change to any model supported by your provider
 # Popular choices: openrouter/auto, openai/gpt-4o-mini, anthropic/claude-3.5-sonnet
