@@ -4,6 +4,11 @@ config.py — Configuration for the Local AI Coding Agent
 Edit these values to customize your setup.
 """
 
+# ── Provider selection ────────────────────────────────────────────────────────
+# "openai"  — use any OpenAI-compatible endpoint (OpenAI, OpenRouter, LM Studio …)
+# "claude"  — use the native Anthropic SDK (direct Claude API, no proxy needed)
+PROVIDER = "openai"
+
 # ── OpenAI / OpenAI-compatible API ────────────────────────────────────────────
 # Set your API key here, or via the OPENAI_API_KEY environment variable.
 # For OpenAI:        leave OPENAI_BASE_URL empty (or set to "https://api.openai.com/v1")
@@ -13,6 +18,13 @@ OPENAI_API_KEY  = "sk-or-v1-21eec6413c1759c45aecad5c97ecf114ec03ddf2896183614c75
 OPENAI_BASE_URL = "https://openrouter.ai/api/v1"   # OpenRouter default
 DEFAULT_MODEL   = "anthropic/claude-3.5-sonnet"    # Change to any model supported by your provider
 # Popular choices: openrouter/auto, openai/gpt-4o-mini, anthropic/claude-3.5-sonnet
+
+# ── Native Claude (Anthropic) API ─────────────────────────────────────────────
+# Only used when PROVIDER = "claude".
+# Get your key at https://console.anthropic.com/
+# Can also be set via the ANTHROPIC_API_KEY environment variable.
+CLAUDE_API_KEY = ""   # e.g. "sk-ant-xxxxxxxxxxxx"
+CLAUDE_MODEL   = "claude-3-5-sonnet-20241022"   # or claude-3-opus-20240229, claude-3-5-haiku-20241022
 
 # ── Agent behaviour ───────────────────────────────────────────────────────────
 MAX_TOOL_CALLS   = 10     # Max tool calls per user message before giving up
