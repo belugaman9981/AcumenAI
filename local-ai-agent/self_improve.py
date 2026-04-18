@@ -143,13 +143,10 @@ class PromptEvolver:
         )
 
         try:
-            response = self.client.chat.completions.create(
-                model="anthropic/claude-3.5-sonnet",
-                messages=[{"role": "user", "content": meta_prompt}],
-                max_tokens=2000,
-                temperature=0.7,
-            )
-            new_prompt = response.choices[0].message.content.strip()
+            new_prompt = self.client.chat(
+                [{"role": "user", "content": meta_prompt}],
+                stream=False,
+            ).strip()
 
             # Sanity check: must be at least 50 chars
             if len(new_prompt) < 50:

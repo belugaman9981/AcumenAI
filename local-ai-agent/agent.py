@@ -213,6 +213,125 @@ class OpenAIClient:
         return "".join(full)
 
 
+# ── Native Claude (Anthropic) client ──────────────────────────────────────────
+
+class ClaudeClient:
+    """Wrapper around the native Anthropic SDK with the same interface as OpenAIClient."""
+
+    MAX_RETRIES = 3
+    RETRY_BACKOFF = [1, 3, 8]
+
+    def __init__(self, model: str):
+        self.model = model
+        try:
+            import anthropic as _anthropic
+            self._anthropic = _anthropic
+        except ImportError:
+            raise ImportError(
+                "The 'anthropic' package is not installed. Run: pip install anthropic"
+            )
+        api_key = config.CLAUDE_API_KEY or os.environ.get("ANTHROPIC_API_KEY", "")
+        self._client = self._anthropic.Anthropic(api_key=api_key)
+        self.total_prompt_tokens = 0
+        self.total_completion_tokens = 0
+
+    def _split_messages(self, messages: list[dict]) -> tuple[str, list[dict]]:
+        """Separate the system message from user/assistant messages."""
+        system = ""
+        filtered = []
+        for m in messages:
+            if m["role"] == "system":
+                system += m["content"]
+            else:
+                filtered.append(m)
+        return system, filtered
+
+    def check_connection(self) -> bool:
+        try:
+            self._client.models.list()
+            return True
+        except self._anthropic.AuthenticationError:
+            return True  # reachable — auth error handled later
+        except Exception:
+            return False
+
+    def list_models(self) -> list[str]:
+        try:
+            return [m.id for m in self._client.models.list().data]
+        except Exception:
+            return []
+
+    def usage_summary(self) -> str:
+        total = self.total_prompt_tokens + self.total_completion_tokens
+        return (
+            f"Tokens used — prompt: {self.total_prompt_tokens:,}  "
+            f"completion: {self.total_completion_tokens:,}  "
+            f"total: {total:,}"
+        )
+
+    def chat(self, messages: list[dict], stream: bool = True) -> str:
+        """Send messages and return the full assistant reply."""
+        system, filtered = self._split_messages(messages)
+        try:
+            if stream:
+                return self._stream_chat(system, filtered)
+            else:
+                resp = self._client.messages.create(
+                    model=self.model,
+                    max_tokens=8096,
+                    system=system,
+                    messages=filtered,
+                    temperature=0.4,
+                )
+                self.total_prompt_tokens += resp.usage.input_tokens
+                self.total_completion_tokens += resp.usage.output_tokens
+                return resp.content[0].text
+        except self._anthropic.AuthenticationError:
+            return (
+                "[ERROR] Invalid Anthropic API key. "
+                "Set CLAUDE_API_KEY in config.py or ANTHROPIC_API_KEY env var."
+            )
+        except self._anthropic.APIConnectionError as exc:
+            return f"[ERROR] Cannot connect to Anthropic API: {exc}"
+        except Exception as exc:
+            return f"[ERROR] Claude API error: {exc}"
+
+    def _stream_chat(self, system: str, messages: list[dict]) -> str:
+        """Stream tokens, printing them as they arrive."""
+        full = []
+        console.print()
+        try:
+            with self._client.messages.stream(
+                model=self.model,
+                max_tokens=8096,
+                system=system,
+                messages=messages,
+                temperature=0.4,
+            ) as stream:
+                console.print("[bold cyan]Assistant:[/bold cyan] ", end="")
+                for text in stream.text_stream:
+                    if text:
+                        full.append(text)
+                        print(text, end="", flush=True)
+                final = stream.get_final_message()
+                self.total_prompt_tokens += final.usage.input_tokens
+                self.total_completion_tokens += final.usage.output_tokens
+        except self._anthropic.AuthenticationError:
+            console.print(
+                "\n[red]Invalid Anthropic API key. "
+                "Set CLAUDE_API_KEY in config.py or ANTHROPIC_API_KEY env var.[/red]"
+            )
+            return "[ERROR] Invalid Anthropic API key."
+        except self._anthropic.APIConnectionError as exc:
+            console.print(f"\n[red]Connection error: {exc}[/red]")
+            return f"[ERROR] Cannot connect to Anthropic API: {exc}"
+        except Exception as exc:
+            console.print(f"\n[red]Stream error: {exc}[/red]")
+
+        print()  # newline after streaming
+        return "".join(full)
+
+
 # ── Tool dispatcher ────────────────────────────────────────────────────────────
 
 def _extract_tool_call(text: str) -> Optional[dict]:
@@ -260,8 +379,13 @@ HISTORY_DIR = Path(__file__).parent / "chat_history"
 
 class CodingAgent:
     def __init__(self, model: str = config.DEFAULT_MODEL):
-        self.model = model
-        self.client = OpenAIClient(model)
+        if config.PROVIDER == "claude":
+            _model = model if model != config.DEFAULT_MODEL else config.CLAUDE_MODEL
+            self.model = _model
+            self.client = ClaudeClient(_model)
+        else:
+            self.model = model
+            self.client = OpenAIClient(model)
         self.history: list[dict] = []
         self.system_prompt = _build_system_prompt()
         self.brain = EvolutionBrain(Path(config.BRAIN_STATE_FILE))
@@ -414,7 +538,7 @@ class CodingAgent:
         if self._prompt_evolver is None:
             self._prompt_evolver = PromptEvolver(
                 default_prompt=self.system_prompt,
-                client=self.client._client,
+                client=self.client,
             )
         return self._prompt_evolver
 
