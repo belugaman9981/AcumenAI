@@ -465,6 +465,45 @@ def clipboard_read() -> str:
         return f"clipboard_read error: {exc}"
 
 
+# ── Tool: deep_research ────────────────────────────────────────────────────────
+
+def deep_research(topic: str, max_sources: int = 3) -> str:
+    """
+    Automated deep research: search the web for a topic, then scrape
+    the top results to gather detailed information.  Returns a compiled
+    summary of the scraped content.
+    """
+    max_sources = max(1, min(max_sources, 5))
+
+    # Step 1: search for the topic
+    search_results = web_search(topic, max_results=max_sources + 2)
+    if search_results.startswith("No results") or search_results.startswith("Search error"):
+        return f"Research failed at search step: {search_results}"
+
+    # Step 2: extract URLs from results
+    urls = re.findall(r'\]\((https?://[^\)]+)\)', search_results)
+    if not urls:
+        return f"Search results (no scrapeable URLs found):\n{search_results}"
+
+    # Step 3: scrape top URLs
+    scraped_parts = [f"## Search results for: {topic}\n\n{search_results}\n"]
+
+    for i, url in enumerate(urls[:max_sources]):
+        try:
+            content = web_scrape(url)
+            if content and not content.startswith("HTTP error") and not content.startswith("Scrape error"):
+                scraped_parts.append(
+                    f"\n## Source {i+1}: {url}\n\n{_truncate(content, config.MAX_SCRAPE_CHARS)}"
+                )
+        except Exception:
+            continue
+
+    if len(scraped_parts) == 1:
+        return f"Could only search, scraping failed. Results:\n{search_results}"
+
+    return _truncate("\n".join(scraped_parts), config.MAX_SCRAPE_CHARS * max_sources)
+
+
 # ── Tool registry ──────────────────────────────────────────────────────────────
 
 TOOLS: dict[str, dict] = {
@@ -555,6 +594,24 @@ TOOLS: dict[str, dict] = {
         "description": (
             "Read the current system clipboard content.\n"
             "Args: (none)"
+        ),
+    },
+    "deep_research": {
+        "fn": lambda topic, max_sources=3: deep_research(topic, max_sources),
+        "description": (
+            "Deep research: automatically searches the web, then scrapes the "
+            "top results to build a comprehensive answer.  Use for complex or "
+            "factual questions where search snippets aren't enough.\n"
+            "Args: topic (str), max_sources (int, default 3)"
+        ),
+    },
+    "think": {
+        "fn": lambda thought: f"[Internal reasoning recorded]\n{thought}",
+        "description": (
+            "Use this tool to pause and reason through complex problems "
+            "step-by-step before taking action. Write your chain of thought "
+            "as the 'thought' arg. Costs nothing — just helps you think clearly.\n"
+            "Args: thought (str)"
         ),
     },
 }

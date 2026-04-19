@@ -29,9 +29,9 @@ CLAUDE_API_KEY = "sk-ant-api03-SdvXCuq5M8tlZ4j2r8FGaZa0BxRe7nOuLr0q0G-RQMb5sZPl2
 CLAUDE_MODEL   = "claude-4-6-sonnet-20241022"   # or claude-3-opus-20240229, claude-3-5-haiku-20241022
 
 # ── Agent behaviour ───────────────────────────────────────────────────────────
-MAX_TOOL_CALLS   = 10     # Max tool calls per user message before giving up
-REQUEST_TIMEOUT  = 20     # Seconds before an HTTP request times out
-MAX_SCRAPE_CHARS = 6_000  # Chars kept from a scraped page (avoid token overload)
+MAX_TOOL_CALLS   = 16     # Max tool calls per user message before giving up
+REQUEST_TIMEOUT  = 25     # Seconds before an HTTP request times out
+MAX_SCRAPE_CHARS = 10_000 # Chars kept from a scraped page (avoid token overload)
 
 # ── GitHub background crawler ─────────────────────────────────────────────────
 # Optional: add your GitHub PAT for 5 000 req/hr instead of 60 req/hr

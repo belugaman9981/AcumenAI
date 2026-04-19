@@ -57,11 +57,31 @@ def _build_system_prompt() -> str:
     )
 
     return textwrap.dedent(f"""
-        You are an expert local AI coding agent running on the user's machine.
+        You are AcumenAI, an expert local AI coding agent running on the user's
+        machine. You are highly capable, methodical, and thorough.
 
         Your job is to help with coding questions, code reviews, debugging,
         architecture decisions, and software research.  You can browse the web,
-        scrape pages, and explore GitHub repositories to gather information.
+        scrape pages, explore GitHub repositories, and run code to gather
+        information and verify your answers.
+
+        ## Reasoning Strategy
+
+        For EVERY question, follow this process:
+
+        1. **Understand** — Restate the core problem in your own words.
+        2. **Plan** — Before using any tool, briefly outline the 2-4 steps
+           you'll take to answer well.  Write this plan as your Thought.
+        3. **Execute** — Use tools one at a time to gather what you need.
+           After each Observation, reflect: "Did this give me what I need?
+           What's still missing?"  If the result is thin or ambiguous,
+           search again with different keywords or scrape the source page.
+        4. **Synthesize** — Once you have enough evidence, combine everything
+           into a clear, well-structured answer.  Cross-check facts against
+           multiple sources when possible.
+        5. **Verify** — Before giving your final answer, ask yourself:
+           "Could any part of this be wrong?  Am I speculating?"  If yes,
+           flag the uncertainty or do one more lookup.
 
         ## How to use tools
 
@@ -79,6 +99,23 @@ def _build_system_prompt() -> str:
         - When you have enough information, answer directly WITHOUT a tool call.
         - Never make up information — use tools to verify facts.
         - Always explain your reasoning before calling a tool.
+        - For complex topics, **chain** tools: search → scrape the best link →
+          search for a second angle → synthesize.
+        - If a web_search gives vague results, use web_scrape on the most
+          relevant URL to read the actual content.
+        - If a coding question could be answered with a quick test, use
+          run_code to verify before answering.
+
+        ## Smart research patterns
+
+        - **Triangulate**: search for the same topic from 2 different angles
+          to cross-verify.
+        - **Deep dive**: when you find a promising result, scrape it for the
+          full details rather than relying on the search snippet.
+        - **Code verification**: when suggesting code, test small pieces with
+          run_code if feasible before presenting them.
+        - **Admit uncertainty**: if you can't find a definitive answer, say so
+          clearly and present what you do know.
 
         ## Available tools
 
@@ -88,6 +125,9 @@ def _build_system_prompt() -> str:
         - Be concise but thorough.
         - Format code with markdown fences.
         - Cite sources (URLs) when you use web results.
+        - When explaining complex topics, use clear structure: intro, details,
+          examples, summary.
+        - Prefer concrete code examples over abstract explanations.
     """).strip()
 
 
@@ -608,16 +648,34 @@ class CodingAgent:
         style_hint = self.brain.style_hint(self._last_user_message)
         # Use the evolved prompt if available, otherwise the base system prompt
         base_prompt = self.prompt_evolver.get_prompt() if self._prompt_evolver else self.system_prompt
-        runtime_prompt = (
-            base_prompt
-            + "\n\n## Learned user preference hint\n"
+
+        # ── Build context-enriched system prompt ──
+        context_parts = [base_prompt]
+
+        # Inject learned style preferences
+        context_parts.append(
+            "\n\n## Learned user preference hint\n"
             + style_hint
             + "\nUse this as a soft preference, not a hard constraint."
         )
+
+        # Inject relevant knowledge from background discoveries
+        knowledge_snippet = self._recall_relevant_knowledge(self._last_user_message)
+        if knowledge_snippet:
+            context_parts.append(
+                "\n\n## Background knowledge (from previous research)\n"
+                "You already know some of this from background research. "
+                "Use it as supporting context, but verify if uncertain:\n\n"
+                + knowledge_snippet
+            )
+
+        runtime_prompt = "".join(context_parts)
         messages = [
             {"role": "system", "content": runtime_prompt},
             *self.history,
         ]
+
+        tool_calls_made = []
 
         for step in range(config.MAX_TOOL_CALLS):
             # Ask the LLM
@@ -638,6 +696,7 @@ class CodingAgent:
             # We have a tool call — execute it
             tool_name = tool_call.get("tool", "unknown")
             tool_args = tool_call.get("args", {})
+            tool_calls_made.append(tool_name)
 
             if config.SHOW_TOOL_CALLS:
                 args_str = ", ".join(f"{k}={repr(v)}" for k, v in tool_args.items())
@@ -655,25 +714,76 @@ class CodingAgent:
                 f"[dim]{obs_preview}{'…' if len(observation) > 200 else ''}[/dim]"
             )
 
+            # ── Reflection prompt: nudge the LLM to evaluate what it learned ──
+            reflection_nudge = (
+                f"Observation from {tool_name}:\n\n{observation}\n\n"
+                "Reflect on this result: Is it sufficient to answer the question? "
+                "Is there anything contradictory or unclear that needs a follow-up? "
+                "If you have enough information, give your final answer now. "
+                "Otherwise, explain what's still missing and call another tool."
+            )
+
             # Feed tool result back into the conversation
             messages.append({"role": "assistant", "content": reply})
             messages.append({
                 "role": "user",
-                "content": (
-                    f"Observation from {tool_name}:\n\n{observation}\n\n"
-                    "Continue reasoning based on this result."
-                ),
+                "content": reflection_nudge,
             })
 
-        # Exceeded max steps
+        # Exceeded max steps — summarize what was done
+        tools_used = ", ".join(tool_calls_made) if tool_calls_made else "none"
         console.print("[red]Max tool calls reached. Asking for final answer.[/red]")
         messages.append({
             "role": "user",
-            "content": "Please provide your best answer now based on what you know so far.",
+            "content": (
+                f"You've used {len(tool_calls_made)} tool calls ({tools_used}). "
+                "Please synthesize everything you've learned and provide your "
+                "best, most complete answer now."
+            ),
         })
         reply = self.client.chat(messages, stream=True)
         self.history.append({"role": "assistant", "content": reply})
         return reply
+
+    # ── Knowledge recall ────────────────────────────────────────────────────────
+
+    def _recall_relevant_knowledge(self, query: str) -> str:
+        """Pull relevant context from background discoveries and codebase index."""
+        parts = []
+
+        # Check background crawler discoveries
+        try:
+            from background import get_recent_discoveries
+            discoveries = get_recent_discoveries(limit=30)
+            if discoveries:
+                query_lower = query.lower()
+                query_words = set(query_lower.split())
+                relevant = []
+                for d in discoveries:
+                    text = f"{d.get('repo', '')} {d.get('summary', '')}".lower()
+                    overlap = sum(1 for w in query_words if w in text and len(w) > 2)
+                    if overlap >= 1:
+                        relevant.append(d)
+                for d in relevant[:3]:
+                    parts.append(
+                        f"- {d.get('repo', '?')}: {d.get('summary', 'no summary')[:200]} "
+                        f"({d.get('url', '')})"
+                    )
+        except Exception:
+            pass
+
+        # Check codebase index if indexed
+        if self.codebase.root and self.codebase.files:
+            try:
+                results = self.codebase.search(query)
+                if results and not results.startswith("No "):
+                    # Take first few lines
+                    lines = results.strip().splitlines()[:5]
+                    parts.append("Codebase matches:\n" + "\n".join(lines))
+            except Exception:
+                pass
+
+        return "\n".join(parts) if parts else ""
 
     # ── One-shot (no history) ───────────────────────────────────────────────────
 
