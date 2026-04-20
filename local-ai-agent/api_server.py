@@ -19,6 +19,12 @@ from flask_cors import CORS
 
 import config
 from agent import CodingAgent
+from wiki_ingest import (
+    ingest_random_to_brain,
+    auto_crawl_wiki,
+    ingest_internet_archive,
+    internet_learn,
+)
 
 app = Flask(__name__)
 CORS(app)  # allow the website to call from any origin
@@ -49,6 +55,59 @@ def chat():
 def brain_status():
     a = get_agent()
     return jsonify({"status": a.brain_status()})
+
+
+@app.route("/brain/train", methods=["POST"])
+def brain_train():
+    a = get_agent()
+    result = a.brain_train(generations=5)
+    return jsonify({"result": result})
+
+
+@app.route("/brain/wiki-random", methods=["POST"])
+def brain_wiki_random():
+    a = get_agent()
+    result = ingest_random_to_brain(a.brain, count=5)
+    return jsonify({"result": result})
+
+
+@app.route("/brain/wiki-crawl", methods=["POST"])
+def brain_wiki_crawl():
+    a = get_agent()
+    result = auto_crawl_wiki(a.brain, rounds=5, per_round=3, train_every=2, train_gens=3)
+    return jsonify({"result": result})
+
+
+@app.route("/brain/internet-learn", methods=["POST"])
+def brain_internet_learn():
+    a = get_agent()
+    result = internet_learn(a.brain)
+    return jsonify({"result": result})
+
+
+@app.route("/brain/predict", methods=["POST"])
+def brain_predict():
+    data = request.get_json(force=True, silent=True) or {}
+    prefix = (data.get("prefix") or "").strip()
+    mode = data.get("mode", "words")
+    a = get_agent()
+    if mode == "chars":
+        result = a.brain_next(prefix=prefix, out_len=80)
+    else:
+        result = a.brain.predict_next_words(prefix=prefix, word_count=30)
+    return jsonify({"result": result})
+
+
+@app.route("/brain/word-map", methods=["POST"])
+def brain_word_map():
+    data = request.get_json(force=True, silent=True) or {}
+    word = (data.get("word") or "").strip()
+    a = get_agent()
+    if word:
+        result = a.brain.word_map_lookup(word)
+    else:
+        result = a.brain.word_map_stats()
+    return jsonify({"result": result})
 
 
 @app.route("/reset", methods=["POST"])
