@@ -3,8 +3,17 @@ brain.py - evolutionary local learning engine for AcumenAI.
 
 This module intentionally keeps learning local and user-controlled:
 - Image guessing: evolves a population of bots on labeled image samples.
-- Text prediction: builds a local character n-gram map and evolves scoring hyperparameters.
+- Text prediction: builds local character AND word n-gram maps, evolves scoring params.
+- Word maps: discovers word relationships and co-occurrence patterns from corpus.
 - Preference tuning: captures like/dislike feedback and produces style hints.
+- Internet learning: crawls Wikipedia, Internet Archive, and public text to train.
+
+The evolutionary algorithm:
+  1. Create a population of bots with random parameters.
+  2. Score each bot on image classification + text prediction accuracy.
+  3. Keep the best performers, discard the worst.
+  4. Breed survivors (crossover) and mutate to fill the population.
+  5. Repeat for many generations.
 """
 
 from __future__ import annotations
@@ -29,6 +38,11 @@ def _clamp(value: float, lo: float, hi: float) -> float:
 
 def _tokenize(text: str) -> list[str]:
     return re.findall(r"[a-zA-Z']+", text.lower())
+
+
+def _word_tokenize(text: str) -> list[str]:
+    """Split text into lowercase word tokens, keeping common punctuation."""
+    return re.findall(r"[a-zA-Z']+|[.,!?;:\-]", text.lower())
 
 
 def _extract_image_features(path: Path) -> list[float]:
@@ -61,21 +75,29 @@ def _extract_image_features(path: Path) -> list[float]:
     return feats
 
 
-def _random_bot(labels: list[str], feature_len: int, vocab: str) -> dict[str, Any]:
+def _random_bot(labels: list[str], feature_len: int, vocab: str, word_vocab: list[str] | None = None) -> dict[str, Any]:
     prototypes: dict[str, list[float]] = {}
     for label in labels:
         prototypes[label] = [random.random() for _ in range(feature_len)]
 
     char_bias = {ch: random.uniform(-0.2, 0.2) for ch in vocab}
+    word_bias = {}
+    if word_vocab:
+        for w in word_vocab[:200]:  # bias for most common words
+            word_bias[w] = random.uniform(-0.15, 0.15)
+
     return {
         "id": f"bot-{int(time.time() * 1000)}-{random.randint(1000, 9999)}",
         "score": 0.0,
         "params": {
             "smoothing": random.uniform(0.01, 1.5),
             "temperature": random.uniform(0.6, 1.6),
+            "word_smoothing": random.uniform(0.01, 1.0),
+            "word_temperature": random.uniform(0.6, 1.6),
             "prototype_mix": random.uniform(0.2, 0.8),
             "prototypes": prototypes,
             "char_bias": char_bias,
+            "word_bias": word_bias,
         },
     }
 
@@ -95,6 +117,11 @@ class EvolutionBrain:
         }
         self.vocab = "abcdefghijklmnopqrstuvwxyz .,!?;:'\"()-\\n"
         self._char_counts: dict[int, dict[str, Counter]] = {2: {}, 3: {}, 4: {}}
+        # Word-level n-gram tables
+        self._word_counts: dict[int, dict[str, Counter]] = {2: {}, 3: {}}
+        self._word_vocab: list[str] = []  # most common words
+        # Word co-occurrence map (word relationships)
+        self._word_map: dict[str, Counter] = {}
         self._rng = random.Random()
 
         self._load()
@@ -111,6 +138,7 @@ class EvolutionBrain:
             self.text_corpus = payload.get("text_corpus", [])
             self.feedback = payload.get("feedback", self.feedback)
             self._rebuild_char_counts()
+            self._rebuild_word_counts()
         except Exception:
             self.population = []
             self.image_samples = []
@@ -123,6 +151,7 @@ class EvolutionBrain:
             "image_samples": self.image_samples,
             "text_corpus": self.text_corpus,
             "feedback": self.feedback,
+            "word_vocab": self._word_vocab[:500],
             "saved_at": time.time(),
         }
         self.state_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
@@ -130,7 +159,7 @@ class EvolutionBrain:
     def init_population(self, size: int) -> None:
         size = max(4, int(size))
         labels = self._labels() or ["class_a", "class_b"]
-        self.population = [_random_bot(labels, 20, self.vocab) for _ in range(size)]
+        self.population = [_random_bot(labels, 20, self.vocab, self._word_vocab) for _ in range(size)]
         self.save()
 
     def _labels(self) -> list[str]:
@@ -182,6 +211,79 @@ class EvolutionBrain:
                 nxt = gram[-1]
                 table[prefix][nxt] += 1
             self._char_counts[n] = dict(table)
+
+    def _rebuild_word_counts(self) -> None:
+        """Build word-level n-gram tables and word co-occurrence map."""
+        self._word_counts = {2: {}, 3: {}}
+        self._word_map = {}
+        merged = "\n".join(self.text_corpus)
+        if not merged:
+            self._word_vocab = []
+            return
+
+        words = _word_tokenize(merged)
+        if len(words) < 3:
+            self._word_vocab = []
+            return
+
+        # Build word frequency list
+        freq = Counter(words)
+        self._word_vocab = [w for w, _ in freq.most_common(2000)]
+
+        # Build word n-gram tables (bigrams and trigrams)
+        for n in (2, 3):
+            table: dict[str, Counter] = defaultdict(Counter)
+            for i in range(len(words) - n + 1):
+                prefix = " ".join(words[i : i + n - 1])
+                nxt = words[i + n - 1]
+                table[prefix][nxt] += 1
+            self._word_counts[n] = dict(table)
+
+        # Build word co-occurrence map (window of 5)
+        window = 5
+        comap: dict[str, Counter] = defaultdict(Counter)
+        for i, w in enumerate(words):
+            for j in range(max(0, i - window), min(len(words), i + window + 1)):
+                if i != j:
+                    comap[w][words[j]] += 1
+        # Keep only top 50 co-occurring words per entry
+        self._word_map = {
+            w: Counter(dict(counts.most_common(50)))
+            for w, counts in comap.items()
+            if counts
+        }
+
+    def add_text(self, text: str, max_chars: int = 500_000) -> str:
+        """Add raw text directly to the corpus (used by internet crawlers)."""
+        text = text[:max_chars].strip()
+        if not text:
+            return "Text was empty."
+        self.text_corpus.append(text)
+        self._rebuild_char_counts()
+        self._rebuild_word_counts()
+        self.save()
+        return f"Added {len(text):,} chars to brain corpus."
+
+    def word_map_lookup(self, word: str, top_n: int = 15) -> str:
+        """Look up what words are associated with a given word."""
+        word = word.lower().strip()
+        if word not in self._word_map:
+            return f"Word '{word}' not in the brain's word map yet."
+        related = self._word_map[word].most_common(top_n)
+        lines = [f"  {w}: {c}" for w, c in related]
+        return f"Words associated with '{word}':\n" + "\n".join(lines)
+
+    def word_map_stats(self) -> str:
+        """Summary of the word map."""
+        if not self._word_map:
+            return "Word map is empty. Add text to the brain first."
+        total_words = len(self._word_map)
+        total_links = sum(len(v) for v in self._word_map.values())
+        top_words = self._word_vocab[:20]
+        return (
+            f"Word map: {total_words:,} unique words, {total_links:,} co-occurrence links\n"
+            f"Top words: {', '.join(top_words)}"
+        )
 
     def _ensure_labels_in_population(self, labels: list[str]) -> None:
         for bot in self.population:
@@ -268,18 +370,63 @@ class EvolutionBrain:
 
         return ll / sample_count
 
+    def _bot_word_score(self, bot: dict[str, Any]) -> float:
+        """Score a bot on word-level next-word prediction."""
+        merged = "\n".join(self.text_corpus)
+        words = _word_tokenize(merged)
+        if len(words) < 20:
+            return 0.0
+
+        smoothing = float(bot["params"].get("word_smoothing", 0.2))
+        smoothing = _clamp(smoothing, 0.001, 2.0)
+        word_bias = bot["params"].get("word_bias", {})
+
+        # Use bigram table
+        table = self._word_counts.get(2, {})
+        if not table:
+            return 0.0
+
+        sample_count = min(1500, len(words) - 2)
+        if sample_count <= 0:
+            return 0.0
+
+        starts = [self._rng.randint(0, len(words) - 3) for _ in range(sample_count)]
+        vocab_size = max(50, len(self._word_vocab))
+
+        ll = 0.0
+        for i in starts:
+            prefix = words[i]
+            actual = words[i + 1]
+            counts = table.get(prefix)
+            if not counts:
+                prob = 1.0 / vocab_size
+            else:
+                denom = sum(counts.values()) + smoothing * vocab_size
+                num = counts.get(actual, 0) + smoothing
+                bias = _clamp(float(word_bias.get(actual, 0.0)), -0.6, 0.6)
+                prob = (num / denom) * (1.0 + bias)
+                prob = max(prob, 1e-9)
+            ll += math.log(prob)
+
+        return ll / sample_count
+
     def _score_population(self) -> None:
         image_weight = 1.0 if self.image_samples else 0.0
         text_weight = 1.0 if self.text_corpus else 0.0
-        total_weight = max(1.0, image_weight + text_weight)
+        word_weight = 0.8 if self._word_counts.get(2) else 0.0
+        total_weight = max(1.0, image_weight + text_weight + word_weight)
 
         for bot in self.population:
             image_score = self._bot_image_score(bot)
             text_score = self._bot_text_score(bot)
-            # Shift text score to a positive-ish range for mixed scoring.
+            word_score = self._bot_word_score(bot) if word_weight else 0.0
+            # Shift scores to a positive-ish range for mixed scoring.
             text_scaled = 1.0 / (1.0 + math.exp(-6.0 * (text_score + 3.0)))
+            word_scaled = 1.0 / (1.0 + math.exp(-6.0 * (word_score + 3.0)))
             bot["score"] = (
-                image_weight * image_score + text_weight * text_scaled
+                image_weight * image_score
+                + text_weight * text_scaled
+                + word_weight * word_scaled
             ) / total_weight
 
     def _mutate(self, bot: dict[str, Any], rate: float = 0.15) -> dict[str, Any]:
@@ -300,6 +447,20 @@ class EvolutionBrain:
                 2.0,
             )
 
+        if self._rng.random() < rate:
+            params["word_smoothing"] = _clamp(
+                float(params.get("word_smoothing", 0.2)) + self._rng.uniform(-0.15, 0.15),
+                0.001,
+                2.0,
+            )
+
+        if self._rng.random() < rate:
+            params["word_temperature"] = _clamp(
+                float(params.get("word_temperature", 1.0)) + self._rng.uniform(-0.12, 0.12),
+                0.3,
+                2.0,
+            )
+
         proto = params.get("prototypes", {})
         for label, vec in proto.items():
             for i in range(len(vec)):
@@ -312,6 +473,12 @@ class EvolutionBrain:
             if self._rng.random() < rate:
                 bias[ch] = _clamp(float(bias[ch]) + self._rng.uniform(-0.08, 0.08), -0.8, 0.8)
         params["char_bias"] = bias
+
+        word_bias = params.get("word_bias", {})
+        for w in list(word_bias.keys()):
+            if self._rng.random() < rate:
+                word_bias[w] = _clamp(float(word_bias[w]) + self._rng.uniform(-0.06, 0.06), -0.6, 0.6)
+        params["word_bias"] = word_bias
 
         child["id"] = f"mut-{int(time.time() * 1000)}-{self._rng.randint(1000, 9999)}"
         child["score"] = 0.0
@@ -327,9 +494,12 @@ class EvolutionBrain:
             "params": {
                 "smoothing": (float(pa.get("smoothing", 0.2)) + float(pb.get("smoothing", 0.2))) / 2.0,
                 "temperature": (float(pa.get("temperature", 1.0)) + float(pb.get("temperature", 1.0))) / 2.0,
+                "word_smoothing": (float(pa.get("word_smoothing", 0.2)) + float(pb.get("word_smoothing", 0.2))) / 2.0,
+                "word_temperature": (float(pa.get("word_temperature", 1.0)) + float(pb.get("word_temperature", 1.0))) / 2.0,
                 "prototype_mix": (float(pa.get("prototype_mix", 0.5)) + float(pb.get("prototype_mix", 0.5))) / 2.0,
                 "prototypes": {},
                 "char_bias": {},
+                "word_bias": {},
             },
         }
 
@@ -355,6 +525,12 @@ class EvolutionBrain:
             xa = float(pa.get("char_bias", {}).get(ch, 0.0))
             xb = float(pb.get("char_bias", {}).get(ch, 0.0))
             child["params"]["char_bias"][ch] = (xa + xb) / 2.0
+
+        words = set(pa.get("word_bias", {}).keys()) | set(pb.get("word_bias", {}).keys())
+        for w in words:
+            xa = float(pa.get("word_bias", {}).get(w, 0.0))
+            xb = float(pb.get("word_bias", {}).get(w, 0.0))
+            child["params"]["word_bias"][w] = (xa + xb) / 2.0
 
         return child
 
@@ -474,6 +650,60 @@ class EvolutionBrain:
             text += self._predict_next_char(text, best)
         return text
 
+    def predict_next_words(self, prefix: str, word_count: int = 20) -> str:
+        """Word-level next-word prediction using the evolved word n-gram model."""
+        best = self.best_bot()
+        if not best:
+            return "No trained bot available."
+
+        if not self._word_counts.get(2):
+            return "No word model built yet. Add text and train the brain."
+
+        word_count = max(1, min(200, int(word_count)))
+        words = _word_tokenize(prefix)
+        if not words:
+            words = ["the"]
+
+        temperature = _clamp(float(best["params"].get("word_temperature", 1.0)), 0.3, 2.0)
+        smoothing = _clamp(float(best["params"].get("word_smoothing", 0.2)), 0.001, 2.0)
+        word_bias = best["params"].get("word_bias", {})
+        vocab_size = max(50, len(self._word_vocab))
+
+        for _ in range(word_count):
+            context = words[-1]
+            table = self._word_counts[2]
+            counts = table.get(context)
+
+            if not counts:
+                # Fall back to a random common word
+                words.append(self._rng.choice(self._word_vocab[:100]) if self._word_vocab else "the")
+                continue
+
+            items = []
+            total = sum(counts.values()) + smoothing * vocab_size
+            candidates = list(counts.keys())
+            if self._word_vocab:
+                candidates = list(set(candidates) | set(self._word_vocab[:50]))
+            for w in candidates:
+                base = (counts.get(w, 0) + smoothing) / total
+                b = _clamp(float(word_bias.get(w, 0.0)), -0.6, 0.6)
+                score = max(1e-9, base * (1.0 + b))
+                score = score ** (1.0 / temperature)
+                items.append((w, score))
+
+            z = sum(s for _, s in items)
+            pick = self._rng.random() * z
+            accum = 0.0
+            chosen = items[0][0]
+            for w, s in items:
+                accum += s
+                if accum >= pick:
+                    chosen = w
+                    break
+            words.append(chosen)
+
+        return " ".join(words)
+
     def best_bot(self) -> dict[str, Any] | None:
         if not self.population:
             return None
@@ -524,11 +754,16 @@ class EvolutionBrain:
         labels = ", ".join(self._labels()) or "none"
         likes = int(self.feedback.get("likes", 0))
         dislikes = int(self.feedback.get("dislikes", 0))
+        word_map_size = len(self._word_map)
+        word_vocab_size = len(self._word_vocab)
+        total_chars = sum(len(t) for t in self.text_corpus)
         return (
             f"Population: {len(self.population)} bots\n"
             f"Best score: {best_score:.4f}\n"
             f"Image samples: {len(self.image_samples)}\n"
             f"Known labels: {labels}\n"
-            f"Text corpora: {len(self.text_corpus)}\n"
+            f"Text corpora: {len(self.text_corpus)} ({total_chars:,} chars)\n"
+            f"Word vocabulary: {word_vocab_size:,} words\n"
+            f"Word map: {word_map_size:,} entries\n"
             f"Feedback: {likes} likes / {dislikes} dislikes"
         )
