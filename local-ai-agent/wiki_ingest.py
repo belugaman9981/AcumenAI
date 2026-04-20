@@ -141,6 +141,7 @@ def ingest_article_to_brain(brain, title: str) -> str:
         brain.text_corpus.append(chunk)
 
     brain._rebuild_char_counts()
+    brain._rebuild_word_counts()
     brain.save()
     return (
         f"Ingested '{art['title']}' — {len(art['text']):,} chars in "
@@ -169,6 +170,7 @@ def ingest_search_to_brain(brain, query: str, max_articles: int = 5) -> str:
         return f"Found titles but could not extract text for: '{query}'"
 
     brain._rebuild_char_counts()
+    brain._rebuild_word_counts()
     brain.save()
     return f"Ingested {len(results)} articles for '{query}':\n" + "\n".join(results)
 
@@ -191,6 +193,7 @@ def ingest_random_to_brain(brain, count: int = 5) -> str:
         names.append(art["title"])
 
     brain._rebuild_char_counts()
+    brain._rebuild_word_counts()
     brain.save()
     return (
         f"Ingested {len(articles)} random articles "
@@ -220,6 +223,7 @@ def auto_crawl_wiki(brain, rounds: int = 10, per_round: int = 5,
             total_articles += 1
 
         brain._rebuild_char_counts()
+        brain._rebuild_word_counts()
         brain.save()
 
         if r % train_every == 0:
@@ -229,9 +233,185 @@ def auto_crawl_wiki(brain, rounds: int = 10, per_round: int = 5,
         time.sleep(1)
 
     brain._rebuild_char_counts()
+    brain._rebuild_word_counts()
     brain.save()
 
     return (
         f"Wiki auto-crawl done: {total_articles} articles ingested "
         f"({total_chars:,} chars) over {rounds} rounds."
+    )
+
+
+# ── Internet Archive / Open Library ingestion ──────────────────────────────────
+
+IA_SEARCH_URL = "https://archive.org/advancedsearch.php"
+IA_META_URL = "https://archive.org/metadata"
+OL_SEARCH_URL = "https://openlibrary.org/search.json"
+
+
+def fetch_internet_archive_texts(query: str, count: int = 5,
+                                  max_chars: int = 80_000) -> list[dict]:
+    """
+    Search the Internet Archive for public-domain text files and
+    return their content for brain ingestion.
+    """
+    params = {
+        "q": f"{query} AND mediatype:texts",
+        "fl[]": "identifier,title",
+        "rows": min(count, 20),
+        "page": 1,
+        "output": "json",
+    }
+    results = []
+    try:
+        resp = _SESSION.get(IA_SEARCH_URL, params=params, timeout=REQUEST_TIMEOUT)
+        resp.raise_for_status()
+        docs = resp.json().get("response", {}).get("docs", [])
+
+        for doc in docs[:count]:
+            identifier = doc.get("identifier", "")
+            title = doc.get("title", identifier)
+            if not identifier:
+                continue
+
+            # Try to find a text file in the item
+            text = _fetch_ia_text(identifier, max_chars)
+            if text and len(text) > 200:
+                results.append({
+                    "title": title,
+                    "text": text,
+                    "url": f"https://archive.org/details/{identifier}",
+                })
+            time.sleep(0.5)
+    except Exception as exc:
+        console.print(f"[dim red]Internet Archive error: {exc}[/dim red]")
+    return results
+
+
+def _fetch_ia_text(identifier: str, max_chars: int) -> str:
+    """Try to fetch a plain text file from an Internet Archive item."""
+    try:
+        resp = _SESSION.get(f"{IA_META_URL}/{identifier}", timeout=REQUEST_TIMEOUT)
+        resp.raise_for_status()
+        files = resp.json().get("files", [])
+
+        # Look for .txt files first, then .htm/.html
+        txt_files = [f for f in files if f.get("name", "").endswith(".txt")]
+        if not txt_files:
+            txt_files = [f for f in files if f.get("name", "").endswith((".htm", ".html"))]
+        if not txt_files:
+            return ""
+
+        # Pick the largest text file under 2MB
+        txt_files.sort(key=lambda f: int(f.get("size", 0)), reverse=True)
+        chosen = None
+        for tf in txt_files:
+            size = int(tf.get("size", 0))
+            if size < 2_000_000:
+                chosen = tf
+                break
+        if not chosen:
+            chosen = txt_files[0]
+
+        file_url = f"https://archive.org/download/{identifier}/{chosen['name']}"
+        text_resp = _SESSION.get(file_url, timeout=30)
+        text_resp.raise_for_status()
+        text = text_resp.text[:max_chars]
+
+        # Clean HTML if needed
+        if chosen["name"].endswith((".htm", ".html")):
+            text = re.sub(r"<[^>]+>", " ", text)
+            text = re.sub(r"\s+", " ", text)
+
+        return text.strip()
+    except Exception:
+        return ""
+
+
+def ingest_internet_archive(brain, query: str = "science",
+                             count: int = 5) -> str:
+    """Search the Internet Archive and ingest results into the brain."""
+    articles = fetch_internet_archive_texts(query, count=count)
+    if not articles:
+        return f"No Internet Archive texts found for: '{query}'"
+
+    total_chars = 0
+    total_chunks = 0
+    names = []
+    for art in articles:
+        chunks = chunk_text(art["text"])
+        for chunk in chunks:
+            brain.text_corpus.append(chunk)
+        total_chars += len(art["text"])
+        total_chunks += len(chunks)
+        names.append(art["title"])
+
+    brain._rebuild_char_counts()
+    brain._rebuild_word_counts()
+    brain.save()
+    return (
+        f"Ingested {len(articles)} Internet Archive texts "
+        f"({total_chars:,} chars, {total_chunks} chunks):\n  "
+        + "\n  ".join(names[:10])
+    )
+
+
+def internet_learn(brain, topics: list[str] | None = None,
+                   wiki_count: int = 5, ia_count: int = 3,
+                   train_gens: int = 5) -> str:
+    """
+    Combined learning from Wikipedia + Internet Archive + training.
+    This is the all-in-one 'learn from the internet' command.
+    """
+    if topics is None:
+        topics = [
+            "science", "history", "mathematics", "philosophy",
+            "computer science", "biology", "physics", "literature",
+            "geography", "astronomy",
+        ]
+
+    results = []
+    total_articles = 0
+    total_chars = 0
+
+    for topic in topics[:5]:
+        # Wikipedia
+        console.print(f"[dim]Learning from Wikipedia: {topic}…[/dim]")
+        titles = search_articles(topic, limit=wiki_count)
+        for title in titles[:wiki_count]:
+            art = fetch_article(title)
+            if art and len(art["text"]) > 200:
+                chunks = chunk_text(art["text"])
+                for chunk in chunks:
+                    brain.text_corpus.append(chunk)
+                total_chars += len(art["text"])
+                total_articles += 1
+            time.sleep(0.3)
+
+        # Internet Archive
+        console.print(f"[dim]Learning from Internet Archive: {topic}…[/dim]")
+        ia_texts = fetch_internet_archive_texts(topic, count=ia_count)
+        for art in ia_texts:
+            chunks = chunk_text(art["text"])
+            for chunk in chunks:
+                brain.text_corpus.append(chunk)
+            total_chars += len(art["text"])
+            total_articles += 1
+
+        results.append(f"  {topic}: done")
+
+    brain._rebuild_char_counts()
+    brain._rebuild_word_counts()
+    brain.save()
+
+    # Train on the new knowledge
+    console.print(f"[dim]Training brain ({train_gens} generations)…[/dim]")
+    stats = brain.train(generations=train_gens)
+
+    return (
+        f"Internet learning complete!\n"
+        f"Articles ingested: {total_articles}\n"
+        f"Total chars: {total_chars:,}\n"
+        f"Training: best={stats['best_score']:.4f}, avg={stats['avg_score']:.4f}\n"
+        f"Topics:\n" + "\n".join(results)
     )
