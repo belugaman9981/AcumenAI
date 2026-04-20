@@ -37,6 +37,8 @@ from wiki_ingest import (
     ingest_search_to_brain,
     ingest_random_to_brain,
     auto_crawl_wiki,
+    ingest_internet_archive,
+    internet_learn,
 )
 from screenshot import screenshot_and_read, extract_text_from_file, analyze_screenshot
 from voice import speak, speak_async, listen, check_voice_available
@@ -490,6 +492,20 @@ class CodingAgent:
 
     def brain_wiki_crawl(self, rounds: int = 10, per_round: int = 5) -> str:
         return auto_crawl_wiki(self.brain, rounds=rounds, per_round=per_round)
+
+    def brain_internet_archive(self, query: str = "science", count: int = 5) -> str:
+        return ingest_internet_archive(self.brain, query=query, count=count)
+
+    def brain_internet_learn(self) -> str:
+        return internet_learn(self.brain)
+
+    def brain_word_map(self, word: str = "") -> str:
+        if word:
+            return self.brain.word_map_lookup(word)
+        return self.brain.word_map_stats()
+
+    def brain_predict_words(self, prefix: str, word_count: int = 30) -> str:
+        return self.brain.predict_next_words(prefix=prefix, word_count=word_count)
 
     # ── Screenshot ──────────────────────────────────────────────────────────────
 
