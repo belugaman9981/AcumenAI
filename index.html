@@ -381,19 +381,38 @@
 
         .sidebar-footer {
             padding: 12px 16px; border-top: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
+            position: relative;
         }
-        .user-info { font-size: 0.85rem; color: var(--text2); display: flex; align-items: center; gap: 8px; }
+        .user-banner {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: 10px; cursor: pointer;
+            transition: background 0.15s;
+        }
+        .user-banner:hover { background: var(--card-hover); }
+        .user-info { font-size: 0.85rem; color: var(--text2); display: flex; align-items: center; gap: 8px; flex:1; }
         .user-avatar {
             width: 28px; height: 28px; border-radius: 50%;
             background: var(--gradient); display: flex; align-items: center;
             justify-content: center; font-size: 0.75rem; font-weight: 700; color: #fff;
         }
-        .logout-btn {
-            background: none; border: none; color: var(--text3);
-            cursor: pointer; font-size: 0.8rem; transition: color 0.15s;
+        .user-menu {
+            display: none; position: absolute; bottom: 100%; left: 8px; right: 8px;
+            background: var(--bg2); border: 1px solid var(--border2);
+            border-radius: 12px; padding: 6px; margin-bottom: 6px;
+            box-shadow: 0 8px 32px var(--shadow); z-index: 100;
         }
-        .logout-btn:hover { color: #f87171; }
+        .user-menu.active { display: block; }
+        .user-menu-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 8px; font-size: 0.85rem;
+            color: var(--text2); cursor: pointer; border: none;
+            background: none; width: 100%; text-align: left;
+            transition: background 0.12s;
+        }
+        .user-menu-item:hover { background: var(--card-hover); color: var(--text); }
+        .user-menu-item.danger:hover { color: #f87171; }
+        .user-menu-item .menu-icon { font-size: 1rem; width: 20px; text-align: center; }
+        .user-menu-sep { height: 1px; background: var(--border); margin: 4px 0; }
 
         /* Main Chat */
         .main {
@@ -420,8 +439,9 @@
             font-size: 2.4rem; font-weight: 800;
             background: var(--gradient);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 12px;
+            margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 12px;
         }
+        .welcome-logo svg { flex-shrink: 0; }
         .welcome-sub { color: var(--text3); font-size: 1rem; margin-bottom: 40px; }
         .suggestions {
             display: grid; grid-template-columns: 1fr 1fr;
@@ -513,7 +533,7 @@
 <div class="landing" id="landing">
     <div class="container">
         <nav>
-            <div class="logo">AcumenAI</div>
+            <div class="logo"><svg class="logo-icon" viewBox="0 0 36 36" width="28" height="28" style="vertical-align:middle;margin-right:6px"><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="50%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><circle cx="18" cy="18" r="16" fill="none" stroke="url(#lg1)" stroke-width="2"/><circle cx="18" cy="12" r="3" fill="url(#lg1)"/><circle cx="10" cy="22" r="2.5" fill="url(#lg1)"/><circle cx="26" cy="22" r="2.5" fill="url(#lg1)"/><circle cx="18" cy="26" r="2" fill="url(#lg1)"/><line x1="18" y1="15" x2="18" y2="24" stroke="url(#lg1)" stroke-width="1.2"/><line x1="18" y1="12" x2="10" y2="22" stroke="url(#lg1)" stroke-width="1" opacity="0.6"/><line x1="18" y1="12" x2="26" y2="22" stroke="url(#lg1)" stroke-width="1" opacity="0.6"/><line x1="10" y1="22" x2="18" y2="26" stroke="url(#lg1)" stroke-width="0.8" opacity="0.4"/><line x1="26" y1="22" x2="18" y2="26" stroke="url(#lg1)" stroke-width="0.8" opacity="0.4"/></svg>AcumenAI</div>
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#quickstart">Get Started</a>
@@ -650,6 +670,7 @@
             <select id="settingsProvider" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.92rem">
                 <option value="openrouter">OpenRouter</option>
                 <option value="openai">OpenAI</option>
+                <option value="claude">Claude (Anthropic)</option>
                 <option value="local">Local (LM Studio / Ollama)</option>
             </select>
         </div>
@@ -673,19 +694,58 @@
     </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â• APP SHELL â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+
+<!-- Profile Modal -->
+<div class="modal-overlay" id="profileModal">
+    <div class="modal-card" style="max-width:420px;text-align:left">
+        <button class="modal-close" onclick="document.getElementById('profileModal').classList.remove('active')">&times;</button>
+        <div class="modal-logo" style="text-align:center">Profile</div>
+        <div style="text-align:center;margin:16px 0">
+            <div class="user-avatar" id="profileAvatar" style="width:56px;height:56px;font-size:1.5rem;margin:0 auto 10px"></div>
+            <div style="font-size:1.1rem;font-weight:600;color:var(--text)" id="profileName"></div>
+            <div style="font-size:.82rem;color:var(--text3);margin-top:4px" id="profileStats"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Brain Dashboard Modal -->
+<div class="modal-overlay" id="brainModal">
+    <div class="modal-card" style="max-width:560px;text-align:left">
+        <button class="modal-close" onclick="document.getElementById('brainModal').classList.remove('active')">&times;</button>
+        <div class="modal-logo" style="text-align:center">&#129504; Brain Dashboard</div>
+        <div class="modal-sub" style="text-align:center">Your self-learning AI brain &mdash; no API needed for local intelligence.</div>
+        <div id="brainStatus" style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:14px;font-size:.85rem;color:var(--text2);line-height:1.7;white-space:pre-line;margin-bottom:14px">Loading...</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="auth-btn" onclick="brainAction('train')" style="font-size:.85rem;padding:10px">&#9881; Train (5 gens)</button>
+            <button class="auth-btn" onclick="brainAction('wiki-random')" style="font-size:.85rem;padding:10px">&#127760; Learn Wikipedia</button>
+            <button class="auth-btn" onclick="brainAction('wiki-crawl')" style="font-size:.85rem;padding:10px">&#128218; Auto-Crawl</button>
+            <button class="auth-btn" onclick="brainAction('internet-learn')" style="font-size:.85rem;padding:10px">&#128421; Internet Learn</button>
+        </div>
+        <div id="brainActionStatus" style="margin-top:10px;font-size:.82rem;color:var(--text3);text-align:center"></div>
+    </div>
+</div>
+
 <div class="app" id="app">
     <div class="sidebar">
         <div class="sidebar-header">
             <button class="new-chat-btn" id="newChatBtn">&#10010; New chat</button>
         </div>
         <div class="chat-list" id="chatList"></div>
-        <div class="sidebar-footer">
-            <div class="user-info">
-                <div class="user-avatar" id="userAvatar"></div>
-                <span id="userName"></span>
+        <div class="sidebar-footer" id="sidebarFooter">
+            <div class="user-menu" id="userMenu">
+                <button class="user-menu-item" onclick="openSettings()"><span class="menu-icon">&#9881;</span> Settings</button>
+                <button class="user-menu-item" onclick="openProfile()"><span class="menu-icon">&#9786;</span> Profile</button>
+                <button class="user-menu-item" onclick="openBrainDashboard()"><span class="menu-icon">&#129504;</span> Brain Dashboard</button>
+                <div class="user-menu-sep"></div>
+                <button class="user-menu-item danger" id="logoutBtn"><span class="menu-icon">&#8617;</span> Log out</button>
             </div>
-            <button class="logout-btn" id="logoutBtn">Log out</button>
+            <div class="user-banner" id="userBanner">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <span id="userName"></span>
+                </div>
+                <span style="color:var(--text3);font-size:0.7rem">&#9679;&#9679;&#9679;</span>
+            </div>
         </div>
     </div>
 
@@ -697,7 +757,7 @@
         </div>
         <div class="messages" id="messages">
             <div class="welcome-screen" id="welcomeScreen">
-                <div class="welcome-logo">AcumenAI</div>
+                <div class="welcome-logo"><svg viewBox="0 0 36 36" width="40" height="40"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="50%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><circle cx="18" cy="18" r="16" fill="none" stroke="url(#lg2)" stroke-width="2"/><circle cx="18" cy="12" r="3" fill="url(#lg2)"/><circle cx="10" cy="22" r="2.5" fill="url(#lg2)"/><circle cx="26" cy="22" r="2.5" fill="url(#lg2)"/><circle cx="18" cy="26" r="2" fill="url(#lg2)"/><line x1="18" y1="15" x2="18" y2="24" stroke="url(#lg2)" stroke-width="1.2"/><line x1="18" y1="12" x2="10" y2="22" stroke="url(#lg2)" stroke-width="1" opacity="0.6"/><line x1="18" y1="12" x2="26" y2="22" stroke="url(#lg2)" stroke-width="1" opacity="0.6"/><line x1="10" y1="22" x2="18" y2="26" stroke="url(#lg2)" stroke-width="0.8" opacity="0.4"/><line x1="26" y1="22" x2="18" y2="26" stroke="url(#lg2)" stroke-width="0.8" opacity="0.4"/></svg>AcumenAI</div>
                 <div class="welcome-sub">How can I help you today?</div>
                 <div class="suggestions">
                     <div class="suggestion" onclick="useSuggestion(this)"><strong>Write code</strong>Help me write a Python script</div>
@@ -842,8 +902,61 @@ function showApp() {
     renderChatList();
 }
 
+// -- User Hover Menu --
+$('userBanner').addEventListener('click', (e) => {
+    e.stopPropagation();
+    $('userMenu').classList.toggle('active');
+});
+document.addEventListener('click', (e) => {
+    if (!$('sidebarFooter').contains(e.target)) {
+        $('userMenu').classList.remove('active');
+    }
+});
+
+function openProfile() {
+    $('userMenu').classList.remove('active');
+    $('profileAvatar').textContent = currentUser[0].toUpperCase();
+    $('profileName').textContent = currentUser;
+    const chatCount = chats.length;
+    const msgCount = chats.reduce((n, c) => n + c.messages.length, 0);
+    $('profileStats').textContent = chatCount + ' chats \u00b7 ' + msgCount + ' messages';
+    $('profileModal').classList.add('active');
+}
+$('profileModal').addEventListener('click', e => { if (e.target === $('profileModal')) $('profileModal').classList.remove('active'); });
+
+function openBrainDashboard() {
+    $('userMenu').classList.remove('active');
+    $('brainModal').classList.add('active');
+    fetchBrainStatus();
+}
+$('brainModal').addEventListener('click', e => { if (e.target === $('brainModal')) $('brainModal').classList.remove('active'); });
+
+async function fetchBrainStatus() {
+    try {
+        const resp = await fetch('http://localhost:5820/brain/status');
+        const data = await resp.json();
+        $('brainStatus').textContent = data.status || 'No status available';
+    } catch (e) {
+        $('brainStatus').textContent = 'Brain server not running. Start with: python api_server.py';
+    }
+}
+
+async function brainAction(action) {
+    const statusEl = $('brainActionStatus');
+    statusEl.textContent = 'Working...';
+    try {
+        const resp = await fetch('http://localhost:5820/brain/' + action, { method: 'POST' });
+        const data = await resp.json();
+        statusEl.textContent = data.result || 'Done!';
+        fetchBrainStatus();
+    } catch (e) {
+        statusEl.textContent = 'Error: ' + e.message;
+    }
+}
+
 // â”€â”€ Log Out â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $('logoutBtn').addEventListener('click', () => {
+    $('userMenu').classList.remove('active');
     localStorage.removeItem('acumen_user');
     currentUser = null;
     chats = [];
@@ -914,7 +1027,7 @@ function openChat(id) {
 function showWelcome() {
     $('messages').innerHTML = `
         <div class="welcome-screen">
-            <div class="welcome-logo">AcumenAI</div>
+            <div class="welcome-logo"><svg viewBox="0 0 36 36" width="40" height="40"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="50%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><circle cx="18" cy="18" r="16" fill="none" stroke="url(#lg2)" stroke-width="2"/><circle cx="18" cy="12" r="3" fill="url(#lg2)"/><circle cx="10" cy="22" r="2.5" fill="url(#lg2)"/><circle cx="26" cy="22" r="2.5" fill="url(#lg2)"/><circle cx="18" cy="26" r="2" fill="url(#lg2)"/><line x1="18" y1="15" x2="18" y2="24" stroke="url(#lg2)" stroke-width="1.2"/><line x1="18" y1="12" x2="10" y2="22" stroke="url(#lg2)" stroke-width="1" opacity="0.6"/><line x1="18" y1="12" x2="26" y2="22" stroke="url(#lg2)" stroke-width="1" opacity="0.6"/><line x1="10" y1="22" x2="18" y2="26" stroke="url(#lg2)" stroke-width="0.8" opacity="0.4"/><line x1="26" y1="22" x2="18" y2="26" stroke="url(#lg2)" stroke-width="0.8" opacity="0.4"/></svg>AcumenAI</div>
             <div class="welcome-sub">How can I help you today?</div>
             <div class="suggestions">
                 <div class="suggestion" onclick="useSuggestion(this)"><strong>Write code</strong>Help me write a Python script</div>
@@ -997,11 +1110,13 @@ function sendMessage() {
 const PROVIDER_URLS = {
     openrouter: 'https://openrouter.ai/api/v1/chat/completions',
     openai: 'https://api.openai.com/v1/chat/completions',
+    claude: 'https://api.anthropic.com/v1/messages',
     local: null,
 };
 const DEFAULT_MODELS = {
     openrouter: 'google/gemma-4-31b-it:free',
     openai: 'gpt-4o',
+    claude: 'claude-sonnet-4-20250514',
     local: 'default',
 };
 function loadSettings() {
@@ -1037,6 +1152,8 @@ function toggleProviderFields() {
     const p = $('settingsProvider').value;
     $('apiKeyGroup').style.display = p === 'local' ? 'none' : 'block';
     $('localUrlGroup').style.display = p === 'local' ? 'block' : 'none';
+    if (p === 'claude') $('settingsApiKey').placeholder = 'sk-ant-...';
+    else $('settingsApiKey').placeholder = 'sk-or-... or sk-...';
     const modelEl = $('settingsModel');
     if (!modelEl.value || Object.values(DEFAULT_MODELS).includes(modelEl.value)) {
         modelEl.value = DEFAULT_MODELS[p] || '';
@@ -1060,6 +1177,12 @@ async function generateReply(msg) {
         return 'Please set your API key in Settings (click the \u2699 gear icon) to start chatting.';
     }
     const model = s.model || DEFAULT_MODELS[s.provider] || 'google/gemma-4-31b-it:free';
+
+    // Claude uses a different API format
+    if (s.provider === 'claude') {
+        return await generateClaudeReply(msg, model, s.apiKey);
+    }
+
     let url;
     if (s.provider === 'local') {
         url = (s.baseUrl || 'http://localhost:1234/v1').replace(/\/+$/, '') + '/chat/completions';
@@ -1093,6 +1216,45 @@ async function generateReply(msg) {
         conversationHistory.pop();
         if (e.message.includes('401') || e.message.includes('403')) {
             return 'Invalid API key. Click the \u2699 gear icon to update your settings.';
+        }
+        return 'Error: ' + e.message + '\nClick the \u2699 gear icon to check your settings.';
+    }
+}
+
+async function generateClaudeReply(msg, model, apiKey) {
+    conversationHistory.push({ role: 'user', content: msg });
+    if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
+    // Claude API requires alternating user/assistant messages, no system in messages array
+    const claudeMessages = conversationHistory.map(m => ({ role: m.role, content: m.content }));
+    try {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01',
+                'anthropic-dangerous-direct-browser-access': 'true',
+            },
+            body: JSON.stringify({
+                model: model,
+                max_tokens: 4096,
+                system: 'You are AcumenAI, an expert coding assistant. Be concise but thorough. Format code with markdown fences.',
+                messages: claudeMessages,
+                temperature: 0.4,
+            }),
+        });
+        if (!resp.ok) {
+            const err = await resp.text();
+            throw new Error('HTTP ' + resp.status + ': ' + err.slice(0, 200));
+        }
+        const data = await resp.json();
+        const reply = (data.content && data.content[0]) ? data.content[0].text : '(empty response)';
+        conversationHistory.push({ role: 'assistant', content: reply });
+        return reply;
+    } catch (e) {
+        conversationHistory.pop();
+        if (e.message.includes('401') || e.message.includes('403')) {
+            return 'Invalid Anthropic API key. Click the \u2699 gear icon to update your settings.';
         }
         return 'Error: ' + e.message + '\nClick the \u2699 gear icon to check your settings.';
     }
