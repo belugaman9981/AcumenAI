@@ -126,7 +126,7 @@ class EvolutionBrain:
 
         self._load()
         if not self.population:
-            self.init_population(24)
+            self.init_population(48)
 
     def _load(self) -> None:
         if not self.state_path.exists():
@@ -538,8 +538,8 @@ class EvolutionBrain:
         generations = max(1, int(generations))
         keep_ratio = _clamp(float(keep_ratio), 0.1, 0.8)
 
-        if len(self.population) < 4:
-            self.init_population(24)
+        if len(self.population) < 6:
+            self.init_population(48)
 
         history: list[float] = []
         pop_size = len(self.population)

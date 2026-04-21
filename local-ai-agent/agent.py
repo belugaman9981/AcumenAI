@@ -93,9 +93,34 @@ def _build_system_prompt() -> str:
     """).strip()
 
 
-# ── OpenAI client ──────────────────────────────────────────────────────────────
+# ── Ollama helper ─────────────────────────────────────────────────────────────
 
-def _make_openai_client() -> OpenAI:
+def _ollama_available() -> bool:
+    """Return True if the local Ollama server is reachable."""
+    import urllib.request
+    try:
+        urllib.request.urlopen(
+            config.OLLAMA_BASE_URL.replace("/v1", "") + "/api/tags", timeout=3
+        )
+        return True
+    except Exception:
+        return False
+
+
+# ── OpenAI / Ollama client factory ────────────────────────────────────────────
+
+def _make_openai_client(provider: str = "openai") -> OpenAI:
+    """Build an OpenAI-compatible client for the chosen provider.
+
+    - provider="ollama"  → points at local Ollama, no real key needed
+    - provider="openai"  → OpenRouter / OpenAI, reads env var
+    """
+    if provider == "ollama":
+        return OpenAI(
+            api_key="ollama",                  # Ollama ignores the key value
+            base_url=config.OLLAMA_BASE_URL,
+        )
+    # openai / openrouter / LM Studio path
     api_key  = config.OPENAI_API_KEY or os.environ.get("OPENAI_API_KEY", "")
     base_url = config.OPENAI_BASE_URL or None
     kwargs: dict = {"api_key": api_key or "not-needed"}
@@ -108,9 +133,9 @@ class OpenAIClient:
     MAX_RETRIES = 3
     RETRY_BACKOFF = [1, 3, 8]  # seconds
 
-    def __init__(self, model: str):
+    def __init__(self, model: str, provider: str = "openai"):
         self.model  = model
-        self._client = _make_openai_client()
+        self._client = _make_openai_client(provider)
         # Token tracking
         self.total_prompt_tokens = 0
         self.total_completion_tokens = 0
@@ -385,9 +410,21 @@ class CodingAgent:
             _model = model if model != config.DEFAULT_MODEL else config.CLAUDE_MODEL
             self.model = _model
             self.client = ClaudeClient(_model)
+        elif config.PROVIDER == "ollama":
+            _model = config.OLLAMA_MODEL
+            self.model = _model
+            if not _ollama_available():
+                from rich.console import Console as _C
+                _C().print(
+                    "[yellow]Warning: Ollama not detected at "
+                    + config.OLLAMA_BASE_URL.replace("/v1", "")
+                    + ". Run 'ollama serve' and 'ollama pull "
+                    + config.OLLAMA_MODEL + "'.[/yellow]"
+                )
+            self.client = OpenAIClient(_model, provider="ollama")
         else:
             self.model = model
-            self.client = OpenAIClient(model)
+            self.client = OpenAIClient(model, provider="openai")
         self.history: list[dict] = []
         self.system_prompt = _build_system_prompt()
         self.brain = EvolutionBrain(Path(config.BRAIN_STATE_FILE))

@@ -1,11 +1,13 @@
-
+# Core
 requests>=2.31.0
 beautifulsoup4>=4.12.0
 rich>=13.7.0
 duckduckgo-search>=6.1.0
-openai>=1.0.0
-anthropic>=0.25.0
+openai>=1.0.0       # Also used as Ollama client (OpenAI-compatible mode)
 lxml>=5.1.0
+
+# Claude API (only needed if PROVIDER = "claude" in config.py)
+anthropic>=0.25.0
 
 # Screenshot analyzer
 Pillow>=10.0.0
@@ -16,4 +18,3 @@ pytesseract>=0.3.10
 pyttsx3>=2.90
 SpeechRecognition>=3.10.0
 # pyaudio>=0.2.14  # uncomment if you want mic input; may need: pipwin install pyaudio
-
