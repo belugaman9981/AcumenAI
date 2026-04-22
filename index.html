@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -545,7 +545,7 @@
         <section class="hero">
             <div class="badge">Open Source AI Agent</div>
             <h1>Your own <span class="gradient">AI coding agent</span><br>that actually works</h1>
-            <p>A local AI assistant that searches the web, explores GitHub, reads your files, and runs code &mdash; powered by any OpenAI-compatible API.</p>
+            <p>A fully local AI assistant powered by its own evolving brain &mdash; no API keys, no subscriptions, no external services. Just pure local intelligence.</p>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="openModal('signup')">&#9733; Get Started</button>
                 <a href="#quickstart" class="btn btn-secondary">&#8594; Quick Start</a>
@@ -556,7 +556,7 @@
             <div class="card">
                 <div class="card-icon icon-blue">&#129504;</div>
                 <h3>Any Model Backend</h3>
-                <p>Works with OpenAI, OpenRouter, LM Studio, or any compatible API.</p>
+                <p>Zero API keys needed. Runs 100% locally on your machine.</p>
             </div>
             <div class="card">
                 <div class="card-icon icon-purple">&#128269;</div>
@@ -594,7 +594,7 @@
                 <span class="cmd">cd</span> AcumenAI/local-ai-agent<br><br>
                 <span class="comment"># Install dependencies</span><br>
                 <span class="cmd">pip install</span> <span class="flag">-r</span> requirements.txt<br><br>
-                <span class="comment"># Set your API key in config.py, then run</span><br>
+                <span class="comment"># No API key needed, just run:</span><br>
                 <span class="cmd">python</span> main.py
             </div>
         </section>
@@ -663,33 +663,30 @@
 <div class="modal-overlay" id="settingsModal">
     <div class="modal-card" style="max-width:440px;text-align:left">
         <button class="modal-close" onclick="document.getElementById('settingsModal').classList.remove('active')">&times;</button>
-        <div class="modal-logo" style="text-align:center">Settings</div>
-        <div class="modal-sub" style="text-align:center">Configure your AI provider to chat from the browser.</div>
-        <div class="input-group">
-            <label>API Provider</label>
-            <select id="settingsProvider" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.92rem">
-                <option value="openrouter">OpenRouter</option>
-                <option value="openai">OpenAI</option>
-                <option value="claude">Claude (Anthropic)</option>
-                <option value="local">Local (LM Studio / Ollama)</option>
-            </select>
+        <div class="modal-logo" style="text-align:center">&#9881; Settings</div>
+        <div class="modal-sub" style="text-align:center">No API keys needed &mdash; 100% local brain.</div>
+
+        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:14px;margin-bottom:16px">
+            <div style="font-size:.8rem;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Brain Server Status</div>
+            <div id="serverStatus" style="font-size:.9rem;color:var(--text2)">Checking...</div>
         </div>
-        <div class="input-group" id="apiKeyGroup">
-            <label>API Key</label>
-            <div class="input-wrap-field">
-                <input type="password" id="settingsApiKey" placeholder="sk-or-... or sk-...">
-                <button class="eye-btn" onclick="togglePass('settingsApiKey', this)" type="button">&#128065;</button>
+
+        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:14px;margin-bottom:16px">
+            <div style="font-size:.8rem;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">To start the brain server</div>
+            <div style="font-family:monospace;font-size:.82rem;color:#60a5fa;line-height:1.8">
+                cd G:\Python\AcumenAI\AcumenAI_improved\local-ai-agent<br>
+                python api_server.py
             </div>
         </div>
-        <div class="input-group">
-            <label>Model</label>
-            <input type="text" id="settingsModel" placeholder="google/gemma-4-31b-it:free" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.92rem">
+
+        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:14px;margin-bottom:16px">
+            <div style="font-size:.8rem;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Upload WSJ / PDF to train brain</div>
+            <input type="file" id="pdfUploadInput" accept=".pdf" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.85rem;cursor:pointer">
+            <button class="auth-btn" onclick="uploadPDF()" style="margin-top:8px;font-size:.85rem;padding:10px">Upload &amp; Ingest PDF</button>
+            <div id="pdfUploadStatus" style="margin-top:8px;font-size:.82rem;color:var(--text3)"></div>
         </div>
-        <div class="input-group" id="localUrlGroup" style="display:none">
-            <label>Base URL</label>
-            <input type="text" id="settingsBaseUrl" placeholder="http://localhost:1234/v1" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.92rem">
-        </div>
-        <button class="auth-btn" onclick="saveSettings()" style="margin-top:10px">Save Settings</button>
+
+        <button class="auth-btn" onclick="saveSettings()" style="margin-top:4px">Close</button>
         <div id="settingsStatus" style="margin-top:10px;font-size:.82rem;color:var(--text3);text-align:center"></div>
     </div>
 </div>
@@ -717,7 +714,9 @@
         <div id="brainStatus" style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:14px;font-size:.85rem;color:var(--text2);line-height:1.7;white-space:pre-line;margin-bottom:14px">Loading...</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
             <button class="auth-btn" onclick="brainAction('train')" style="font-size:.85rem;padding:10px">&#9881; Train (5 gens)</button>
-            <button class="auth-btn" onclick="brainAction('wiki-random')" style="font-size:.85rem;padding:10px">&#127760; Learn Wikipedia</button>
+            <button class="auth-btn" onclick="brainAction('wiki-random')" style="font-size:.85rem;padding:10px">&#127760; Random Wikipedia</button>
+            <button class="auth-btn" onclick="brainWikiSearch()" style="font-size:.85rem;padding:10px">&#128269; Search Wikipedia</button>
+            <button class="auth-btn" onclick="brainAction('wiki-crawl')" style="font-size:.85rem;padding:10px">&#129432; Auto-Crawl Wiki</button>
             <button class="auth-btn" onclick="brainAction('wiki-crawl')" style="font-size:.85rem;padding:10px">&#128218; Auto-Crawl</button>
             <button class="auth-btn" onclick="brainAction('internet-learn')" style="font-size:.85rem;padding:10px">&#128421; Internet Learn</button>
         </div>
@@ -1106,62 +1105,30 @@ function sendMessage() {
     });
 }
 
-// -- Settings --
-const PROVIDER_URLS = {
-    openrouter: 'https://openrouter.ai/api/v1/chat/completions',
-    openai: 'https://api.openai.com/v1/chat/completions',
-    claude: 'https://api.anthropic.com/v1/messages',
-    local: null,
-};
-const DEFAULT_MODELS = {
-    openrouter: 'google/gemma-4-31b-it:free',
-    openai: 'gpt-4o',
-    claude: 'claude-sonnet-4-20250514',
-    local: 'default',
-};
-function loadSettings() {
-    return {
-        provider: localStorage.getItem('acumen_provider') || 'openrouter',
-        apiKey: localStorage.getItem('acumen_apikey') || '',
-        model: localStorage.getItem('acumen_model') || '',
-        baseUrl: localStorage.getItem('acumen_baseurl') || 'http://localhost:1234/v1',
-    };
-}
-function saveSettings() {
-    const provider = $('settingsProvider').value;
-    const apiKey = $('settingsApiKey').value.trim();
-    const model = $('settingsModel').value.trim();
-    const baseUrl = $('settingsBaseUrl').value.trim();
-    localStorage.setItem('acumen_provider', provider);
-    localStorage.setItem('acumen_apikey', apiKey);
-    if (model) localStorage.setItem('acumen_model', model);
-    if (baseUrl) localStorage.setItem('acumen_baseurl', baseUrl);
-    $('settingsStatus').textContent = 'Settings saved!';
-    $('settingsModal').classList.remove('active');
-}
-function openSettings() {
-    const s = loadSettings();
-    $('settingsProvider').value = s.provider;
-    $('settingsApiKey').value = s.apiKey;
-    $('settingsModel').value = s.model || DEFAULT_MODELS[s.provider] || '';
-    $('settingsBaseUrl').value = s.baseUrl;
-    toggleProviderFields();
-    $('settingsModal').classList.add('active');
-}
-function toggleProviderFields() {
-    const p = $('settingsProvider').value;
-    $('apiKeyGroup').style.display = p === 'local' ? 'none' : 'block';
-    $('localUrlGroup').style.display = p === 'local' ? 'block' : 'none';
-    if (p === 'claude') $('settingsApiKey').placeholder = 'sk-ant-...';
-    else $('settingsApiKey').placeholder = 'sk-or-... or sk-...';
-    const modelEl = $('settingsModel');
-    if (!modelEl.value || Object.values(DEFAULT_MODELS).includes(modelEl.value)) {
-        modelEl.value = DEFAULT_MODELS[p] || '';
+// -- Settings (no API keys needed) --
+const LOCAL_API = 'http://localhost:5820';
+let serverOnline = false;
+
+async function checkServer() {
+    try {
+        const r = await fetch(LOCAL_API + '/health', { signal: AbortSignal.timeout(2000) });
+        const d = await r.json();
+        serverOnline = true;
+        $('serverStatus').textContent = '🟢 Brain server online — ' + d.bots + ' bots';
+        $('serverStatus').style.color = '#22c55e';
+    } catch(e) {
+        serverOnline = false;
+        $('serverStatus').textContent = '🔴 Brain server offline — run: python api_server.py';
+        $('serverStatus').style.color = '#ef4444';
     }
 }
+setInterval(checkServer, 5000);
+checkServer();
+
+function openSettings() { $('settingsModal').classList.add('active'); checkServer(); }
+function saveSettings() { $('settingsModal').classList.remove('active'); }
 $('settingsBtn').addEventListener('click', openSettings);
-$('settingsBtnGlobal').addEventListener('click', openSettings);
-$('settingsProvider').addEventListener('change', toggleProviderFields);
+$('settingsBtnGlobal') && $('settingsBtnGlobal').addEventListener('click', openSettings);
 $('settingsModal').addEventListener('click', e => {
     if (e.target === $('settingsModal')) $('settingsModal').classList.remove('active');
 });
@@ -1169,98 +1136,70 @@ $('settingsModal').addEventListener('click', e => {
 let conversationHistory = [];
 function resetConversation() { conversationHistory = []; }
 
-// -- AI Replies via direct API call --
+// -- AI Replies via local brain (no API key needed) --
 async function generateReply(msg) {
-    const s = loadSettings();
-    if (!s.apiKey && s.provider !== 'local') {
-        openSettings();
-        return 'Please set your API key in Settings (click the \u2699 gear icon) to start chatting.';
-    }
-    const model = s.model || DEFAULT_MODELS[s.provider] || 'google/gemma-4-31b-it:free';
-
-    // Claude uses a different API format
-    if (s.provider === 'claude') {
-        return await generateClaudeReply(msg, model, s.apiKey);
-    }
-
-    let url;
-    if (s.provider === 'local') {
-        url = (s.baseUrl || 'http://localhost:1234/v1').replace(/\/+$/, '') + '/chat/completions';
-    } else {
-        url = PROVIDER_URLS[s.provider];
+    if (!serverOnline) {
+        return '⚠️ Brain server is offline. Open PowerShell and run:\n\n  cd G:\\Python\\AcumenAI\\AcumenAI_improved\\local-ai-agent\n  python api_server.py\n\nThen refresh this page.';
     }
     conversationHistory.push({ role: 'user', content: msg });
     if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
-    const messages = [
-        { role: 'system', content: 'You are AcumenAI, an expert coding assistant. Be concise but thorough. Format code with markdown fences.' },
-        ...conversationHistory
-    ];
     try {
-        const headers = { 'Content-Type': 'application/json' };
-        if (s.apiKey) headers['Authorization'] = 'Bearer ' + s.apiKey;
-        if (s.provider === 'openrouter') headers['HTTP-Referer'] = window.location.href;
-        const resp = await fetch(url, {
+        const resp = await fetch(LOCAL_API + '/chat', {
             method: 'POST',
-            headers,
-            body: JSON.stringify({ model, messages, temperature: 0.4, max_tokens: 2048 }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: msg }),
         });
-        if (!resp.ok) {
-            const err = await resp.text();
-            throw new Error('HTTP ' + resp.status + ': ' + err.slice(0, 200));
-        }
+        if (!resp.ok) throw new Error('Server error ' + resp.status);
         const data = await resp.json();
-        const reply = (data.choices && data.choices[0] && data.choices[0].message) ? data.choices[0].message.content : '(empty response)';
+        const reply = data.reply || '(no reply)';
+        const source = data.source || 'brain';
+        const badge = source === 'live search' ? ' 🔍' : source === 'cached search' ? ' 📦' : ' 🧠';
         conversationHistory.push({ role: 'assistant', content: reply });
-        return reply;
-    } catch (e) {
+        return reply + badge;
+    } catch(e) {
         conversationHistory.pop();
-        if (e.message.includes('401') || e.message.includes('403')) {
-            return 'Invalid API key. Click the \u2699 gear icon to update your settings.';
-        }
-        return 'Error: ' + e.message + '\nClick the \u2699 gear icon to check your settings.';
+        return 'Error connecting to brain server: ' + e.message;
+    }
+}
+// -- PDF Upload --
+async function uploadPDF() {
+    const input = $('pdfUploadInput');
+    const status = $('pdfUploadStatus');
+    if (!input.files.length) { status.textContent = 'Please choose a PDF file first.'; return; }
+    if (!serverOnline) { status.textContent = 'Brain server is offline. Start it first.'; return; }
+    const formData = new FormData();
+    formData.append('file', input.files[0]);
+    status.textContent = 'Uploading and ingesting...';
+    try {
+        const resp = await fetch(LOCAL_API + '/pdf', { method: 'POST', body: formData });
+        const data = await resp.json();
+        status.textContent = data.result || data.error || 'Done!';
+        status.style.color = data.error ? '#ef4444' : '#22c55e';
+        fetchBrainStatus();
+    } catch(e) {
+        status.textContent = 'Error: ' + e.message;
+        status.style.color = '#ef4444';
     }
 }
 
-async function generateClaudeReply(msg, model, apiKey) {
-    conversationHistory.push({ role: 'user', content: msg });
-    if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
-    // Claude API requires alternating user/assistant messages, no system in messages array
-    const claudeMessages = conversationHistory.map(m => ({ role: m.role, content: m.content }));
+async function brainWikiSearch() {
+    const q = prompt('Enter a topic to search on Wikipedia:');
+    if (!q) return;
+    const statusEl = $('brainActionStatus');
+    statusEl.textContent = 'Searching Wikipedia for: ' + q + '...';
     try {
-        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        const resp = await fetch(LOCAL_API + '/brain/wiki-search', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': apiKey,
-                'anthropic-version': '2023-06-01',
-                'anthropic-dangerous-direct-browser-access': 'true',
-            },
-            body: JSON.stringify({
-                model: model,
-                max_tokens: 4096,
-                system: 'You are AcumenAI, an expert coding assistant. Be concise but thorough. Format code with markdown fences.',
-                messages: claudeMessages,
-                temperature: 0.4,
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: q })
         });
-        if (!resp.ok) {
-            const err = await resp.text();
-            throw new Error('HTTP ' + resp.status + ': ' + err.slice(0, 200));
-        }
         const data = await resp.json();
-        const reply = (data.content && data.content[0]) ? data.content[0].text : '(empty response)';
-        conversationHistory.push({ role: 'assistant', content: reply });
-        return reply;
-    } catch (e) {
-        conversationHistory.pop();
-        if (e.message.includes('401') || e.message.includes('403')) {
-            return 'Invalid Anthropic API key. Click the \u2699 gear icon to update your settings.';
-        }
-        return 'Error: ' + e.message + '\nClick the \u2699 gear icon to check your settings.';
-    }
+        statusEl.textContent = data.result || 'Done!';
+        fetchBrainStatus();
+    } catch(e) { statusEl.textContent = 'Error: ' + e.message; }
 }
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Helpers --
 function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
 function formatText(text) {
@@ -1278,8 +1217,7 @@ function useSuggestion(el) {
     sendMessage();
 }
 
-// â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Init --
 initAuth();
 </script>
 </body>
-</html>

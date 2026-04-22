@@ -1,214 +1,207 @@
+# AcumenAI — Local AI Agent
 
-# 🤖 Local AI Coding Agent
-
-A coding agent that works with any **OpenAI-compatible API**.  
-Use OpenAI, OpenRouter, LM Studio, or another compatible endpoint.
-
-## Features
-
-| Feature | Details |
-|---|---|
-| 🧠 Model backend | Any OpenAI-compatible model or local server |
-| 🔍 Web search | DuckDuckGo — no API key needed |
-| 🌐 Web scraping | Fetches & cleans any public URL |
-| 🐙 GitHub search | Search repos by stars, forks, language |
-| 👤 Notable coders | Browse repos from Torvalds, Karpathy, Evan You… |
-| 🕷  Background crawler | Silently explores GitHub while you're away |
-| 💾 Discoveries DB | SQLite log of everything the crawler finds |
-| 🧬 Evolutionary brain | Population of bots, survivor selection, mutation/crossover |
-| 🖼 Image classifier training | Teach labels (bee/cow/etc.) from your own images |
-| ✍ Local next-text learner | Character-map learning from local text corpora |
-| 👍 Preference adaptation | Learns style from /like and /dislike feedback |
+No API keys. No external AI services. Runs 100% on your machine.
 
 ---
 
-## Quick Start
+## What powers it
 
-### 1 — Install Python dependencies
+| Component | What it does |
+|-----------|-------------|
+| **48 evolved bots** | The core brain — learns from text, Wikipedia, and PDFs |
+| **DuckDuckGo search** | Handles live questions (prices, news, current events) |
+| **Smart cache** | Stable answers cached locally so it doesn't re-fetch every time |
+| **PDF ingestion** | Drop in WSJ articles or any PDF to train the brain |
+| **Background crawler** | Silently learns from GitHub while you're away |
 
-```bash
-cd local-ai-agent
+---
+
+## Setup
+
+```powershell
 pip install -r requirements.txt
-```
-
-### 2 — Pick a provider
-
-Open [config.py](local-ai-agent/config.py) and set one of these:
-
-OpenAI:
-```python
-OPENAI_API_KEY = "your-api-key"
-OPENAI_BASE_URL = ""
-DEFAULT_MODEL = "gpt-4o-mini"
-```
-
-OpenRouter:
-```python
-OPENAI_API_KEY = "your-api-key"
-OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
-DEFAULT_MODEL = "openrouter/auto"
-```
-
-LM Studio:
-```python
-OPENAI_API_KEY = "lm-studio"
-OPENAI_BASE_URL = "http://localhost:1234/v1"
-DEFAULT_MODEL = "local-model-name"
-```
-
-### 3 — Run
-
-```bash
 python main.py
 ```
 
 ---
 
-## CLI Options
+## Training the brain
+
+The brain starts empty. Feed it knowledge before chatting:
 
 ```
-python main.py [OPTIONS]
-
-Options:
-       --model <name>       Model to use  (default: value from config.py)
-  --no-background      Disable the idle GitHub crawler
-  --discoveries        Print crawler discoveries and exit
-       --list-models        List available models on the current API endpoint and exit
+/brain init 48
+/brain wiki-random 10
+/brain wiki-search artificial intelligence
+/brain wiki-search python programming
+/brain train 30
+/brain status
 ```
 
-### In-session commands
+The more articles it reads and the more generations it trains, the better
+the responses get.
 
-| Command | Action |
-|---|---|
-| `/help` | Show help |
+### Automated training loop (PowerShell)
+
+Leave this running overnight to build up a well-trained brain:
+
+```powershell
+$topics = @("artificial intelligence","science","technology","history",
+            "mathematics","programming","economics","medicine","space","music")
+
+foreach ($topic in $topics) {
+    Write-Host "Training on: $topic" -ForegroundColor Cyan
+    python -c "
+from pathlib import Path
+from brain import EvolutionBrain
+from wiki_ingest import ingest_search_to_brain
+b = EvolutionBrain(Path('brain_state.json'))
+print(ingest_search_to_brain(b, '$topic', max_articles=3))
+print(b.train(20))
+b.save()
+"
+}
+Write-Host "Done!" -ForegroundColor Green
+```
+
+---
+
+## Terminal commands
+
+### Chat commands
+| Command | What it does |
+|---------|-------------|
+| `/like` | Tell the brain the last reply was good |
+| `/dislike` | Tell the brain the last reply was bad |
 | `/reset` | Clear conversation history |
-| `/discoveries` | Show what the crawler found |
-| `/models` | List models on the current API endpoint |
-| `/model <name>` | Switch model mid-session |
-| `/like` | Mark last reply as good (preference learning) |
-| `/dislike` | Mark last reply as bad (preference learning) |
-| `/brain ...` | Control evolutionary brain |
+| `/discoveries` | Show what the background crawler found on GitHub |
 | `/quit` | Exit |
 
-### `/brain` commands
+### Brain commands
+| Command | What it does |
+|---------|-------------|
+| `/brain status` | Show bot count, scores, vocabulary size |
+| `/brain init 48` | Reset to a fresh 48-bot population |
+| `/brain train <n>` | Run n training generations |
+| `/brain add-text <path>` | Learn from a local text file |
+| `/brain wiki <title>` | Ingest one Wikipedia article |
+| `/brain wiki-search <query>` | Search & ingest top Wikipedia results |
+| `/brain wiki-random <n>` | Ingest n random Wikipedia articles |
+| `/brain wiki-crawl <rounds>` | Auto-crawl Wikipedia and train |
+| `/brain word-map [word]` | Show word co-occurrence map |
+| `/brain next <prefix>` | Predict next characters from a prefix |
+| `/brain add-image <label> <path>` | Add a labeled image sample |
+| `/brain guess <path>` | Classify an image with the brain |
 
-```text
-/brain status
-/brain init <population>
-/brain add-image <label> <path>
-/brain add-text <path>
-/brain train <generations>
-/brain guess <path>
-/brain next <prefix text>
-```
+### PDF commands
+| Command | What it does |
+|---------|-------------|
+| `/pdf <path>` | Ingest a PDF file into the brain |
+| `/pdf-dir <path>` | Ingest all PDFs in a folder |
 
-Example workflow:
+### Search commands
+| Command | What it does |
+|---------|-------------|
+| `/search <query>` | Force a live DuckDuckGo search |
+| `/search-stats` | Show what is cached and when it expires |
+| `/search-clear` | Wipe the search cache |
 
-```text
-/brain init 100
-/brain add-image bee "C:/data/bee1.jpg"
-/brain add-image cow "C:/data/cow1.jpg"
-/brain train 40
-/brain guess "C:/data/test.jpg"
-```
-
-This keeps top-performing bots each generation and recycles weaker ones by replacing them with mutated/crossover descendants.
+### Other commands
+| Command | What it does |
+|---------|-------------|
+| `/screenshot` | Capture screen and extract text via OCR |
+| `/ocr <path>` | Extract text from an image file |
+| `/speak` | Read the last reply aloud |
+| `/voice` | Speak your next message via microphone |
+| `/index <path>` | Index a codebase directory |
+| `/search <query>` | Search indexed codebase |
+| `/plugins` | List loaded plugins |
+| `/help` | Full command list |
 
 ---
 
-## Example conversations
+## Website / browser mode
+
+Start the local server to use the website:
+
+```powershell
+python api_server.py
+```
+
+Then open `../index.html` in your browser. The settings panel shows a
+green dot when connected. You can upload PDF files directly from the
+settings panel to train the brain.
+
+### API endpoints (for developers)
+
+| Method | Endpoint | Body | What it does |
+|--------|----------|------|-------------|
+| GET | `/health` | — | Server status + bot count |
+| POST | `/chat` | `{"message":"..."}` | Send a message, get a reply |
+| GET | `/brain/status` | — | Brain stats |
+| POST | `/brain/init` | `{"population":48}` | Reset brain |
+| POST | `/brain/train` | `{"generations":10}` | Train n generations |
+| POST | `/brain/wiki-random` | `{"count":5}` | Ingest random Wikipedia |
+| POST | `/brain/wiki-search` | `{"query":"..."}` | Search Wikipedia |
+| POST | `/brain/wiki-crawl` | `{"rounds":5}` | Auto-crawl Wikipedia |
+| POST | `/brain/predict` | `{"prefix":"...","mode":"words"}` | Predict next words |
+| POST | `/brain/word-map` | `{"word":"..."}` | Word co-occurrence lookup |
+| POST | `/brain/ingest-text` | `{"text":"..."}` | Add text to corpus |
+| POST | `/brain/feedback` | `{"liked":true}` | Record like/dislike |
+| POST | `/pdf` | `multipart file=<pdf>` | Upload & ingest PDF |
+| GET | `/search/stats` | — | Cache stats |
+| POST | `/search/clear` | — | Clear search cache |
+| POST | `/reset` | — | Clear conversation history |
+
+---
+
+## How the brain learns
 
 ```
-You: How do I implement a trie in Python? Search GitHub for examples.
-
-You: Find the most-starred Rust web frameworks and compare them.
-
-You: Look at torvalds' GitHub and summarise his most interesting repos.
-
-You: Search for how async/await works in Zig.
+1. You feed it text (Wikipedia / PDFs / text files)
+2. It builds character and word n-gram tables from everything it reads
+3. A population of 48 bots evolves — each with different smoothing,
+   temperature, and bias parameters
+4. Each generation: score all bots → keep the best → breed + mutate
+   the rest → repeat
+5. When you chat, the best-scoring bot generates the response
+6. /like and /dislike adjust the brain's style preferences over time
 ```
 
 ---
 
-## Configuration
+## Smart search caching
 
-Edit `config.py` to customise:
+| Query type | Example | Cache TTL |
+|------------|---------|-----------|
+| Volatile | "price of bitcoin" | Never cached — always live |
+| Semi-stable | "who is the CEO of Apple" | 7 days |
+| Stable | "what is machine learning" | 30 days |
+
+---
+
+## Config options (`config.py`)
 
 ```python
-DEFAULT_MODEL = "gpt-4o-mini"   # Your preferred model
-
-# Add your GitHub PAT for 5,000 API calls/hour instead of 60
-GITHUB_TOKEN = "ghp_xxxxxxxxxxxx"
-
-# Add or remove notable coders for the background crawler
-NOTABLE_CODERS = ["torvalds", "karpathy", "gvanrossum", ...]
-
-# How often the background crawler runs (seconds)
-CRAWLER_SLEEP_SECONDS = 300
+DEFAULT_BRAIN_POPULATION = 48   # number of bots
+RESPONSE_WORD_COUNT = 80        # words per brain response (increase for longer answers)
+WORD_MAP_TOP_N = 10             # related words pulled per keyword
+GITHUB_TOKEN = ""               # optional: GitHub PAT for 5,000 req/hr
+CRAWLER_SLEEP_SECONDS = 300     # how often the background crawler runs
 ```
 
 ---
 
-## Project Structure
+## Requirements
 
-```
-local-ai-agent/
-├── main.py          # CLI entry point & chat loop
-├── agent.py         # ReAct loop + API client
-├── tools.py         # Web search, scraping, GitHub API
-├── background.py    # Idle GitHub crawler
-├── config.py        # All configuration
-├── requirements.txt
-└── crawler_memory.db   # Auto-created SQLite database
-```
-
----
-
-## How it works (ReAct loop)
-
-```
-User: "Find the best async Python frameworks"
-         │
-         ▼
-  ┌─────────────┐
-       │ API model    │  ← Thought: I should search GitHub for async Python frameworks
-  └──────┬──────┘
-         │  tool_call: github_search(query="async python framework", sort="stars")
-         ▼
-  ┌─────────────┐
-  │ GitHub API  │  → Returns: fastapi, aiohttp, tornado, starlette…
-  └──────┬──────┘
-         │  Observation fed back to LLM
-         ▼
-  ┌─────────────┐
-       │ API model    │  ← Thought: Let me also check web_search for benchmarks
-  └──────┬──────┘
-         │  tool_call: web_search(query="async python framework benchmark 2024")
-         ▼
-  ┌─────────────┐
-  │ DuckDuckGo  │  → Returns: articles with performance comparisons
-  └──────┬──────┘
-         │  Observation fed back to LLM
-         ▼
-  ┌─────────────┐
-       │ API model    │  → Final answer with citations ✅
-  └─────────────┘
-```
-
----
-
-## Recommended models by use case
-
-| Task | Model |
-|---|---|
-| General coding help | `gpt-4o-mini` or `openrouter/auto` |
-| Code review / architecture | `gpt-4o` |
-| Local desktop setup | Your LM Studio model name |
-| Best overall quality | Provider-dependent |
+- Python 3.11+
+- Windows / Mac / Linux
+- Internet connection (for Wikipedia + DuckDuckGo search)
+- No GPU needed
+- No API keys needed
 
 ---
 
 ## License
 
 MIT — do whatever you want with it.
-
