@@ -3,6 +3,7 @@ config.py — AcumenAI Configuration
 No API keys. No external services. Runs 100% on its own trained brain.
 """
 
+
 # ── Agent behaviour ───────────────────────────────────────────────────────────
 MAX_TOOL_CALLS   = 10
 REQUEST_TIMEOUT  = 30
