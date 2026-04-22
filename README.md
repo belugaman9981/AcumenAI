@@ -1,214 +1,91 @@
+# AcumenAI
 
-# 🤖 Local AI Coding Agent
+A fully local AI assistant powered by its own evolving brain.
+No API keys. No subscriptions. No external AI services.
 
-A coding agent that works with any **OpenAI-compatible API**.  
-Use OpenAI, OpenRouter, LM Studio, or another compatible endpoint.
-
-## Features
-
-| Feature | Details |
-|---|---|
-| 🧠 Model backend | Any OpenAI-compatible model or local server |
-| 🔍 Web search | DuckDuckGo — no API key needed |
-| 🌐 Web scraping | Fetches & cleans any public URL |
-| 🐙 GitHub search | Search repos by stars, forks, language |
-| 👤 Notable coders | Browse repos from Torvalds, Karpathy, Evan You… |
-| 🕷  Background crawler | Silently explores GitHub while you're away |
-| 💾 Discoveries DB | SQLite log of everything the crawler finds |
-| 🧬 Evolutionary brain | Population of bots, survivor selection, mutation/crossover |
-| 🖼 Image classifier training | Teach labels (bee/cow/etc.) from your own images |
-| ✍ Local next-text learner | Character-map learning from local text corpora |
-| 👍 Preference adaptation | Learns style from /like and /dislike feedback |
+> Try the website: https://belugaman9981.github.io/AcumenAI/
 
 ---
 
-## Quick Start
+## How it works
 
-### 1 — Install Python dependencies
+AcumenAI has a population of **48 evolved bots** that learn from Wikipedia,
+text files, and PDF documents you feed it. The more you train it, the smarter
+it gets. Live questions (like crypto prices or news) are answered automatically
+via DuckDuckGo search — no API key needed.
 
-```bash
+---
+
+## Quick Start (Windows)
+
+**Step 1 — Install Python if you don't have it**
+```powershell
+winget install Python.Python.3.11
+```
+
+**Step 2 — Install dependencies**
+```powershell
 cd local-ai-agent
 pip install -r requirements.txt
 ```
 
-### 2 — Pick a provider
-
-Open [config.py](local-ai-agent/config.py) and set one of these:
-
-OpenAI:
-```python
-OPENAI_API_KEY = "your-api-key"
-OPENAI_BASE_URL = ""
-DEFAULT_MODEL = "gpt-4o-mini"
-```
-
-OpenRouter:
-```python
-OPENAI_API_KEY = "your-api-key"
-OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
-DEFAULT_MODEL = "openrouter/auto"
-```
-
-LM Studio:
-```python
-OPENAI_API_KEY = "lm-studio"
-OPENAI_BASE_URL = "http://localhost:1234/v1"
-DEFAULT_MODEL = "local-model-name"
-```
-
-### 3 — Run
-
-```bash
+**Step 3 — Run the terminal chat**
+```powershell
 python main.py
 ```
 
----
-
-## CLI Options
-
+**Step 4 — Train the brain before chatting**
 ```
-python main.py [OPTIONS]
-
-Options:
-       --model <name>       Model to use  (default: value from config.py)
-  --no-background      Disable the idle GitHub crawler
-  --discoveries        Print crawler discoveries and exit
-       --list-models        List available models on the current API endpoint and exit
-```
-
-### In-session commands
-
-| Command | Action |
-|---|---|
-| `/help` | Show help |
-| `/reset` | Clear conversation history |
-| `/discoveries` | Show what the crawler found |
-| `/models` | List models on the current API endpoint |
-| `/model <name>` | Switch model mid-session |
-| `/like` | Mark last reply as good (preference learning) |
-| `/dislike` | Mark last reply as bad (preference learning) |
-| `/brain ...` | Control evolutionary brain |
-| `/quit` | Exit |
-
-### `/brain` commands
-
-```text
-/brain status
-/brain init <population>
-/brain add-image <label> <path>
-/brain add-text <path>
-/brain train <generations>
-/brain guess <path>
-/brain next <prefix text>
-```
-
-Example workflow:
-
-```text
-/brain init 100
-/brain add-image bee "C:/data/bee1.jpg"
-/brain add-image cow "C:/data/cow1.jpg"
-/brain train 40
-/brain guess "C:/data/test.jpg"
-```
-
-This keeps top-performing bots each generation and recycles weaker ones by replacing them with mutated/crossover descendants.
-
----
-
-## Example conversations
-
-```
-You: How do I implement a trie in Python? Search GitHub for examples.
-
-You: Find the most-starred Rust web frameworks and compare them.
-
-You: Look at torvalds' GitHub and summarise his most interesting repos.
-
-You: Search for how async/await works in Zig.
+/brain init 48
+/brain wiki-random 10
+/brain train 30
 ```
 
 ---
 
-## Configuration
+## Using the Website
 
-Edit `config.py` to customise:
+The website (`index.html`) connects to a local server that bridges your browser
+to the brain. You need two PowerShell windows:
 
-```python
-DEFAULT_MODEL = "gpt-4o-mini"   # Your preferred model
-
-# Add your GitHub PAT for 5,000 API calls/hour instead of 60
-GITHUB_TOKEN = "ghp_xxxxxxxxxxxx"
-
-# Add or remove notable coders for the background crawler
-NOTABLE_CODERS = ["torvalds", "karpathy", "gvanrossum", ...]
-
-# How often the background crawler runs (seconds)
-CRAWLER_SLEEP_SECONDS = 300
+**Window 1 — start the brain server:**
+```powershell
+cd local-ai-agent
+python api_server.py
 ```
+
+**Window 2 — open the website:**
+```powershell
+start index.html
+```
+
+The settings panel will show a green dot when the server is connected.
+You can also upload WSJ or other PDF articles straight from the settings panel.
 
 ---
 
 ## Project Structure
 
 ```
-local-ai-agent/
-├── main.py          # CLI entry point & chat loop
-├── agent.py         # ReAct loop + API client
-├── tools.py         # Web search, scraping, GitHub API
-├── background.py    # Idle GitHub crawler
-├── config.py        # All configuration
-├── requirements.txt
-└── crawler_memory.db   # Auto-created SQLite database
+AcumenAI/
+├── index.html                  ← Website (open in browser)
+└── local-ai-agent/
+    ├── main.py                 ← Terminal chat entry point
+    ├── api_server.py           ← Local web server (bridges website ↔ brain)
+    ├── agent.py                ← Response engine (brain + search)
+    ├── brain.py                ← Evolutionary learning engine (48 bots)
+    ├── search_cache.py         ← Smart DuckDuckGo search with caching
+    ├── pdf_ingest.py           ← PDF ingestion (WSJ articles etc.)
+    ├── wiki_ingest.py          ← Wikipedia learning
+    ├── config.py               ← Configuration
+    ├── tools.py                ← Web search, scraping, GitHub tools
+    ├── background.py           ← Background GitHub crawler
+    ├── set_population_48.py    ← Utility to resize brain to 48 bots
+    └── requirements.txt
 ```
-
----
-
-## How it works (ReAct loop)
-
-```
-User: "Find the best async Python frameworks"
-         │
-         ▼
-  ┌─────────────┐
-       │ API model    │  ← Thought: I should search GitHub for async Python frameworks
-  └──────┬──────┘
-         │  tool_call: github_search(query="async python framework", sort="stars")
-         ▼
-  ┌─────────────┐
-  │ GitHub API  │  → Returns: fastapi, aiohttp, tornado, starlette…
-  └──────┬──────┘
-         │  Observation fed back to LLM
-         ▼
-  ┌─────────────┐
-       │ API model    │  ← Thought: Let me also check web_search for benchmarks
-  └──────┬──────┘
-         │  tool_call: web_search(query="async python framework benchmark 2024")
-         ▼
-  ┌─────────────┐
-  │ DuckDuckGo  │  → Returns: articles with performance comparisons
-  └──────┬──────┘
-         │  Observation fed back to LLM
-         ▼
-  ┌─────────────┐
-       │ API model    │  → Final answer with citations ✅
-  └─────────────┘
-```
-
----
-
-## Recommended models by use case
-
-| Task | Model |
-|---|---|
-| General coding help | `gpt-4o-mini` or `openrouter/auto` |
-| Code review / architecture | `gpt-4o` |
-| Local desktop setup | Your LM Studio model name |
-| Best overall quality | Provider-dependent |
 
 ---
 
 ## License
 
 MIT — do whatever you want with it.
-
