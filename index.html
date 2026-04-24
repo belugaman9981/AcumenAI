@@ -4,383 +4,569 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AcumenAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
 
-        /* â”€â”€ CSS Variables (Dark default) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         :root {
-            --bg: #0a0a0f;
-            --bg2: #0f0f17;
-            --surface: rgba(255,255,255,0.03);
-            --border: rgba(255,255,255,0.06);
-            --border2: rgba(255,255,255,0.1);
-            --text: #e0e0e0;
-            --text2: #888;
-            --text3: #555;
-            --text4: #444;
-            --accent: #3b82f6;
-            --accent2: #6366f1;
-            --accent3: #8b5cf6;
-            --gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            --gradient2: linear-gradient(135deg, #3b82f6, #6366f1);
-            --gradient3: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
-            --card-hover: rgba(255,255,255,0.05);
-            --code-bg: rgba(255,255,255,0.04);
+            --bg: #111217;
+            --bg2: #171821;
+            --bg3: #1d1e29;
+            --surface: rgba(255,255,255,0.04);
+            --surface2: rgba(255,255,255,0.06);
+            --border: rgba(255,255,255,0.07);
+            --border2: rgba(255,255,255,0.13);
+            --text: #f2f1ef;
+            --text2: #a9acb6;
+            --text3: #7f838f;
+            --text4: #5f6470;
+            --accent: #ef8f49;
+            --accent-dim: rgba(239,143,73,0.12);
+            --accent-glow: rgba(239,143,73,0.2);
+            --accent2: #d4783b;
+            --accent2-dim: rgba(212,120,59,0.12);
+            --gradient: linear-gradient(135deg, #ef8f49 0%, #d4783b 100%);
+            --gradient2: linear-gradient(135deg, #ef8f49 0%, #d4783b 100%);
+            --gradient3: linear-gradient(135deg, #f4a061, #ef8f49, #d4783b);
+            --card-hover: rgba(239,143,73,0.04);
+            --code-bg: rgba(0,0,0,0.35);
             --code-border: rgba(255,255,255,0.08);
-            --glow1: rgba(59,130,246,0.07);
-            --glow2: rgba(139,92,246,0.05);
-            --input-bg: rgba(255,255,255,0.04);
-            --shadow: rgba(0,0,0,0.3);
-            --overlay: rgba(0,0,0,0.6);
+            --input-bg: rgba(255,255,255,0.05);
+            --shadow: rgba(0,0,0,0.5);
+            --overlay: rgba(0,0,0,0.7);
+            --glow1: rgba(239,143,73,0.08);
+            --glow2: rgba(239,143,73,0.04);
+            --sidebar-bg: #131522;
+            --sidebar-border: #232739;
+            --sidebar-text: #ececf2;
+            --sidebar-text2: #9aa2b6;
+            --sidebar-hover: #1b1f30;
+            --sidebar-active: #24283c;
+            --sidebar-button-bg: #171a28;
+            --sidebar-button-border: #31364a;
+            --sidebar-button-border-hover: #474e64;
+            --sidebar-menu-bg: #191d2c;
+            --sidebar-scroll: #2f3448;
+            --chat-bg: radial-gradient(circle at top, rgba(240,143,73,0.07), transparent 34%), #10131e;
+            --chat-header-bg: rgba(16,19,30,0.88);
+            --chat-header-border: rgba(255,255,255,0.08);
+            --chat-subtext: #9ea6bc;
+            --chat-message-text: #ececf2;
+            --suggestion-bg: rgba(27,31,45,0.9);
+            --suggestion-text: #afb6cb;
+            --suggestion-hover-text: #f4f2ee;
+            --input-surface: rgba(22,25,37,0.95);
+            --input-border: rgba(255,255,255,0.14);
         }
         .light {
-            --bg: #f8f9fc;
-            --bg2: #ffffff;
-            --surface: rgba(0,0,0,0.02);
+            --bg: #e9e8e2;
+            --bg2: #f4f3ef;
+            --bg3: #eceae4;
+            --surface: rgba(0,0,0,0.03);
+            --surface2: rgba(0,0,0,0.05);
             --border: rgba(0,0,0,0.08);
-            --border2: rgba(0,0,0,0.12);
-            --text: #1a1a2e;
-            --text2: #555;
-            --text3: #888;
-            --text4: #aaa;
-            --card-hover: rgba(0,0,0,0.04);
-            --code-bg: rgba(0,0,0,0.03);
-            --code-border: rgba(0,0,0,0.08);
-            --glow1: rgba(59,130,246,0.04);
-            --glow2: rgba(139,92,246,0.03);
-            --input-bg: rgba(0,0,0,0.03);
-            --shadow: rgba(0,0,0,0.08);
-            --overlay: rgba(0,0,0,0.4);
+            --border2: rgba(0,0,0,0.14);
+            --text: #18181e;
+            --text2: #555568;
+            --text3: #888898;
+            --text4: #aaaab5;
+            --accent: #d6813f;
+            --accent-dim: rgba(214,129,63,0.1);
+            --accent-glow: rgba(214,129,63,0.15);
+            --accent2: #c77136;
+            --accent2-dim: rgba(199,113,54,0.1);
+            --card-hover: rgba(214,129,63,0.04);
+            --code-bg: rgba(0,0,0,0.04);
+            --code-border: rgba(0,0,0,0.09);
+            --input-bg: rgba(0,0,0,0.04);
+            --shadow: rgba(0,0,0,0.1);
+            --overlay: rgba(0,0,0,0.45);
+            --glow1: rgba(214,129,63,0.05);
+            --glow2: rgba(214,129,63,0.04);
+            --sidebar-bg: #f4f4f1;
+            --sidebar-border: #e3e1db;
+            --sidebar-text: #20252d;
+            --sidebar-text2: #697382;
+            --sidebar-hover: #ebe9e3;
+            --sidebar-active: #e1dccf;
+            --sidebar-button-bg: #fbfaf8;
+            --sidebar-button-border: #d8d5cc;
+            --sidebar-button-border-hover: #c6c1b4;
+            --sidebar-menu-bg: #fbfaf7;
+            --sidebar-scroll: #d3d0c7;
+            --chat-bg: radial-gradient(circle at top, rgba(255,255,255,0.45), transparent 32%), #efede8;
+            --chat-header-bg: rgba(239,237,232,0.86);
+            --chat-header-border: rgba(20,22,28,0.1);
+            --chat-subtext: #737d8c;
+            --chat-message-text: #232832;
+            --suggestion-bg: #f4f3f0;
+            --suggestion-text: #5a6474;
+            --suggestion-hover-text: #1c212b;
+            --input-surface: #f6f5f2;
+            --input-border: rgba(20,22,28,0.12);
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at top right, rgba(239,143,73,0.1), transparent 32%), var(--bg);
             color: var(--text);
             overflow-x: hidden;
         }
+        body.light {
+            background: var(--bg);
+        }
 
-        /* â”€â”€ Animated BG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /* Dot-grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
+            background-size: 28px 28px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body.light::before {
+            background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
+        }
+
         .bg-glow {
             position: fixed;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle at 30% 40%, var(--glow1) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 60%, var(--glow2) 0%, transparent 50%);
-            animation: drift 20s ease-in-out infinite;
+            top: -40%; left: -30%;
+            width: 180%; height: 180%;
+            background:
+                radial-gradient(ellipse at 28% 35%, var(--glow1) 0%, transparent 55%),
+                radial-gradient(ellipse at 72% 65%, var(--glow2) 0%, transparent 50%);
+            animation: drift 25s ease-in-out infinite;
             z-index: 0;
             pointer-events: none;
         }
         @keyframes drift {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-30px, 20px); }
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-20px, 15px) scale(1.02); }
         }
 
-        /* â”€â”€ Theme Toggle (always visible) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /* Theme & settings toggles */
         .theme-toggle {
             position: fixed;
-            top: 18px;
-            right: 18px;
+            top: 18px; right: 18px;
             z-index: 9999;
-            width: 40px; height: 40px;
-            border-radius: 50%;
+            width: 38px; height: 38px;
+            border-radius: 10px;
             border: 1px solid var(--border2);
-            background: var(--surface);
+            background: var(--bg2);
             color: var(--text2);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
             transition: all 0.2s;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
         }
-        .theme-toggle:hover { background: var(--card-hover); }
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
 
-        /* â”€â”€ Landing Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /* Landing */
         .landing { position: relative; z-index: 1; }
         .landing.hidden { display: none; }
 
         .container {
-            max-width: 900px;
+            max-width: 920px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 28px;
         }
 
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 24px 0;
+            padding: 22px 0;
             border-bottom: 1px solid var(--border);
         }
         .logo {
-            font-size: 1.4rem;
-            font-weight: 700;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
             letter-spacing: -0.5px;
+            display: flex; align-items: center; gap: 10px;
         }
-        .nav-links { display: flex; align-items: center; gap: 8px; }
+        .logo-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--gradient);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .nav-links { display: flex; align-items: center; gap: 4px; }
         .nav-links a {
             color: var(--text2);
             text-decoration: none;
-            margin-left: 20px;
-            font-size: 0.9rem;
-            transition: color 0.2s;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
         }
-        .nav-links a:hover { color: var(--text); }
+        .nav-links a:hover { color: var(--text); background: var(--surface); }
         .nav-btn {
             padding: 8px 18px;
-            border-radius: 8px;
-            font-size: 0.88rem;
+            border-radius: 9px;
+            font-size: 0.86rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             text-decoration: none;
             border: none;
-            margin-left: 8px;
+            font-family: inherit;
+            margin-left: 4px;
         }
         .nav-btn-outline {
             background: transparent;
             border: 1px solid var(--border2);
             color: var(--text);
         }
-        .nav-btn-outline:hover { background: var(--card-hover); }
+        .nav-btn-outline:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
         .nav-btn-primary {
             background: var(--gradient2);
             color: #fff;
         }
-        .nav-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(59,130,246,0.25); }
+        .nav-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
 
         /* Hero */
         .hero {
             text-align: center;
-            padding: 100px 0 60px;
+            padding: 110px 0 64px;
         }
         .badge {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             padding: 6px 16px;
-            border-radius: 20px;
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-            font-size: 0.8rem;
-            font-weight: 500;
-            margin-bottom: 24px;
+            border-radius: 100px;
+            background: var(--accent-dim);
+            border: 1px solid rgba(240,160,48,0.25);
+            color: var(--accent);
+            font-size: 0.78rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.04em;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+        .badge::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
         .hero h1 {
-            font-size: 3.2rem;
+            font-size: 3.6rem;
             font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            letter-spacing: -1.5px;
+            line-height: 1.08;
+            margin-bottom: 22px;
+            letter-spacing: -2px;
+            color: var(--text);
         }
         .hero h1 .gradient {
             background: var(--gradient3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .hero p {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             color: var(--text2);
-            max-width: 520px;
-            margin: 0 auto 36px;
-            line-height: 1.6;
+            max-width: 500px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+            font-weight: 400;
         }
         .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
         .btn {
             display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 24px; border-radius: 10px; text-decoration: none;
-            font-weight: 600; font-size: 0.95rem; transition: all 0.2s; border: none; cursor: pointer;
+            padding: 13px 26px; border-radius: 11px;
+            font-weight: 600; font-size: 0.92rem;
+            transition: all 0.2s; border: none; cursor: pointer;
+            font-family: inherit; text-decoration: none;
         }
         .btn-primary { background: var(--gradient2); color: #fff; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(59,130,246,0.3); }
-        .btn-secondary { background: var(--surface); border: 1px solid var(--border2); color: var(--text2); }
-        .btn-secondary:hover { background: var(--card-hover); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 36px var(--accent-glow); }
+        .btn-secondary {
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            color: var(--text2);
+        }
+        .btn-secondary:hover { background: var(--surface); color: var(--text); border-color: var(--border2); }
 
-        /* Features */
+        /* Feature cards */
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 14px;
+        }
         .features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
-            padding: 40px 0 60px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+            padding: 12px 0 64px;
         }
         .card {
-            background: var(--surface);
+            background: var(--bg2);
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 28px;
+            border-radius: 16px;
+            padding: 26px 28px;
             transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
         }
-        .card:hover { background: var(--card-hover); border-color: rgba(99,102,241,0.3); transform: translateY(-3px); }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: var(--gradient);
+            border-radius: 3px 0 0 3px;
+            transform: scaleY(0);
+            transition: transform 0.25s;
+        }
+        .card:hover {
+            background: var(--card-hover);
+            border-color: rgba(240,160,48,0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        .card:hover::before { transform: scaleY(1); }
         .card-icon {
-            width: 42px; height: 42px; border-radius: 10px;
+            width: 40px; height: 40px; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem; margin-bottom: 16px;
+            font-size: 1.2rem; margin-bottom: 14px;
         }
-        .card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; }
-        .card p { font-size: 0.88rem; color: var(--text2); line-height: 1.5; }
-        .icon-blue { background: rgba(59,130,246,0.12); }
-        .icon-purple { background: rgba(139,92,246,0.12); }
-        .icon-green { background: rgba(34,197,94,0.12); }
-        .icon-orange { background: rgba(249,115,22,0.12); }
-        .icon-pink { background: rgba(236,72,153,0.12); }
-        .icon-cyan { background: rgba(6,182,212,0.12); }
+        .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+        .card p { font-size: 0.85rem; color: var(--text2); line-height: 1.6; }
+        .icon-blue { background: rgba(239,143,73,0.12); }
+        .icon-purple { background: rgba(239,143,73,0.14); }
+        .icon-green { background: rgba(239,143,73,0.1); }
+        .icon-orange { background: rgba(239,143,73,0.12); }
+        .icon-pink { background: rgba(239,143,73,0.16); }
+        .icon-cyan { background: rgba(239,143,73,0.12); }
 
-        /* Code section */
-        .code-section { padding: 20px 0 60px; text-align: center; }
-        .code-section h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
-        .code-section .subtitle { color: var(--text3); margin-bottom: 30px; font-size: 0.95rem; }
+        /* Code / quickstart */
+        .code-section { padding: 10px 0 64px; }
+        .code-section h2 {
+            font-size: 1.9rem; font-weight: 800; margin-bottom: 8px;
+            letter-spacing: -0.8px;
+        }
+        .code-section .subtitle { color: var(--text3); margin-bottom: 28px; font-size: 0.92rem; }
         .code-block {
-            background: var(--code-bg); border: 1px solid var(--code-border);
-            border-radius: 12px; padding: 24px 28px; text-align: left;
-            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-            font-size: 0.88rem; line-height: 1.7; overflow-x: auto;
+            background: var(--code-bg);
+            border: 1px solid var(--code-border);
+            border-radius: 14px;
+            padding: 26px 30px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem; line-height: 1.9; overflow-x: auto;
+            position: relative;
+        }
+        .code-block::before {
+            content: 'bash';
+            position: absolute;
+            top: 10px; right: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text4);
+            letter-spacing: 0.08em;
         }
         .code-block .comment { color: var(--text3); }
-        .code-block .cmd { color: #22c55e; }
-        .code-block .flag { color: #60a5fa; }
+        .code-block .cmd { color: var(--accent2); }
+        .code-block .flag { color: var(--accent); }
 
         footer {
             text-align: center; padding: 40px 0;
-            border-top: 1px solid var(--border); color: var(--text4); font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            color: var(--text4); font-size: 0.82rem;
         }
-        footer a { color: #60a5fa; text-decoration: none; }
+        footer a { color: var(--accent); text-decoration: none; }
         footer a:hover { text-decoration: underline; }
 
-        /* â”€â”€ Modal Overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /* Modal overlay */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
+            display: none; position: fixed; inset: 0;
             background: var(--overlay);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(4px);
+            z-index: 1000; align-items: center; justify-content: center;
+            backdrop-filter: blur(6px);
         }
         .modal-overlay.active { display: flex; }
 
         .modal-card {
             background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 44px 38px;
-            width: 100%;
-            max-width: 400px;
+            border: 1px solid var(--border2);
+            border-radius: 22px;
+            padding: 44px 40px;
+            width: 100%; max-width: 400px;
             text-align: center;
-            box-shadow: 0 24px 60px var(--shadow);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4), 0 0 0 1px var(--border);
             position: relative;
         }
         .modal-close {
-            position: absolute;
-            top: 14px; right: 16px;
+            position: absolute; top: 16px; right: 18px;
             background: none; border: none;
-            color: var(--text3); font-size: 1.3rem;
-            cursor: pointer;
+            color: var(--text3); font-size: 1.2rem;
+            cursor: pointer; width: 28px; height: 28px;
+            border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
         }
-        .modal-close:hover { color: var(--text); }
+        .modal-close:hover { background: var(--surface); color: var(--text); }
         .modal-logo {
-            font-size: 1.8rem; font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem; font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .modal-logo-dot {
+            width: 8px; height: 8px; border-radius: 50%;
             background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 6px;
         }
-        .modal-sub {
-            color: var(--text3); font-size: 0.88rem; margin-bottom: 28px;
-        }
+        .modal-sub { color: var(--text3); font-size: 0.86rem; margin-bottom: 28px; }
+
         .input-group { text-align: left; margin-bottom: 14px; }
         .input-group label {
-            display: block; font-size: 0.8rem; color: var(--text2);
-            margin-bottom: 6px; font-weight: 500;
+            display: block; font-size: 0.78rem; color: var(--text2);
+            margin-bottom: 6px; font-weight: 600; letter-spacing: 0.02em;
         }
-        .input-wrap-field {
-            position: relative;
-        }
+        .input-wrap-field { position: relative; }
         .input-group input {
-            width: 100%;
-            padding: 12px 40px 12px 14px;
-            border-radius: 10px;
-            border: 1px solid var(--border2);
-            background: var(--input-bg);
-            color: var(--text);
-            font-size: 0.95rem;
-            outline: none;
-            transition: border-color 0.2s;
+            width: 100%; padding: 12px 42px 12px 14px;
+            border-radius: 10px; border: 1px solid var(--border2);
+            background: var(--input-bg); color: var(--text);
+            font-size: 0.92rem; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: inherit;
         }
-        .input-group input:focus { border-color: rgba(99,102,241,0.5); }
+        .input-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
         .eye-btn {
-            position: absolute;
-            right: 10px; top: 50%; transform: translateY(-50%);
+            position: absolute; right: 10px; top: 50%;
+            transform: translateY(-50%);
             background: none; border: none;
             color: var(--text3); cursor: pointer;
-            font-size: 1rem; padding: 4px;
+            font-size: 0.95rem; padding: 4px;
         }
         .eye-btn:hover { color: var(--text); }
 
         .auth-btn {
             width: 100%; padding: 13px; border: none;
-            border-radius: 10px; background: var(--gradient2);
-            color: #fff; font-size: 0.95rem; font-weight: 600;
+            border-radius: 11px; background: var(--gradient2);
+            color: #fff; font-size: 0.92rem; font-weight: 700;
             cursor: pointer; margin-top: 6px; transition: all 0.2s;
+            font-family: inherit; letter-spacing: 0.01em;
         }
-        .auth-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(59,130,246,0.3); }
-        .auth-error { color: #f87171; font-size: 0.82rem; margin-top: 10px; min-height: 18px; }
-        .auth-switch {
-            margin-top: 16px; font-size: 0.84rem; color: var(--text3);
-        }
-        .auth-switch a {
-            color: #60a5fa; cursor: pointer; text-decoration: none;
-        }
+        .auth-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 28px var(--accent-glow); }
+        .auth-error { color: #f87171; font-size: 0.8rem; margin-top: 10px; min-height: 18px; }
+        .auth-switch { margin-top: 16px; font-size: 0.83rem; color: var(--text3); }
+        .auth-switch a { color: var(--accent); cursor: pointer; text-decoration: none; }
         .auth-switch a:hover { text-decoration: underline; }
 
-        /* â”€â”€ App Shell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-        .app { display: none; height: 100vh; overflow: hidden; }
+        /* ─── App Shell ──────────────────────────────────── */
+        .app { display: none; height: 100vh; overflow: hidden; background: var(--chat-bg); }
         .app.active { display: flex; }
 
         /* Sidebar */
         .sidebar {
-            width: 260px; background: var(--bg2);
-            border-right: 1px solid var(--border);
+            width: 268px; background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
             display: flex; flex-direction: column; flex-shrink: 0;
         }
-        .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); }
-        .new-chat-btn {
-            width: 100%; padding: 10px; border-radius: 10px;
-            border: 1px solid var(--border2); background: transparent;
-            color: var(--text2); font-size: 0.88rem; font-weight: 500;
-            cursor: pointer; display: flex; align-items: center; gap: 8px;
-            transition: background 0.15s;
+        .sidebar-header {
+            padding: 14px 12px 10px;
+            border-bottom: 1px solid var(--sidebar-border);
         }
-        .new-chat-btn:hover { background: var(--card-hover); }
+        .new-chat-btn {
+            width: 100%; padding: 10px 14px; border-radius: 10px;
+            border: 1px solid var(--sidebar-button-border); background: var(--sidebar-button-bg);
+            color: var(--sidebar-text); font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: all 0.15s; font-family: inherit;
+        }
+        .new-chat-btn:hover {
+            background: var(--sidebar-hover);
+            border-color: var(--sidebar-button-border-hover);
+            color: var(--sidebar-text);
+        }
+        .sidebar-quick {
+            padding: 10px 8px 4px;
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+        .sidebar-quick-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 8px 10px;
+            border: 0;
+            border-radius: 9px;
+            background: transparent;
+            color: var(--sidebar-text2);
+            font-size: 0.84rem;
+            text-align: left;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        .sidebar-quick-item:hover {
+            background: var(--sidebar-hover);
+            color: var(--sidebar-text);
+        }
+        .sidebar-section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem; letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--sidebar-text2);
+            padding: 14px 14px 6px;
+        }
 
-        .chat-list { flex: 1; overflow-y: auto; padding: 8px; }
-        .chat-list::-webkit-scrollbar { width: 4px; }
-        .chat-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+        .chat-list { flex: 1; overflow-y: auto; padding: 6px 8px; }
+        .chat-list::-webkit-scrollbar { width: 3px; }
+        .chat-list::-webkit-scrollbar-thumb { background: var(--sidebar-scroll); border-radius: 4px; }
 
         .chat-list-item {
-            padding: 10px 12px; border-radius: 8px; font-size: 0.85rem;
-            color: var(--text2); cursor: pointer; display: flex;
-            justify-content: space-between; align-items: center;
-            margin-bottom: 2px; transition: background 0.15s;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            padding: 9px 12px; border-radius: 9px; font-size: 0.83rem;
+            color: var(--sidebar-text2); cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1px; transition: all 0.12s;
+            white-space: nowrap; overflow: hidden;
         }
-        .chat-list-item:hover { background: var(--card-hover); }
-        .chat-list-item.active { background: var(--surface); color: var(--text); }
+        .chat-list-item:hover { background: var(--sidebar-hover); color: var(--sidebar-text); }
+        .chat-list-item.active {
+            background: var(--sidebar-active);
+            color: var(--sidebar-text);
+            border: 1px solid var(--sidebar-button-border);
+        }
         .chat-list-item .chat-title { overflow: hidden; text-overflow: ellipsis; flex: 1; }
         .chat-list-item .delete-btn {
             opacity: 0; background: none; border: none;
-            color: var(--text3); cursor: pointer; font-size: 1rem; padding: 0 4px; flex-shrink: 0;
+            color: #8e8a80; cursor: pointer; font-size: 1rem;
+            padding: 0 4px; flex-shrink: 0;
         }
         .chat-list-item:hover .delete-btn { opacity: 1; }
         .chat-list-item .delete-btn:hover { color: #f87171; }
 
         .sidebar-footer {
-            padding: 12px 16px; border-top: 1px solid var(--border);
+            padding: 10px 12px;
+            border-top: 1px solid var(--sidebar-border);
             position: relative;
         }
         .user-banner {
@@ -388,135 +574,204 @@
             padding: 8px 10px; border-radius: 10px; cursor: pointer;
             transition: background 0.15s;
         }
-        .user-banner:hover { background: var(--card-hover); }
-        .user-info { font-size: 0.85rem; color: var(--text2); display: flex; align-items: center; gap: 8px; flex:1; }
+        .user-banner:hover { background: var(--sidebar-hover); }
+        .user-info { font-size: 0.84rem; color: var(--sidebar-text); display: flex; align-items: center; gap: 9px; flex:1; }
         .user-avatar {
-            width: 28px; height: 28px; border-radius: 50%;
-            background: var(--gradient); display: flex; align-items: center;
-            justify-content: center; font-size: 0.75rem; font-weight: 700; color: #fff;
+            width: 30px; height: 30px; border-radius: 8px;
+            background: linear-gradient(140deg, #ef8f49, #d4783b); display: flex; align-items: center;
+            justify-content: center; font-size: 0.78rem; font-weight: 800; color: #fff;
+            flex-shrink: 0;
         }
         .user-menu {
             display: none; position: absolute; bottom: 100%; left: 8px; right: 8px;
-            background: var(--bg2); border: 1px solid var(--border2);
-            border-radius: 12px; padding: 6px; margin-bottom: 6px;
-            box-shadow: 0 8px 32px var(--shadow); z-index: 100;
+            background: var(--sidebar-menu-bg); border: 1px solid var(--sidebar-border);
+            border-radius: 14px; padding: 6px; margin-bottom: 6px;
+            box-shadow: 0 12px 40px var(--shadow); z-index: 100;
         }
         .user-menu.active { display: block; }
         .user-menu-item {
             display: flex; align-items: center; gap: 10px;
-            padding: 10px 12px; border-radius: 8px; font-size: 0.85rem;
-            color: var(--text2); cursor: pointer; border: none;
+            padding: 9px 12px; border-radius: 8px; font-size: 0.84rem;
+            color: var(--sidebar-text2); cursor: pointer; border: none;
             background: none; width: 100%; text-align: left;
-            transition: background 0.12s;
+            transition: all 0.12s; font-family: inherit;
         }
-        .user-menu-item:hover { background: var(--card-hover); color: var(--text); }
-        .user-menu-item.danger:hover { color: #f87171; }
-        .user-menu-item .menu-icon { font-size: 1rem; width: 20px; text-align: center; }
-        .user-menu-sep { height: 1px; background: var(--border); margin: 4px 0; }
+        .user-menu-item:hover { background: var(--sidebar-hover); color: var(--sidebar-text); }
+        .user-menu-item.danger:hover { color: #f87171; background: rgba(248,113,113,0.06); }
+        .user-menu-item .menu-icon { font-size: 0.95rem; width: 20px; text-align: center; }
+        .user-menu-sep { height: 1px; background: var(--sidebar-border); margin: 4px 0; }
 
-        /* Main Chat */
+        /* Main chat */
         .main {
-            flex: 1; display: flex; flex-direction: column; background: var(--bg); min-width: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--chat-bg);
+            min-width: 0;
         }
         .main-header {
-            padding: 14px 24px; border-bottom: 1px solid var(--border);
-            font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;
+            padding: 14px 26px;
+            border-bottom: 1px solid var(--chat-header-border);
+            font-weight: 600; font-size: 0.92rem;
+            display: flex; align-items: center; gap: 10px;
+            background: var(--chat-header-bg);
+            backdrop-filter: blur(8px);
         }
         .model-badge {
-            font-size: 0.75rem; font-weight: 500; padding: 3px 10px;
-            border-radius: 12px; background: rgba(139,92,246,0.12); color: #a78bfa;
+            font-size: 0.72rem; font-weight: 600;
+            padding: 3px 10px; border-radius: 100px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.04em;
         }
 
-        .messages { flex: 1; overflow-y: auto; padding: 24px; }
-        .messages::-webkit-scrollbar { width: 5px; }
-        .messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+        .messages { flex: 1; overflow-y: auto; padding: 30px 0; }
+        .messages::-webkit-scrollbar { width: 4px; }
+        .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
         .welcome-screen {
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; height: 100%; text-align: center;
+            padding: 20px;
         }
         .welcome-logo {
-            font-size: 2.4rem; font-weight: 800;
-            background: var(--gradient);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem; font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 14px;
         }
-        .welcome-logo svg { flex-shrink: 0; }
-        .welcome-sub { color: var(--text3); font-size: 1rem; margin-bottom: 40px; }
+        .welcome-logo-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            background: var(--gradient2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 6px 24px var(--accent-glow);
+        }
+        .welcome-sub { color: var(--chat-subtext); font-size: 0.95rem; margin-bottom: 44px; }
         .suggestions {
             display: grid; grid-template-columns: 1fr 1fr;
-            gap: 10px; max-width: 520px; width: 100%;
+            gap: 10px; max-width: 540px; width: 100%;
         }
         .suggestion {
-            padding: 14px 16px; border-radius: 12px;
-            border: 1px solid var(--border); background: var(--surface);
-            cursor: pointer; text-align: left; font-size: 0.85rem; color: var(--text2);
-            transition: all 0.15s;
+            padding: 14px 18px; border-radius: 13px;
+            border: 1px solid var(--border);
+            background: var(--suggestion-bg);
+            cursor: pointer; text-align: left; font-size: 0.83rem;
+            color: var(--suggestion-text); transition: all 0.15s;
         }
-        .suggestion:hover { background: var(--card-hover); border-color: rgba(99,102,241,0.3); color: var(--text); }
-        .suggestion strong { display: block; color: var(--text); margin-bottom: 4px; font-size: 0.88rem; }
+        .suggestion:hover {
+            background: var(--card-hover);
+            border-color: rgba(239,143,73,0.33);
+            color: var(--suggestion-hover-text);
+            transform: translateY(-1px);
+        }
+        .suggestion strong {
+            display: block; color: var(--text);
+            margin-bottom: 3px; font-size: 0.86rem; font-weight: 700;
+        }
 
-        .message { max-width: 720px; margin: 0 auto 24px; padding: 0 20px; display: flex; gap: 14px; }
-        .msg-avatar {
-            width: 30px; height: 30px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+        .message {
+            max-width: 760px; margin: 0 auto 8px;
+            padding: 12px 28px; display: flex; gap: 14px;
         }
-        .msg-avatar.user { background: var(--gradient2); color: #fff; }
-        .msg-avatar.ai { background: linear-gradient(135deg, #8b5cf6, #ec4899); color: #fff; }
+        .message:hover { background: rgba(255,255,255,0.02); border-radius: 12px; }
+        .msg-avatar {
+            width: 32px; height: 32px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.78rem; font-weight: 800;
+            flex-shrink: 0; margin-top: 2px;
+        }
+        .msg-avatar.user { background: linear-gradient(135deg, #ef8f49, #d4783b); color: #fff; }
+        .msg-avatar.ai {
+            background: linear-gradient(135deg, #f3a063, #d4783b);
+            color: #fff;
+        }
         .msg-content { flex: 1; min-width: 0; }
-        .msg-role { font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; color: var(--text2); }
-        .msg-text { font-size: 0.92rem; line-height: 1.65; color: var(--text); word-wrap: break-word; }
+        .msg-role {
+            font-size: 0.77rem; font-weight: 700; margin-bottom: 6px;
+            color: #9ba1af; letter-spacing: 0.03em; text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .msg-text { font-size: 0.92rem; line-height: 1.72; color: var(--chat-message-text); word-wrap: break-word; }
         .msg-text code {
-            background: var(--code-bg); padding: 2px 6px; border-radius: 4px;
-            font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.85em;
+            background: var(--code-bg);
+            border: 1px solid var(--code-border);
+            padding: 2px 7px; border-radius: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.83em; color: var(--accent);
         }
         .msg-text pre {
-            background: var(--code-bg); border: 1px solid var(--code-border);
-            border-radius: 10px; padding: 16px; margin: 10px 0; overflow-x: auto;
-            font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.85em; line-height: 1.6;
+            background: var(--code-bg);
+            border: 1px solid var(--code-border);
+            border-radius: 12px; padding: 18px 20px;
+            margin: 12px 0; overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.84em; line-height: 1.7;
+        }
+        .msg-text pre code {
+            background: none; border: none; padding: 0; color: inherit;
         }
 
-        .typing-indicator { display: none; max-width: 720px; margin: 0 auto; padding: 0 20px; }
+        .typing-indicator { display: none; max-width: 760px; margin: 0 auto; padding: 12px 28px; }
         .typing-indicator.active { display: flex; gap: 14px; }
-        .typing-dots { display: flex; gap: 4px; padding: 10px 0; }
+        .typing-dots { display: flex; gap: 5px; padding: 12px 0; align-items: center; }
         .typing-dots span {
             width: 7px; height: 7px; border-radius: 50%;
-            background: var(--text3); animation: blink 1.4s infinite;
+            background: var(--accent);
+            animation: blink 1.4s infinite;
         }
         .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
         .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes blink { 0%, 60%, 100% { opacity: 0.3; } 30% { opacity: 1; } }
-
-        .input-area { padding: 16px 24px 24px; }
-        .input-wrap-chat { max-width: 720px; margin: 0 auto; position: relative; }
-        .input-box {
-            width: 100%; padding: 14px 52px 14px 18px; border-radius: 14px;
-            border: 1px solid var(--border2); background: var(--input-bg);
-            color: var(--text); font-size: 0.95rem; font-family: inherit;
-            outline: none; resize: none; min-height: 50px; max-height: 200px;
-            line-height: 1.5; transition: border-color 0.2s;
+        @keyframes blink {
+            0%, 60%, 100% { opacity: 0.25; transform: scale(0.9); }
+            30% { opacity: 1; transform: scale(1.1); }
         }
-        .input-box:focus { border-color: rgba(99,102,241,0.4); }
+
+        .input-area { padding: 14px 22px 22px; }
+        .input-wrap-chat { max-width: 760px; margin: 0 auto; position: relative; }
+        .input-box {
+            width: 100%; padding: 15px 52px 15px 20px;
+            border-radius: 15px; border: 1px solid var(--input-border);
+            background: var(--input-surface); color: var(--chat-message-text);
+            font-size: 0.92rem; font-family: inherit;
+            outline: none; resize: none; min-height: 52px; max-height: 200px;
+            line-height: 1.5; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-box:focus {
+            border-color: rgba(239,143,73,0.44);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
         .input-box::placeholder { color: var(--text4); }
         .send-btn {
             position: absolute; right: 10px; bottom: 10px;
-            width: 34px; height: 34px; border-radius: 8px; border: none;
+            width: 36px; height: 36px; border-radius: 10px; border: none;
             background: var(--gradient2); color: #fff; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; transition: all 0.15s;
+            font-size: 1rem; transition: all 0.15s;
+            box-shadow: 0 2px 10px var(--accent-glow);
         }
-        .send-btn:hover { transform: scale(1.05); }
-        .send-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
-        .input-hint { text-align: center; font-size: 0.72rem; color: var(--text4); margin-top: 8px; }
+        .send-btn:hover { transform: scale(1.06); box-shadow: 0 4px 18px var(--accent-glow); }
+        .send-btn:disabled { opacity: 0.3; cursor: default; transform: none; box-shadow: none; }
+        .input-hint { text-align: center; font-size: 0.7rem; color: var(--text4); margin-top: 8px; letter-spacing: 0.01em; }
 
-        /* â”€â”€ Mobile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /* Divider in message list */
+        .msg-divider {
+            max-width: 760px; margin: 4px auto;
+            height: 1px; background: var(--border);
+            opacity: 0.6;
+        }
+
+        /* Mobile */
         @media (max-width: 700px) {
             .sidebar { display: none; }
             .suggestions { grid-template-columns: 1fr; }
             .modal-card { margin: 20px; padding: 36px 24px; }
-            .hero h1 { font-size: 2.2rem; }
+            .hero h1 { font-size: 2.4rem; }
             .nav-links a { display: none; }
+            .messages { padding: 16px 0; }
+            .message { padding: 8px 16px; }
         }
     </style>
 </head>
@@ -525,15 +780,18 @@
 <!-- Theme Toggle -->
 <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">&#9790;</button>
 <!-- Settings Toggle (always visible) -->
-<button class="theme-toggle" id="settingsBtnGlobal" title="Settings" style="right:64px">&#9881;</button>
+<button class="theme-toggle" id="settingsBtnGlobal" title="Settings" style="right:62px">&#9881;</button>
 
 <div class="bg-glow"></div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â• LANDING PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════ LANDING PAGE ═══════════════ -->
 <div class="landing" id="landing">
     <div class="container">
         <nav>
-            <div class="logo"><svg class="logo-icon" viewBox="0 0 36 36" width="28" height="28" style="vertical-align:middle;margin-right:6px"><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="50%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><circle cx="18" cy="18" r="16" fill="none" stroke="url(#lg1)" stroke-width="2"/><circle cx="18" cy="12" r="3" fill="url(#lg1)"/><circle cx="10" cy="22" r="2.5" fill="url(#lg1)"/><circle cx="26" cy="22" r="2.5" fill="url(#lg1)"/><circle cx="18" cy="26" r="2" fill="url(#lg1)"/><line x1="18" y1="15" x2="18" y2="24" stroke="url(#lg1)" stroke-width="1.2"/><line x1="18" y1="12" x2="10" y2="22" stroke="url(#lg1)" stroke-width="1" opacity="0.6"/><line x1="18" y1="12" x2="26" y2="22" stroke="url(#lg1)" stroke-width="1" opacity="0.6"/><line x1="10" y1="22" x2="18" y2="26" stroke="url(#lg1)" stroke-width="0.8" opacity="0.4"/><line x1="26" y1="22" x2="18" y2="26" stroke="url(#lg1)" stroke-width="0.8" opacity="0.4"/></svg>AcumenAI</div>
+            <div class="logo">
+                <div class="logo-dot"></div>
+                AcumenAI
+            </div>
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#quickstart">Get Started</a>
@@ -545,56 +803,60 @@
         <section class="hero">
             <div class="badge">Open Source AI Agent</div>
             <h1>Your own <span class="gradient">AI coding agent</span><br>that actually works</h1>
-            <p>A fully local AI assistant powered by its own evolving brain &mdash; no API keys, no subscriptions, no external services. Just pure local intelligence.</p>
+            <p>A fully local AI assistant powered by its own evolving brain — no API keys, no subscriptions, no external services. Pure local intelligence.</p>
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="openModal('signup')">&#9733; Get Started</button>
+                <button class="btn btn-primary" onclick="openModal('signup')">&#9733; Get Started Free</button>
                 <a href="#quickstart" class="btn btn-secondary">&#8594; Quick Start</a>
             </div>
         </section>
 
-        <section class="features" id="features">
-            <div class="card">
-                <div class="card-icon icon-blue">&#129504;</div>
-                <h3>Any Model Backend</h3>
-                <p>Zero API keys needed. Runs 100% locally on your machine.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon icon-purple">&#128269;</div>
-                <h3>Web Search</h3>
-                <p>DuckDuckGo search built in. No API key needed.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon icon-green">&#128025;</div>
-                <h3>GitHub Explorer</h3>
-                <p>Search repos, browse notable coders, read code files.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon icon-orange">&#128196;</div>
-                <h3>File Read &amp; Write</h3>
-                <p>Read, write, and list local files. Works with your code directly.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon icon-pink">&#9889;</div>
-                <h3>Code Execution</h3>
-                <p>Run Python and JS snippets in a sandboxed subprocess.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon icon-cyan">&#128375;</div>
-                <h3>Background Crawler</h3>
-                <p>Silently explores trending GitHub repos while you're idle.</p>
+        <section id="features">
+            <div class="section-label">What it can do</div>
+            <div class="features">
+                <div class="card">
+                    <div class="card-icon icon-blue">&#129504;</div>
+                    <h3>Any Model Backend</h3>
+                    <p>Zero API keys needed. Runs 100% locally on your machine with any Ollama model.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon icon-purple">&#128269;</div>
+                    <h3>Web Search</h3>
+                    <p>DuckDuckGo search built in — no API key, no limit, no tracking.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon icon-green">&#128025;</div>
+                    <h3>GitHub Explorer</h3>
+                    <p>Search repos, browse notable coders, and read code files directly.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon icon-orange">&#128196;</div>
+                    <h3>File Read &amp; Write</h3>
+                    <p>Read, write, and list local files. Works with your codebase directly.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon icon-pink">&#9889;</div>
+                    <h3>Code Execution</h3>
+                    <p>Run Python and JS snippets in a secure sandboxed subprocess.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon icon-cyan">&#128375;</div>
+                    <h3>Background Crawler</h3>
+                    <p>Silently explores trending GitHub repos and learns while you're idle.</p>
+                </div>
             </div>
         </section>
 
         <section class="code-section" id="quickstart">
-            <h2>Get started in 30 seconds</h2>
-            <p class="subtitle">Clone, configure, run.</p>
+            <div class="section-label">Quick Start</div>
+            <h2>Up and running in 60 seconds</h2>
+            <p class="subtitle">Clone the repo, install dependencies, run.</p>
             <div class="code-block">
                 <span class="comment"># Clone the repo</span><br>
                 <span class="cmd">git clone</span> https://github.com/belugaman9981/AcumenAI.git<br>
                 <span class="cmd">cd</span> AcumenAI/local-ai-agent<br><br>
                 <span class="comment"># Install dependencies</span><br>
                 <span class="cmd">pip install</span> <span class="flag">-r</span> requirements.txt<br><br>
-                <span class="comment"># No API key needed, just run:</span><br>
+                <span class="comment"># No API key needed — just run:</span><br>
                 <span class="cmd">python</span> main.py
             </div>
         </section>
@@ -605,12 +867,12 @@
     </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â• AUTH MODALS â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ════════════ AUTH MODALS ════════════ -->
 <!-- Login -->
 <div class="modal-overlay" id="loginModal">
     <div class="modal-card">
         <button class="modal-close" onclick="closeModals()">&times;</button>
-        <div class="modal-logo">AcumenAI</div>
+        <div class="modal-logo"><div class="modal-logo-dot"></div>AcumenAI</div>
         <div class="modal-sub">Welcome back</div>
         <div class="input-group">
             <label>Username</label>
@@ -633,7 +895,7 @@
 <div class="modal-overlay" id="signupModal">
     <div class="modal-card">
         <button class="modal-close" onclick="closeModals()">&times;</button>
-        <div class="modal-logo">AcumenAI</div>
+        <div class="modal-logo"><div class="modal-logo-dot"></div>AcumenAI</div>
         <div class="modal-sub">Create your account</div>
         <div class="input-group">
             <label>Username</label>
@@ -663,43 +925,42 @@
 <div class="modal-overlay" id="settingsModal">
     <div class="modal-card" style="max-width:440px;text-align:left">
         <button class="modal-close" onclick="document.getElementById('settingsModal').classList.remove('active')">&times;</button>
-        <div class="modal-logo" style="text-align:center">&#9881; Settings</div>
+        <div class="modal-logo" style="text-align:center;justify-content:center">&#9881; Settings</div>
         <div class="modal-sub" style="text-align:center">No API keys needed &mdash; 100% local brain.</div>
 
-        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:14px;margin-bottom:16px">
-            <div style="font-size:.8rem;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Brain Server Status</div>
-            <div id="serverStatus" style="font-size:.9rem;color:var(--text2)">Checking...</div>
+        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:12px;padding:14px;margin-bottom:14px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em">Brain Server</div>
+            <div id="serverStatus" style="font-size:.88rem;color:var(--text2)">Checking...</div>
         </div>
 
-        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:14px;margin-bottom:16px">
-            <div style="font-size:.8rem;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">To start the brain server</div>
-            <div style="font-family:monospace;font-size:.82rem;color:#60a5fa;line-height:1.8">
+        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:12px;padding:14px;margin-bottom:14px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text4);margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em">Start Server</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent);line-height:1.8">
                 cd G:\Python\AcumenAI\AcumenAI_improved\local-ai-agent<br>
                 python api_server.py
             </div>
         </div>
 
-        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:14px;margin-bottom:16px">
-            <div style="font-size:.8rem;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Upload WSJ / PDF to train brain</div>
-            <input type="file" id="pdfUploadInput" accept=".pdf" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.85rem;cursor:pointer">
-            <button class="auth-btn" onclick="uploadPDF()" style="margin-top:8px;font-size:.85rem;padding:10px">Upload &amp; Ingest PDF</button>
-            <div id="pdfUploadStatus" style="margin-top:8px;font-size:.82rem;color:var(--text3)"></div>
+        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:12px;padding:14px;margin-bottom:14px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text4);margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em">Train Brain (PDF)</div>
+            <input type="file" id="pdfUploadInput" accept=".pdf" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.83rem;cursor:pointer;font-family:inherit">
+            <button class="auth-btn" onclick="uploadPDF()" style="margin-top:8px;font-size:.84rem;padding:10px">Upload &amp; Ingest PDF</button>
+            <div id="pdfUploadStatus" style="margin-top:8px;font-size:.8rem;color:var(--text3)"></div>
         </div>
 
         <button class="auth-btn" onclick="saveSettings()" style="margin-top:4px">Close</button>
-        <div id="settingsStatus" style="margin-top:10px;font-size:.82rem;color:var(--text3);text-align:center"></div>
+        <div id="settingsStatus" style="margin-top:10px;font-size:.8rem;color:var(--text3);text-align:center"></div>
     </div>
 </div>
-
 
 <!-- Profile Modal -->
 <div class="modal-overlay" id="profileModal">
     <div class="modal-card" style="max-width:420px;text-align:left">
         <button class="modal-close" onclick="document.getElementById('profileModal').classList.remove('active')">&times;</button>
-        <div class="modal-logo" style="text-align:center">Profile</div>
+        <div class="modal-logo" style="text-align:center;justify-content:center">Profile</div>
         <div style="text-align:center;margin:16px 0">
-            <div class="user-avatar" id="profileAvatar" style="width:56px;height:56px;font-size:1.5rem;margin:0 auto 10px"></div>
-            <div style="font-size:1.1rem;font-weight:600;color:var(--text)" id="profileName"></div>
+            <div class="user-avatar" id="profileAvatar" style="width:56px;height:56px;font-size:1.5rem;border-radius:16px;margin:0 auto 10px"></div>
+            <div style="font-size:1.1rem;font-weight:700;color:var(--text)" id="profileName"></div>
             <div style="font-size:.82rem;color:var(--text3);margin-top:4px" id="profileStats"></div>
         </div>
     </div>
@@ -709,26 +970,33 @@
 <div class="modal-overlay" id="brainModal">
     <div class="modal-card" style="max-width:560px;text-align:left">
         <button class="modal-close" onclick="document.getElementById('brainModal').classList.remove('active')">&times;</button>
-        <div class="modal-logo" style="text-align:center">&#129504; Brain Dashboard</div>
+        <div class="modal-logo" style="text-align:center;justify-content:center">&#129504; Brain Dashboard</div>
         <div class="modal-sub" style="text-align:center">Your self-learning AI brain &mdash; no API needed for local intelligence.</div>
-        <div id="brainStatus" style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;padding:14px;font-size:.85rem;color:var(--text2);line-height:1.7;white-space:pre-line;margin-bottom:14px">Loading...</div>
+        <div id="brainStatus" style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:12px;padding:14px;font-size:.84rem;color:var(--text2);line-height:1.7;white-space:pre-line;margin-bottom:14px;font-family:'JetBrains Mono',monospace">Loading...</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <button class="auth-btn" onclick="brainAction('train')" style="font-size:.85rem;padding:10px">&#9881; Train (5 gens)</button>
-            <button class="auth-btn" onclick="brainAction('wiki-random')" style="font-size:.85rem;padding:10px">&#127760; Random Wikipedia</button>
-            <button class="auth-btn" onclick="brainWikiSearch()" style="font-size:.85rem;padding:10px">&#128269; Search Wikipedia</button>
-            <button class="auth-btn" onclick="brainAction('wiki-crawl')" style="font-size:.85rem;padding:10px">&#129432; Auto-Crawl Wiki</button>
-            <button class="auth-btn" onclick="brainAction('wiki-crawl')" style="font-size:.85rem;padding:10px">&#128218; Auto-Crawl</button>
-            <button class="auth-btn" onclick="brainAction('internet-learn')" style="font-size:.85rem;padding:10px">&#128421; Internet Learn</button>
+            <button class="auth-btn" onclick="brainAction('train')" style="font-size:.84rem;padding:10px">&#9881; Train (5 gens)</button>
+            <button class="auth-btn" onclick="brainAction('wiki-random')" style="font-size:.84rem;padding:10px">&#127760; Random Wikipedia</button>
+            <button class="auth-btn" onclick="brainWikiSearch()" style="font-size:.84rem;padding:10px">&#128269; Search Wikipedia</button>
+            <button class="auth-btn" onclick="brainAction('wiki-crawl')" style="font-size:.84rem;padding:10px">&#129432; Auto-Crawl Wiki</button>
+            <button class="auth-btn" onclick="brainAction('wiki-crawl')" style="font-size:.84rem;padding:10px">&#128218; Auto-Crawl</button>
+            <button class="auth-btn" onclick="brainAction('internet-learn')" style="font-size:.84rem;padding:10px">&#128421; Internet Learn</button>
         </div>
-        <div id="brainActionStatus" style="margin-top:10px;font-size:.82rem;color:var(--text3);text-align:center"></div>
+        <div id="brainActionStatus" style="margin-top:10px;font-size:.8rem;color:var(--text3);text-align:center"></div>
     </div>
 </div>
 
+<!-- ═══════════════ APP SHELL ═══════════════ -->
 <div class="app" id="app">
     <div class="sidebar">
         <div class="sidebar-header">
             <button class="new-chat-btn" id="newChatBtn">&#10010; New chat</button>
         </div>
+        <div class="sidebar-quick">
+            <button class="sidebar-quick-item" onclick="openSettings()">&#9881; Settings</button>
+            <button class="sidebar-quick-item" onclick="openBrainDashboard()">&#129504; Brain</button>
+            <button class="sidebar-quick-item" onclick="openProfile()">&#9786; Profile</button>
+        </div>
+        <div class="sidebar-section-label">Task History</div>
         <div class="chat-list" id="chatList"></div>
         <div class="sidebar-footer" id="sidebarFooter">
             <div class="user-menu" id="userMenu">
@@ -752,12 +1020,15 @@
         <div class="main-header">
             <span id="chatTitle">New chat</span>
             <span class="model-badge">AcumenAI</span>
-            <button id="settingsBtn" style="margin-left:auto;background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer;padding:6px 10px;border-radius:8px;transition:all .2s" title="Settings">&#9881;</button>
+            <button id="settingsBtn" style="margin-left:auto;background:none;border:none;color:var(--text2);font-size:1.1rem;cursor:pointer;padding:6px 10px;border-radius:9px;transition:all .2s" title="Settings">&#9881;</button>
         </div>
         <div class="messages" id="messages">
             <div class="welcome-screen" id="welcomeScreen">
-                <div class="welcome-logo"><svg viewBox="0 0 36 36" width="40" height="40"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="50%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><circle cx="18" cy="18" r="16" fill="none" stroke="url(#lg2)" stroke-width="2"/><circle cx="18" cy="12" r="3" fill="url(#lg2)"/><circle cx="10" cy="22" r="2.5" fill="url(#lg2)"/><circle cx="26" cy="22" r="2.5" fill="url(#lg2)"/><circle cx="18" cy="26" r="2" fill="url(#lg2)"/><line x1="18" y1="15" x2="18" y2="24" stroke="url(#lg2)" stroke-width="1.2"/><line x1="18" y1="12" x2="10" y2="22" stroke="url(#lg2)" stroke-width="1" opacity="0.6"/><line x1="18" y1="12" x2="26" y2="22" stroke="url(#lg2)" stroke-width="1" opacity="0.6"/><line x1="10" y1="22" x2="18" y2="26" stroke="url(#lg2)" stroke-width="0.8" opacity="0.4"/><line x1="26" y1="22" x2="18" y2="26" stroke="url(#lg2)" stroke-width="0.8" opacity="0.4"/></svg>AcumenAI</div>
-                <div class="welcome-sub">How can I help you today?</div>
+                <div class="welcome-logo">
+                    <div class="welcome-logo-icon">&#129504;</div>
+                    AcumenAI
+                </div>
+                <div class="welcome-sub">Local intelligence. No cloud. How can I help?</div>
                 <div class="suggestions">
                     <div class="suggestion" onclick="useSuggestion(this)"><strong>Write code</strong>Help me write a Python script</div>
                     <div class="suggestion" onclick="useSuggestion(this)"><strong>Debug an issue</strong>Find and fix a bug in my code</div>
@@ -783,7 +1054,7 @@
 <script>
 const $ = id => document.getElementById(id);
 
-// â”€â”€ Theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Theme ──────────────────────────────────────────────────
 function initTheme() {
     const saved = localStorage.getItem('acumen_theme');
     if (saved === 'light') document.body.classList.add('light');
@@ -799,7 +1070,7 @@ $('themeToggle').addEventListener('click', () => {
 });
 initTheme();
 
-// â”€â”€ Auth Modals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Auth Modals ────────────────────────────────────────────
 function openModal(type) {
     closeModals();
     $(type + 'Modal').classList.add('active');
@@ -815,12 +1086,10 @@ function switchModal(type) {
     openModal(type);
 }
 
-// Close on overlay click
 ['loginModal', 'signupModal'].forEach(id => {
     $(id).addEventListener('click', e => { if (e.target === $(id)) closeModals(); });
 });
 
-// Show/hide password
 function togglePass(inputId, btn) {
     const inp = $(inputId);
     if (inp.type === 'password') {
@@ -832,12 +1101,12 @@ function togglePass(inputId, btn) {
     }
 }
 
-// â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── State ──────────────────────────────────────────────────
 let currentUser = null;
 let chats = [];
 let activeChatId = null;
 
-// â”€â”€ Auto-login â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Auto-login ─────────────────────────────────────────────
 function initAuth() {
     const saved = localStorage.getItem('acumen_user');
     if (saved) {
@@ -847,7 +1116,7 @@ function initAuth() {
     }
 }
 
-// â”€â”€ Sign Up â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Sign Up ────────────────────────────────────────────────
 $('signupBtn').addEventListener('click', doSignup);
 $('signupPass2').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
 
@@ -871,7 +1140,7 @@ function doSignup() {
     showApp();
 }
 
-// â”€â”€ Log In â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Log In ─────────────────────────────────────────────────
 $('loginBtn').addEventListener('click', doLogin);
 $('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 $('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginPass').focus(); });
@@ -892,7 +1161,7 @@ function doLogin() {
     showApp();
 }
 
-// â”€â”€ Show App â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Show App ───────────────────────────────────────────────
 function showApp() {
     $('landing').classList.add('hidden');
     $('app').classList.add('active');
@@ -901,7 +1170,6 @@ function showApp() {
     renderChatList();
 }
 
-// -- User Hover Menu --
 $('userBanner').addEventListener('click', (e) => {
     e.stopPropagation();
     $('userMenu').classList.toggle('active');
@@ -953,7 +1221,7 @@ async function brainAction(action) {
     }
 }
 
-// â”€â”€ Log Out â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Log Out ────────────────────────────────────────────────
 $('logoutBtn').addEventListener('click', () => {
     $('userMenu').classList.remove('active');
     localStorage.removeItem('acumen_user');
@@ -964,7 +1232,7 @@ $('logoutBtn').addEventListener('click', () => {
     $('landing').classList.remove('hidden');
 });
 
-// â”€â”€ Chat Persistence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Chat Persistence ───────────────────────────────────────
 function loadChats() {
     const raw = localStorage.getItem('acumen_chats_' + currentUser);
     chats = raw ? JSON.parse(raw) : [];
@@ -973,7 +1241,7 @@ function saveChats() {
     localStorage.setItem('acumen_chats_' + currentUser, JSON.stringify(chats));
 }
 
-// â”€â”€ Chat List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Chat List ──────────────────────────────────────────────
 function renderChatList() {
     const list = $('chatList');
     list.innerHTML = '';
@@ -994,7 +1262,7 @@ function deleteChat(id) {
     renderChatList();
 }
 
-// â”€â”€ New Chat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── New Chat ───────────────────────────────────────────────
 $('newChatBtn').addEventListener('click', () => {
     activeChatId = null;
     showWelcome();
@@ -1022,12 +1290,15 @@ function openChat(id) {
     renderChatList();
 }
 
-// â”€â”€ Messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Messages ───────────────────────────────────────────────
 function showWelcome() {
     $('messages').innerHTML = `
         <div class="welcome-screen">
-            <div class="welcome-logo"><svg viewBox="0 0 36 36" width="40" height="40"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="50%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><circle cx="18" cy="18" r="16" fill="none" stroke="url(#lg2)" stroke-width="2"/><circle cx="18" cy="12" r="3" fill="url(#lg2)"/><circle cx="10" cy="22" r="2.5" fill="url(#lg2)"/><circle cx="26" cy="22" r="2.5" fill="url(#lg2)"/><circle cx="18" cy="26" r="2" fill="url(#lg2)"/><line x1="18" y1="15" x2="18" y2="24" stroke="url(#lg2)" stroke-width="1.2"/><line x1="18" y1="12" x2="10" y2="22" stroke="url(#lg2)" stroke-width="1" opacity="0.6"/><line x1="18" y1="12" x2="26" y2="22" stroke="url(#lg2)" stroke-width="1" opacity="0.6"/><line x1="10" y1="22" x2="18" y2="26" stroke="url(#lg2)" stroke-width="0.8" opacity="0.4"/><line x1="26" y1="22" x2="18" y2="26" stroke="url(#lg2)" stroke-width="0.8" opacity="0.4"/></svg>AcumenAI</div>
-            <div class="welcome-sub">How can I help you today?</div>
+            <div class="welcome-logo">
+                <div class="welcome-logo-icon">&#129504;</div>
+                AcumenAI
+            </div>
+            <div class="welcome-sub">Local intelligence. No cloud. How can I help?</div>
             <div class="suggestions">
                 <div class="suggestion" onclick="useSuggestion(this)"><strong>Write code</strong>Help me write a Python script</div>
                 <div class="suggestion" onclick="useSuggestion(this)"><strong>Debug an issue</strong>Find and fix a bug in my code</div>
@@ -1065,7 +1336,7 @@ function appendMessage(role, text) {
     container.scrollTop = container.scrollHeight;
 }
 
-// â”€â”€ Send â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Send ───────────────────────────────────────────────────
 $('sendBtn').addEventListener('click', sendMessage);
 $('msgInput').addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
@@ -1161,6 +1432,7 @@ async function generateReply(msg) {
         return 'Error connecting to brain server: ' + e.message;
     }
 }
+
 // -- PDF Upload --
 async function uploadPDF() {
     const input = $('pdfUploadInput');
@@ -1221,3 +1493,4 @@ function useSuggestion(el) {
 initAuth();
 </script>
 </body>
+</html>
