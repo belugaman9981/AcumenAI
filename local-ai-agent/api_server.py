@@ -40,7 +40,19 @@ from wiki_ingest import ingest_random_to_brain, auto_crawl_wiki, ingest_search_t
 from pdf_ingest import ingest_pdf_to_brain
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins="*", supports_credentials=False)
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return response
+
+@app.route("/<path:path>", methods=["OPTIONS"])
+@app.route("/", methods=["OPTIONS"])
+def options_handler(path=""):
+    return "", 204
 
 _agent: CodingAgent | None = None
 
