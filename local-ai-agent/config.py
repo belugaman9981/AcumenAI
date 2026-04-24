@@ -31,6 +31,6 @@ DEFAULT_BRAIN_POPULATION = 48   # exactly 48 bots
 
 # ── Response generation ───────────────────────────────────────────────────────
 # How many words the brain generates per response
-RESPONSE_WORD_COUNT = 80
+RESPONSE_WORD_COUNT = 150
 # How many related words to pull from the word map per keyword
-WORD_MAP_TOP_N = 10
+WORD_MAP_TOP_N = 20

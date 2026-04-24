@@ -133,21 +133,21 @@ class EvolutionBrain:
             return
         try:
             payload = json.loads(self.state_path.read_text(encoding="utf-8"))
-            self.population = payload.get("population", [])
+            self.population = payload.get("population", []) # the poputalion of bots that the user wanted to evolve
             self.image_samples = payload.get("image_samples", [])
             self.text_corpus = payload.get("text_corpus", [])
             self.feedback = payload.get("feedback", self.feedback)
             self._rebuild_char_counts()
             self._rebuild_word_counts()
         except Exception:
-            self.population = []
+            self.population = [] # makes a list of what the user wanted to evolve
             self.image_samples = []
             self.text_corpus = []
 
     def save(self) -> None:
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
         payload = {
-            "population": self.population,
+            "population": self.population, # the population of bots that the user wanted to evolve
             "image_samples": self.image_samples,
             "text_corpus": self.text_corpus,
             "feedback": self.feedback,
