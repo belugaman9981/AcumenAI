@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AcumenAI — Intelligence at the Frontier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+:root {
+  --cream:   #e9e4da;
+  --cream2:  #f2ede5;
+  --ink:     #181614;
+  --ink2:    #3a3632;
+  --ink3:    #7a756e;
+  --ink4:    #b0a99f;
+  --rust:    #c8573a;
+  --rust2:   #e06a4a;
+  --card-bg: #181614;
+  --card-fg: #f0ebe2;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── NAV ────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+  background: var(--cream);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 60px;
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 1.1rem; letter-spacing: -0.2px;
+  color: var(--ink); text-decoration: none;
+}
+.nav-links {
+  display: flex; align-items: center; gap: 6px;
+}
+.nav-links a {
+  font-size: 0.875rem; font-weight: 500; color: var(--ink2);
+  text-decoration: none; padding: 6px 14px; border-radius: 6px;
+  transition: color 0.15s;
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-cta {
+  background: var(--ink); color: var(--cream2) !important;
+  border-radius: 100px !important; padding: 8px 22px !important;
+  font-weight: 600 !important; font-size: 0.86rem !important;
+  transition: background 0.2s !important;
+}
+.nav-cta:hover { background: var(--ink2) !important; color: var(--cream2) !important; }
+
+/* ── HERO ───────────────────────────────────────── */
+.hero {
+  padding: 140px 40px 100px;
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: end;
+}
+.hero-left {}
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.76rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink3);
+  margin-bottom: 24px;
+}
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
+  font-weight: 700; line-height: 1.12;
+  letter-spacing: -1px; color: var(--ink);
+  margin-bottom: 0;
+}
+.hero h1 u {
+  text-decoration: underline;
+  text-decoration-color: var(--rust);
+  text-underline-offset: 5px;
+  text-decoration-thickness: 2px;
+}
+.hero h1 em {
+  font-style: italic; font-family: 'Instrument Serif', serif;
+  font-weight: 400; font-size: 1.08em;
+}
+.hero-right {
+  padding-bottom: 8px;
+}
+.hero-right p {
+  font-size: 1.1rem; line-height: 1.75;
+  color: var(--ink2); margin-bottom: 32px;
+  font-weight: 400;
+}
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; border-radius: 100px;
+  font-size: 0.9rem; font-weight: 600; font-family: 'Syne', sans-serif;
+  text-decoration: none; cursor: pointer; border: none;
+  transition: all 0.2s;
+}
+.btn-dark { background: var(--ink); color: var(--cream2); }
+.btn-dark:hover { background: var(--ink2); }
+.btn-outline {
+  background: transparent; color: var(--ink);
+  border: 1.5px solid rgba(0,0,0,0.25);
+}
+.btn-outline:hover { border-color: var(--ink); background: rgba(0,0,0,0.04); }
+
+/* ── DARK HERO CARD ─────────────────────────────── */
+.hero-card-wrap {
+  padding: 0 40px 80px;
+  max-width: 1200px; margin: 0 auto;
+}
+.hero-card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  overflow: hidden;
+  min-height: 440px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  position: relative;
+}
+.hero-card-left {
+  padding: 64px 60px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.hero-card-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.35);
+  margin-bottom: 20px;
+}
+.hero-card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 3.5vw, 3.8rem);
+  font-weight: 700; color: var(--card-fg);
+  line-height: 1.1; letter-spacing: -1px;
+}
+.hero-card-sub {
+  font-size: 0.92rem; color: rgba(255,255,255,0.45);
+  line-height: 1.7; max-width: 340px; margin-top: 28px;
+}
+.hero-card-right {
+  position: relative;
+  background: linear-gradient(135deg, #1e1b28 0%, #0e0c14 100%);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+
+/* Animated neural web */
+.neural-canvas {
+  position: absolute; inset: 0;
+  opacity: 0.7;
+}
+
+/* ── STATS ──────────────────────────────────────── */
+.stats-section {
+  max-width: 1200px; margin: 0 auto;
+  padding: 60px 40px 80px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+}
+.stat {
+  padding: 0 40px;
+  border-right: 1px solid rgba(0,0,0,0.08);
+}
+.stat:first-child { padding-left: 0; }
+.stat:last-child  { border-right: none; }
+.stat-num {
+  font-family: 'Instrument Serif', serif;
+  font-size: 3.2rem; font-weight: 400; line-height: 1;
+  color: var(--ink); margin-bottom: 8px;
+}
+.stat-label { font-size: 0.88rem; color: var(--ink3); font-weight: 500; }
+
+/* ── ABOUT SPLIT ─────────────────────────────────── */
+.about-section {
+  max-width: 1200px; margin: 0 auto;
+  padding: 80px 40px 100px;
+  display: grid; grid-template-columns: 320px 1fr; gap: 80px;
+  align-items: start;
+}
+.about-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink3);
+  padding-top: 8px;
+}
+.about-body h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(1.9rem, 3vw, 2.8rem);
+  font-weight: 400; line-height: 1.2;
+  margin-bottom: 24px; color: var(--ink);
+}
+.about-body p {
+  font-size: 1rem; line-height: 1.8;
+  color: var(--ink2); margin-bottom: 20px;
+}
+
+/* ── MODEL CARD ─────────────────────────────────── */
+.model-section {
+  background: var(--ink); color: var(--card-fg);
+  padding: 100px 40px;
+}
+.model-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+.model-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.38);
+  margin-bottom: 18px;
+}
+.model-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(2.8rem, 4.5vw, 5rem);
+  font-weight: 400; line-height: 1.05;
+  margin-bottom: 24px; color: #fff;
+}
+.model-title em {
+  font-style: italic; color: var(--rust2);
+}
+.model-desc {
+  font-size: 1rem; line-height: 1.8;
+  color: rgba(255,255,255,0.6); margin-bottom: 36px;
+}
+.model-features {
+  display: flex; flex-direction: column; gap: 0;
+}
+.model-feature {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.08);
+}
+.model-feature:last-child { border-bottom: 1px solid rgba(255,255,255,0.08); }
+.mf-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: rgba(255,255,255,0.07);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.mf-body h4 { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; color: #fff; }
+.mf-body p  { font-size: 0.84rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+/* ── PRINCIPLES ─────────────────────────────────── */
+.principles {
+  max-width: 1200px; margin: 0 auto; padding: 100px 40px;
+}
+.principles-hed {
+  display: grid; grid-template-columns: 320px 1fr; gap: 80px;
+  margin-bottom: 60px;
+}
+.principles-hed h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(1.9rem, 2.8vw, 2.6rem); font-weight: 400;
+  line-height: 1.2; color: var(--ink);
+}
+.principles-hed p { font-size: 1rem; color: var(--ink2); line-height: 1.8; padding-top: 8px; }
+.principles-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+.principle {
+  padding: 36px 28px 36px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  border-right: 1px solid rgba(0,0,0,0.08);
+}
+.principle:nth-child(3n) { border-right: none; }
+.principle:nth-child(n+4) { border-bottom: none; }
+.principle + .principle { padding-left: 28px; }
+.principle:nth-child(3n+1) { padding-left: 0; }
+.p-num {
+  font-family: 'DM Mono', monospace; font-size: 0.72rem;
+  color: var(--ink4); margin-bottom: 16px; letter-spacing: 0.08em;
+}
+.p-title { font-size: 1rem; font-weight: 700; margin-bottom: 10px; color: var(--ink); }
+.p-desc  { font-size: 0.88rem; color: var(--ink3); line-height: 1.7; }
+
+/* ── CTA SECTION ────────────────────────────────── */
+.cta-section {
+  background: var(--cream2); border-top: 1px solid rgba(0,0,0,0.07);
+  padding: 100px 40px; text-align: center;
+}
+.cta-section h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(2.2rem, 4vw, 3.6rem); font-weight: 400;
+  line-height: 1.15; max-width: 600px; margin: 0 auto 24px;
+  color: var(--ink);
+}
+.cta-section h2 em { font-style: italic; }
+.cta-section p {
+  font-size: 1rem; color: var(--ink3); margin-bottom: 40px; line-height: 1.7;
+}
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ── FOOTER ─────────────────────────────────────── */
+footer {
+  border-top: 1px solid rgba(0,0,0,0.1);
+  padding: 40px 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.84rem; color: var(--ink4);
+}
+footer a { color: var(--ink3); text-decoration: none; }
+footer a:hover { color: var(--ink); }
+.footer-links { display: flex; gap: 24px; }
+
+/* ── SCROLL ANIMATIONS ──────────────────────────── */
+.fade-in {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.fade-in.visible {
+  opacity: 1; transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .hero { grid-template-columns: 1fr; padding: 120px 24px 60px; gap: 36px; }
+  .hero-card { grid-template-columns: 1fr; }
+  .hero-card-right { min-height: 280px; }
+  .stats-section { grid-template-columns: 1fr; }
+  .stat { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); padding: 24px 0; }
+  .about-section { grid-template-columns: 1fr; gap: 20px; }
+  .model-inner { grid-template-columns: 1fr; }
+  .principles-hed { grid-template-columns: 1fr; gap: 16px; }
+  .principles-grid { grid-template-columns: 1fr; }
+  .principle { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); padding: 28px 0; }
+  nav { padding: 0 20px; }
+  .nav-links a:not(.nav-cta) { display: none; }
+  .hero-card-wrap { padding: 0 20px 60px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">AcumenAI</a>
+  <div class="nav-links">
+    <a href="#research">Research</a>
+    <a href="#model">ClawCow Agent</a>
+    <a href="#about">Mission</a>
+    <a href="#" class="nav-cta btn">Try ClawCow ↗</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-left fade-in">
+    <div class="hero-eyebrow">AcumenAI · Est. 2025</div>
+    <h1>Local AI that<br><em>thinks</em> and<br><u>learns</u> for itself</h1>
+  </div>
+  <div class="hero-right fade-in" style="transition-delay:0.12s">
+    <p>AcumenAI is an independent AI lab building agents that evolve through experience — no cloud, no API keys, no limits. Intelligence that belongs to you.</p>
+    <div class="hero-btns">
+      <a href="#model" class="btn btn-dark">Meet ClawCow Agent</a>
+      <a href="#research" class="btn btn-outline">Our research</a>
+    </div>
+  </div>
+</section>
+
+<!-- DARK FEATURE CARD -->
+<div class="hero-card-wrap fade-in" style="transition-delay:0.22s">
+  <div class="hero-card">
+    <div class="hero-card-left">
+      <div>
+        <div class="hero-card-eyebrow">Flagship Model — 2025</div>
+        <div class="hero-card-title">ClawCow<br>Agent</div>
+        <p class="hero-card-sub">Our first public agent — self-training, Wikipedia-crawling, and evolving its own understanding every 45 seconds. Zero cloud dependency.</p>
+      </div>
+      <div>
+        <a href="#model" class="btn" style="background:rgba(255,255,255,0.1);color:#fff;margin-top:32px;display:inline-flex">
+          Explore the model →
+        </a>
+      </div>
+    </div>
+    <div class="hero-card-right">
+      <canvas class="neural-canvas" id="neuralCanvas"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<section class="stats-section" id="research">
+  <div class="stat fade-in">
+    <div class="stat-num">100%</div>
+    <div class="stat-label">Local — no external API calls</div>
+  </div>
+  <div class="stat fade-in" style="transition-delay:0.1s">
+    <div class="stat-num">45s</div>
+    <div class="stat-label">Auto-learn cycle interval</div>
+  </div>
+  <div class="stat fade-in" style="transition-delay:0.2s">
+    <div class="stat-num">∞</div>
+    <div class="stat-label">Knowledge — grows continuously</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="about-label fade-in">Our mission</div>
+  <div class="about-body fade-in" style="transition-delay:0.1s">
+    <h2>Intelligence should belong to the person using it — not a server farm in Virginia.</h2>
+    <p>AcumenAI was built out of frustration with AI systems that phone home, charge monthly fees, and keep your data on someone else's machine. We believe a model that runs entirely on your hardware — one that grows smarter from your use — is fundamentally more trustworthy.</p>
+    <p>Our research focuses on evolutionary learning: small populations of neural bots that compete, breed, and mutate to improve their predictions over time. No gradient descent. No GPUs required. Just relentless iteration.</p>
+  </div>
+</section>
+
+<!-- MODEL SECTION -->
+<section class="model-section" id="model">
+  <div class="model-inner">
+    <div class="fade-in">
+      <div class="model-eyebrow">Flagship Agent · AcumenAI</div>
+      <div class="model-title">ClawCow<br><em>Agent</em></div>
+      <p class="model-desc">A self-evolving AI agent that crawls Wikipedia, ingests PDFs, searches the web, and runs code — all locally on your machine. It learns while you sleep.</p>
+      <a href="#" class="btn" style="background:var(--rust);color:#fff">Try ClawCow Agent →</a>
+    </div>
+    <div class="model-features fade-in" style="transition-delay:0.15s">
+      <div class="model-feature">
+        <div class="mf-icon">&#129504;</div>
+        <div class="mf-body">
+          <h4>Evolutionary Brain</h4>
+          <p>A population of bots compete and breed to improve prediction accuracy — no neural network, no GPU needed.</p>
+        </div>
+      </div>
+      <div class="model-feature">
+        <div class="mf-icon">&#128025;</div>
+        <div class="mf-body">
+          <h4>Auto-Wikipedia Crawler</h4>
+          <p>Every 45 seconds when idle, ClawCow ingests new Wikipedia articles and trains on them automatically.</p>
+        </div>
+      </div>
+      <div class="model-feature">
+        <div class="mf-icon">&#128269;</div>
+        <div class="mf-body">
+          <h4>Web Search</h4>
+          <p>DuckDuckGo integration — no API key, no tracking. Live answers when the brain doesn't know.</p>
+        </div>
+      </div>
+      <div class="model-feature">
+        <div class="mf-icon">&#9889;</div>
+        <div class="mf-body">
+          <h4>Code Execution</h4>
+          <p>Runs Python and JavaScript in sandboxed subprocesses. Writes, tests, and iterates on real code.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRINCIPLES -->
+<section class="principles" id="principles">
+  <div class="principles-hed">
+    <h2 class="fade-in">Built on a few hard principles</h2>
+    <p class="fade-in" style="transition-delay:0.1s">We made choices that cost us convenience — they're the right choices anyway.</p>
+  </div>
+  <div class="principles-grid">
+    <div class="principle fade-in">
+      <div class="p-num">01</div>
+      <div class="p-title">Your data stays yours</div>
+      <p class="p-desc">No telemetry, no cloud sync, no training on your conversations. Everything lives on your machine.</p>
+    </div>
+    <div class="principle fade-in" style="transition-delay:0.08s">
+      <div class="p-num">02</div>
+      <div class="p-title">Open by default</div>
+      <p class="p-desc">The source is on GitHub. Read it, fork it, audit it. We don't hide what ClawCow does.</p>
+    </div>
+    <div class="principle fade-in" style="transition-delay:0.16s">
+      <div class="p-num">03</div>
+      <div class="p-title">Continuous learning</div>
+      <p class="p-desc">Models that don't evolve become stale. ClawCow gets smarter every time it runs — by design.</p>
+    </div>
+    <div class="principle fade-in" style="transition-delay:0.08s">
+      <div class="p-num">04</div>
+      <div class="p-title">No subscription required</div>
+      <p class="p-desc">One download, yours forever. Intelligence shouldn't come with a monthly invoice.</p>
+    </div>
+    <div class="principle fade-in" style="transition-delay:0.16s">
+      <div class="p-num">05</div>
+      <div class="p-title">Hardware accessible</div>
+      <p class="p-desc">Runs on a laptop from 2018. No CUDA, no 24GB VRAM. Designed for real hardware.</p>
+    </div>
+    <div class="principle fade-in" style="transition-delay:0.24s">
+      <div class="p-num">06</div>
+      <div class="p-title">Research first</div>
+      <p class="p-desc">Every product decision is grounded in our evolutionary AI research. No hype, no vaporware.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="fade-in">Ready to run an AI<br>that <em>actually</em> learns?</h2>
+  <p class="fade-in" style="transition-delay:0.1s">Download ClawCow Agent. No account needed. No credit card. Just clone and run.</p>
+  <div class="cta-btns fade-in" style="transition-delay:0.2s">
+    <a href="https://github.com/belugaman9981/AcumenAI" target="_blank" class="btn btn-dark">Get ClawCow Agent ↗</a>
+    <a href="#research" class="btn btn-outline">Read the docs</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:-0.2px;color:var(--ink)">AcumenAI</div>
+  <div class="footer-links">
+    <a href="#">Research</a>
+    <a href="#">GitHub</a>
+    <a href="#">Docs</a>
+    <a href="#">Privacy</a>
+  </div>
+  <div>© 2025 AcumenAI</div>
+</footer>
+
+<script>
+// ── Neural canvas animation ──────────────────────────────
+const canvas = document.getElementById('neuralCanvas');
+const ctx    = canvas.getContext('2d');
+let nodes = [], W, H, raf;
+
+function resize() {
+  const r = canvas.getBoundingClientRect();
+  W = canvas.width  = r.width;
+  H = canvas.height = r.height;
+}
+
+function initNodes() {
+  nodes = Array.from({ length: 38 }, () => ({
+    x:  Math.random() * W,
+    y:  Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.45,
+    vy: (Math.random() - 0.5) * 0.45,
+    r:  Math.random() * 2.5 + 1,
+  }));
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  nodes.forEach(n => {
+    n.x += n.vx; n.y += n.vy;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+  });
+
+  // Draw edges
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const d  = Math.sqrt(dx * dx + dy * dy);
+      if (d < 120) {
+        const alpha = (1 - d / 120) * 0.4;
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(200,87,58,${alpha})`;
+        ctx.lineWidth = 0.8;
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Draw nodes
+  nodes.forEach(n => {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(200,87,58,0.7)';
+    ctx.fill();
+  });
+
+  raf = requestAnimationFrame(draw);
+}
+
+window.addEventListener('resize', () => { resize(); initNodes(); });
+resize(); initNodes(); draw();
+
+
+// ── Scroll fade-in ───────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
