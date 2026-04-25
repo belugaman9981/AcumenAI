@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AcumenAI</title>
+    <title>ClawCow Agent</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -715,7 +715,7 @@
         <nav>
             <div class="logo">
                 <div class="logo-dot"></div>
-                AcumenAI
+                ClawCow Agent
             </div>
             <div class="nav-links">
                 <a href="#features">Features</a>
@@ -797,7 +797,7 @@
 <div class="modal-overlay" id="loginModal">
     <div class="modal-card">
         <button class="modal-close" onclick="closeModals()">&times;</button>
-        <div class="modal-logo"><div class="modal-logo-dot"></div>AcumenAI</div>
+        <div class="modal-logo"><div class="modal-logo-dot"></div>ClawCow Agent</div>
         <div class="modal-sub">Welcome back</div>
         <div class="input-group">
             <label>Username</label>
@@ -820,7 +820,7 @@
 <div class="modal-overlay" id="signupModal">
     <div class="modal-card">
         <button class="modal-close" onclick="closeModals()">&times;</button>
-        <div class="modal-logo"><div class="modal-logo-dot"></div>AcumenAI</div>
+        <div class="modal-logo"><div class="modal-logo-dot"></div>ClawCow Agent</div>
         <div class="modal-sub">Create your account</div>
         <div class="input-group">
             <label>Username</label>
@@ -861,7 +861,7 @@
         <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:12px;padding:14px;margin-bottom:14px">
             <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text4);margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em">Start Server</div>
             <div style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent);line-height:1.8">
-                cd G:\Python\AcumenAI\AcumenAI_improved\local-ai-agent<br>
+                cd G:\Python\AcumenAI\local-ai-agent<br>
                 python api_server.py
             </div>
         </div>
@@ -938,14 +938,14 @@
     <div class="main">
         <div class="main-header">
             <span id="chatTitle">New chat</span>
-            <span class="model-badge">AcumenAI</span>
+            <span class="model-badge">ClawCow Agent</span>
             <button id="settingsBtn" style="margin-left:auto;background:none;border:none;color:var(--text2);font-size:1.1rem;cursor:pointer;padding:6px 10px;border-radius:9px;transition:all .2s" title="Settings">&#9881;</button>
         </div>
         <div class="messages" id="messages">
             <div class="welcome-screen" id="welcomeScreen">
                 <div class="welcome-logo">
                     <div class="welcome-logo-icon">&#129504;</div>
-                    AcumenAI
+                    ClawCow Agent
                 </div>
                 <div class="welcome-sub">Local intelligence. No cloud. How can I help?</div>
                 <div class="suggestions">
@@ -962,10 +962,10 @@
         </div>
         <div class="input-area">
             <div class="input-wrap-chat">
-                <textarea class="input-box" id="msgInput" placeholder="Message AcumenAI..." rows="1"></textarea>
+                <textarea class="input-box" id="msgInput" placeholder="Message ClawCow Agent..." rows="1"></textarea>
                 <button class="send-btn" id="sendBtn">&#8593;</button>
             </div>
-            <div class="input-hint">AcumenAI can make mistakes. Verify important information.</div>
+            <div class="input-hint">ClawCow Agent can make mistakes. Verify important information.</div>
         </div>
     </div>
 </div>
@@ -1215,7 +1215,7 @@ function showWelcome() {
         <div class="welcome-screen">
             <div class="welcome-logo">
                 <div class="welcome-logo-icon">&#129504;</div>
-                AcumenAI
+                ClawCow Agent
             </div>
             <div class="welcome-sub">Local intelligence. No cloud. How can I help?</div>
             <div class="suggestions">
@@ -1241,7 +1241,7 @@ function makeMsgEl(role, text) {
     div.innerHTML = `
         <div class="msg-avatar ${role === 'user' ? 'user' : 'ai'}">${initial}</div>
         <div class="msg-content">
-            <div class="msg-role">${role === 'user' ? 'You' : 'AcumenAI'}</div>
+            <div class="msg-role">${role === 'user' ? 'You' : 'ClawCow Agent'}</div>
             <div class="msg-text">${formatText(text)}</div>
         </div>`;
     return div;
@@ -1329,7 +1329,7 @@ function resetConversation() { conversationHistory = []; }
 // -- AI Replies via local brain (no API key needed) --
 async function generateReply(msg) {
     if (!serverOnline) {
-        return '⚠️ Brain server is offline. Open PowerShell and run:\n\n  cd G:\\Python\\AcumenAI\\AcumenAI_improved\\local-ai-agent\n  python api_server.py\n\nThen refresh this page.';
+        return '⚠️ Brain server is offline. Open PowerShell and run:\n\n  cd G:\\Python\\AcumenAI\\local-ai-agent\n  python api_server.py\n\nThen refresh this page.';
     }
     conversationHistory.push({ role: 'user', content: msg });
     if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);

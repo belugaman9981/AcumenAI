@@ -1,5 +1,5 @@
 """
-api_server.py — Local HTTP bridge between the website and the AcumenAI brain.
+api_server.py — Local HTTP bridge between the website and the ClawCow Agent brain.
 
 Run this alongside the website:
     python api_server.py
@@ -71,7 +71,7 @@ def health():
     a = get_agent()
     return jsonify({
         "ok": True,
-        "engine": "AcumenAI Local Brain",
+        "engine": "ClawCow Agent Local Brain",
         "bots": len(a.brain.population),
         "trained": bool(a.brain.text_corpus),
     })
@@ -237,7 +237,7 @@ def reset():
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("  AcumenAI Local API Server")
+    print("  ClawCow Agent Local API Server")
     print("  http://localhost:5820")
     print("  No API keys needed — 100% local brain")
     print("=" * 50)
