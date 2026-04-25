@@ -1,1419 +1,592 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AcumenAI</title>
-    <meta http-equiv="refresh" content="0; url=acumenai_site.html">
-    <script>
-        window.location.replace('acumenai_site.html');
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AcumenAI — Intelligence at the Frontier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
 
-        :root {
-            --bg: #08090e;
-            --bg2: #0d0e16;
-            --bg3: #111220;
-            --surface: rgba(255,255,255,0.04);
-            --surface2: rgba(255,255,255,0.06);
-            --border: rgba(255,255,255,0.07);
-            --border2: rgba(255,255,255,0.13);
-            --text: #eeeef5;
-            --text2: #888a9a;
-            --text3: #555668;
-            --text4: #38394a;
-            --accent: #f0a030;
-            --accent-dim: rgba(240,160,48,0.12);
-            --accent-glow: rgba(240,160,48,0.2);
-            --accent2: #0ecfb0;
-            --accent2-dim: rgba(14,207,176,0.1);
-            --gradient: linear-gradient(135deg, #f0a030 0%, #e8486c 100%);
-            --gradient2: linear-gradient(135deg, #f0a030 0%, #ff7c4d 100%);
-            --gradient3: linear-gradient(135deg, #f0a030, #e8486c, #c64dff);
-            --card-hover: rgba(240,160,48,0.04);
-            --code-bg: rgba(0,0,0,0.35);
-            --code-border: rgba(255,255,255,0.08);
-            --input-bg: rgba(255,255,255,0.05);
-            --shadow: rgba(0,0,0,0.5);
-            --overlay: rgba(0,0,0,0.7);
-            --glow1: rgba(240,160,48,0.06);
-            --glow2: rgba(14,207,176,0.04);
-        }
-        .light {
-            --bg: #f7f6f2;
-            --bg2: #ffffff;
-            --bg3: #f0efe9;
-            --surface: rgba(0,0,0,0.03);
-            --surface2: rgba(0,0,0,0.05);
-            --border: rgba(0,0,0,0.08);
-            --border2: rgba(0,0,0,0.14);
-            --text: #18181e;
-            --text2: #555568;
-            --text3: #888898;
-            --text4: #aaaab5;
-            --accent: #c47a10;
-            --accent-dim: rgba(196,122,16,0.1);
-            --accent-glow: rgba(196,122,16,0.15);
-            --accent2: #0a9e87;
-            --accent2-dim: rgba(10,158,135,0.08);
-            --card-hover: rgba(196,122,16,0.04);
-            --code-bg: rgba(0,0,0,0.04);
-            --code-border: rgba(0,0,0,0.09);
-            --input-bg: rgba(0,0,0,0.04);
-            --shadow: rgba(0,0,0,0.1);
-            --overlay: rgba(0,0,0,0.45);
-            --glow1: rgba(196,122,16,0.05);
-            --glow2: rgba(10,158,135,0.04);
-        }
+:root {
+  --cream:   #e9e4da;
+  --cream2:  #f2ede5;
+  --ink:     #181614;
+  --ink2:    #3a3632;
+  --ink3:    #7a756e;
+  --ink4:    #b0a99f;
+  --rust:    #c8573a;
+  --rust2:   #e06a4a;
+  --card-bg: #181614;
+  --card-fg: #f0ebe2;
+}
 
-        body {
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-        }
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
 
-        /* Dot-grid background */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
-            background-size: 28px 28px;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .light body::before {
-            background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
-        }
+/* ── NAV ────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+  background: var(--cream);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 60px;
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 1.1rem; letter-spacing: -0.2px;
+  color: var(--ink); text-decoration: none;
+}
+.nav-links {
+  display: flex; align-items: center; gap: 6px;
+}
+.nav-links a {
+  font-size: 0.875rem; font-weight: 500; color: var(--ink2);
+  text-decoration: none; padding: 6px 14px; border-radius: 6px;
+  transition: color 0.15s;
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-cta {
+  background: var(--ink); color: var(--cream2) !important;
+  border-radius: 100px !important; padding: 8px 22px !important;
+  font-weight: 600 !important; font-size: 0.86rem !important;
+  transition: background 0.2s !important;
+}
+.nav-cta:hover { background: var(--ink2) !important; color: var(--cream2) !important; }
 
-        .bg-glow {
-            position: fixed;
-            top: -40%; left: -30%;
-            width: 180%; height: 180%;
-            background:
-                radial-gradient(ellipse at 28% 35%, var(--glow1) 0%, transparent 55%),
-                radial-gradient(ellipse at 72% 65%, var(--glow2) 0%, transparent 50%);
-            animation: drift 25s ease-in-out infinite;
-            z-index: 0;
-            pointer-events: none;
-        }
-        @keyframes drift {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(-20px, 15px) scale(1.02); }
-        }
+/* ── HERO ───────────────────────────────────────── */
+.hero {
+  padding: 140px 40px 100px;
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: end;
+}
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.76rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink3);
+  margin-bottom: 24px;
+}
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
+  font-weight: 700; line-height: 1.12;
+  letter-spacing: -1px; color: var(--ink);
+  margin-bottom: 0;
+}
+.hero h1 u {
+  text-decoration: underline;
+  text-decoration-color: var(--rust);
+  text-underline-offset: 5px;
+  text-decoration-thickness: 2px;
+}
+.hero h1 em {
+  font-style: italic; font-family: 'Instrument Serif', serif;
+  font-weight: 400; font-size: 1.08em;
+}
+.hero-right {
+  padding-bottom: 8px;
+}
+.hero-right p {
+  font-size: 1.1rem; line-height: 1.75;
+  color: var(--ink2); margin-bottom: 32px;
+  font-weight: 400;
+}
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; border-radius: 100px;
+  font-size: 0.9rem; font-weight: 600; font-family: 'Syne', sans-serif;
+  text-decoration: none; cursor: pointer; border: none;
+  transition: all 0.2s;
+}
+.btn-dark { background: var(--ink); color: var(--cream2); }
+.btn-dark:hover { background: var(--ink2); }
+.btn-outline {
+  background: transparent; color: var(--ink);
+  border: 1.5px solid rgba(0,0,0,0.25);
+}
+.btn-outline:hover { border-color: var(--ink); background: rgba(0,0,0,0.04); }
 
-        /* Theme & settings toggles */
-        .theme-toggle {
-            position: fixed;
-            top: 18px; right: 18px;
-            z-index: 9999;
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            border: 1px solid var(--border2);
-            background: var(--bg2);
-            color: var(--text2);
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
-            transition: all 0.2s;
-            backdrop-filter: blur(12px);
-        }
-        .theme-toggle:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
+/* ── DARK HERO CARD ─────────────────────────────── */
+.hero-card-wrap {
+  padding: 0 40px 80px;
+  max-width: 1200px; margin: 0 auto;
+}
+.hero-card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  overflow: hidden;
+  min-height: 440px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  position: relative;
+}
+.hero-card-left {
+  padding: 64px 60px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.hero-card-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.35);
+  margin-bottom: 20px;
+}
+.hero-card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 3.5vw, 3.8rem);
+  font-weight: 700; color: var(--card-fg);
+  line-height: 1.1; letter-spacing: -1px;
+}
+.hero-card-sub {
+  font-size: 0.92rem; color: rgba(255,255,255,0.45);
+  line-height: 1.7; max-width: 340px; margin-top: 28px;
+}
+.hero-card-right {
+  position: relative;
+  background: linear-gradient(135deg, #1e1b28 0%, #0e0c14 100%);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
 
-        /* Landing */
-        .landing { position: relative; z-index: 1; }
-        .landing.hidden { display: none; }
+/* Animated neural web */
+.neural-canvas {
+  position: absolute; inset: 0;
+  opacity: 0.7;
+}
 
-        .container {
-            max-width: 920px;
-            margin: 0 auto;
-            padding: 0 28px;
-        }
+/* ── STATS ──────────────────────────────────────── */
+.stats-section {
+  max-width: 1200px; margin: 0 auto;
+  padding: 60px 40px 80px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+}
+.stat {
+  padding: 0 40px;
+  border-right: 1px solid rgba(0,0,0,0.08);
+}
+.stat:first-child { padding-left: 0; }
+.stat:last-child  { border-right: none; }
+.stat-num {
+  font-family: 'Instrument Serif', serif;
+  font-size: 3.2rem; font-weight: 400; line-height: 1;
+  color: var(--ink); margin-bottom: 8px;
+}
+.stat-label { font-size: 0.88rem; color: var(--ink3); font-weight: 500; }
 
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 22px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .logo {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text);
-            letter-spacing: -0.5px;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .logo-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: var(--gradient);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-        .nav-links { display: flex; align-items: center; gap: 4px; }
-        .nav-links a {
-            color: var(--text2);
-            text-decoration: none;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .nav-links a:hover { color: var(--text); background: var(--surface); }
-        .nav-btn {
-            padding: 8px 18px;
-            border-radius: 9px;
-            font-size: 0.86rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            border: none;
-            font-family: inherit;
-            margin-left: 4px;
-        }
-        .nav-btn-outline {
-            background: transparent;
-            border: 1px solid var(--border2);
-            color: var(--text);
-        }
-        .nav-btn-outline:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
-        .nav-btn-primary {
-            background: var(--gradient2);
-            color: #fff;
-        }
-        .nav-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+/* ── ABOUT SPLIT ─────────────────────────────────── */
+.about-section {
+  max-width: 1200px; margin: 0 auto;
+  padding: 80px 40px 100px;
+  display: grid; grid-template-columns: 320px 1fr; gap: 80px;
+  align-items: start;
+}
+.about-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink3);
+  padding-top: 8px;
+}
+.about-body h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(1.9rem, 3vw, 2.8rem);
+  font-weight: 400; line-height: 1.2;
+  margin-bottom: 24px; color: var(--ink);
+}
+.about-body p {
+  font-size: 1rem; line-height: 1.8;
+  color: var(--ink2); margin-bottom: 20px;
+}
 
-        /* Hero */
-        .hero {
-            text-align: center;
-            padding: 110px 0 64px;
-        }
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            border-radius: 100px;
-            background: var(--accent-dim);
-            border: 1px solid rgba(240,160,48,0.25);
-            color: var(--accent);
-            font-size: 0.78rem;
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 0.04em;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-        .badge::before {
-            content: '';
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--accent);
-            box-shadow: 0 0 8px var(--accent);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-        .hero h1 {
-            font-size: 3.6rem;
-            font-weight: 800;
-            line-height: 1.08;
-            margin-bottom: 22px;
-            letter-spacing: -2px;
-            color: var(--text);
-        }
-        .hero h1 .gradient {
-            background: var(--gradient3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .hero p {
-            font-size: 1.1rem;
-            color: var(--text2);
-            max-width: 500px;
-            margin: 0 auto 40px;
-            line-height: 1.7;
-            font-weight: 400;
-        }
-        .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 13px 26px; border-radius: 11px;
-            font-weight: 600; font-size: 0.92rem;
-            transition: all 0.2s; border: none; cursor: pointer;
-            font-family: inherit; text-decoration: none;
-        }
-        .btn-primary { background: var(--gradient2); color: #fff; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 36px var(--accent-glow); }
-        .btn-secondary {
-            background: var(--surface2);
-            border: 1px solid var(--border2);
-            color: var(--text2);
-        }
-        .btn-secondary:hover { background: var(--surface); color: var(--text); border-color: var(--border2); }
+/* ── MODEL CARD ─────────────────────────────────── */
+.model-section {
+  background: var(--ink); color: var(--card-fg);
+  padding: 100px 40px;
+}
+.model-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+.model-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.38);
+  margin-bottom: 18px;
+}
+.model-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(2.8rem, 4.5vw, 5rem);
+  font-weight: 400; line-height: 1.05;
+  margin-bottom: 24px; color: #fff;
+}
+.model-title em {
+  font-style: italic; color: var(--rust2);
+}
+.model-desc {
+  font-size: 1rem; line-height: 1.8;
+  color: rgba(255,255,255,0.6); margin-bottom: 36px;
+}
+.model-features {
+  display: flex; flex-direction: column; gap: 0;
+}
+.model-feature {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.08);
+}
+.model-feature:last-child { border-bottom: 1px solid rgba(255,255,255,0.08); }
+.mf-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: rgba(255,255,255,0.07);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.mf-body h4 { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; color: #fff; }
+.mf-body p  { font-size: 0.84rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
 
-        /* Feature cards */
-        .section-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
-            font-weight: 500;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 14px;
-        }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 12px;
-            padding: 12px 0 64px;
-        }
-        .card {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 26px 28px;
-            transition: all 0.25s;
-            position: relative;
-            overflow: hidden;
-        }
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 3px; height: 100%;
-            background: var(--gradient);
-            border-radius: 3px 0 0 3px;
-            transform: scaleY(0);
-            transition: transform 0.25s;
-        }
-        .card:hover {
-            background: var(--card-hover);
-            border-color: rgba(240,160,48,0.2);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-        }
-        .card:hover::before { transform: scaleY(1); }
-        .card-icon {
-            width: 40px; height: 40px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; margin-bottom: 14px;
-        }
-        .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
-        .card p { font-size: 0.85rem; color: var(--text2); line-height: 1.6; }
-        .icon-blue { background: rgba(59,130,246,0.1); }
-        .icon-purple { background: rgba(139,92,246,0.1); }
-        .icon-green { background: rgba(34,197,94,0.1); }
-        .icon-orange { background: rgba(240,160,48,0.1); }
-        .icon-pink { background: rgba(236,72,153,0.1); }
-        .icon-cyan { background: rgba(14,207,176,0.1); }
+/* ── PRINCIPLES ─────────────────────────────────── */
+.principles {
+  max-width: 1200px; margin: 0 auto; padding: 100px 40px;
+}
+.principles-hed {
+  display: grid; grid-template-columns: 320px 1fr; gap: 80px;
+  margin-bottom: 60px;
+}
+.principles-hed h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(1.9rem, 2.8vw, 2.6rem); font-weight: 400;
+  line-height: 1.2; color: var(--ink);
+}
+.principles-hed p { font-size: 1rem; color: var(--ink2); line-height: 1.8; padding-top: 8px; }
+.principles-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+.principle {
+  padding: 36px 28px 36px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  border-right: 1px solid rgba(0,0,0,0.08);
+}
+.principle:nth-child(3n) { border-right: none; }
+.principle:nth-child(n+4) { border-bottom: none; }
+.principle + .principle { padding-left: 28px; }
+.principle:nth-child(3n+1) { padding-left: 0; }
+.p-num {
+  font-family: 'DM Mono', monospace; font-size: 0.72rem;
+  color: var(--ink4); margin-bottom: 16px; letter-spacing: 0.08em;
+}
+.p-title { font-size: 1rem; font-weight: 700; margin-bottom: 10px; color: var(--ink); }
+.p-desc  { font-size: 0.88rem; color: var(--ink3); line-height: 1.7; }
 
-        /* Code / quickstart */
-        .code-section { padding: 10px 0 64px; }
-        .code-section h2 {
-            font-size: 1.9rem; font-weight: 800; margin-bottom: 8px;
-            letter-spacing: -0.8px;
-        }
-        .code-section .subtitle { color: var(--text3); margin-bottom: 28px; font-size: 0.92rem; }
-        .code-block {
-            background: var(--code-bg);
-            border: 1px solid var(--code-border);
-            border-radius: 14px;
-            padding: 26px 30px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem; line-height: 1.9; overflow-x: auto;
-            position: relative;
-        }
-        .code-block::before {
-            content: 'bash';
-            position: absolute;
-            top: 10px; right: 16px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            color: var(--text4);
-            letter-spacing: 0.08em;
-        }
-        .code-block .comment { color: var(--text3); }
-        .code-block .cmd { color: var(--accent2); }
-        .code-block .flag { color: var(--accent); }
+/* ── CTA SECTION ────────────────────────────────── */
+.cta-section {
+  background: var(--cream2); border-top: 1px solid rgba(0,0,0,0.07);
+  padding: 100px 40px; text-align: center;
+}
+.cta-section h2 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(2.2rem, 4vw, 3.6rem); font-weight: 400;
+  line-height: 1.15; max-width: 600px; margin: 0 auto 24px;
+  color: var(--ink);
+}
+.cta-section h2 em { font-style: italic; }
+.cta-section p {
+  font-size: 1rem; color: var(--ink3); margin-bottom: 40px; line-height: 1.7;
+}
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-        footer {
-            text-align: center; padding: 40px 0;
-            border-top: 1px solid var(--border);
-            color: var(--text4); font-size: 0.82rem;
-        }
-        footer a { color: var(--accent); text-decoration: none; }
-        footer a:hover { text-decoration: underline; }
+/* ── FOOTER ─────────────────────────────────────── */
+footer {
+  border-top: 1px solid rgba(0,0,0,0.1);
+  padding: 40px 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.84rem; color: var(--ink4);
+}
+footer a { color: var(--ink3); text-decoration: none; }
+footer a:hover { color: var(--ink); }
+.footer-links { display: flex; gap: 24px; }
 
-        /* Modal overlay */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: var(--overlay);
-            z-index: 1000; align-items: center; justify-content: center;
-            backdrop-filter: blur(6px);
-        }
-        .modal-overlay.active { display: flex; }
+/* ── SCROLL ANIMATIONS ──────────────────────────── */
+.fade-in {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.fade-in.visible {
+  opacity: 1; transform: translateY(0);
+}
 
-        .modal-card {
-            background: var(--bg2);
-            border: 1px solid var(--border2);
-            border-radius: 22px;
-            padding: 44px 40px;
-            width: 100%; max-width: 400px;
-            text-align: center;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.4), 0 0 0 1px var(--border);
-            position: relative;
-        }
-        .modal-close {
-            position: absolute; top: 16px; right: 18px;
-            background: none; border: none;
-            color: var(--text3); font-size: 1.2rem;
-            cursor: pointer; width: 28px; height: 28px;
-            border-radius: 6px; display: flex; align-items: center; justify-content: center;
-            transition: all 0.15s;
-        }
-        .modal-close:hover { background: var(--surface); color: var(--text); }
-        .modal-logo {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.5rem; font-weight: 600;
-            color: var(--text);
-            margin-bottom: 4px;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-        .modal-logo-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: var(--gradient);
-        }
-        .modal-sub { color: var(--text3); font-size: 0.86rem; margin-bottom: 28px; }
-
-        .input-group { text-align: left; margin-bottom: 14px; }
-        .input-group label {
-            display: block; font-size: 0.78rem; color: var(--text2);
-            margin-bottom: 6px; font-weight: 600; letter-spacing: 0.02em;
-        }
-        .input-wrap-field { position: relative; }
-        .input-group input {
-            width: 100%; padding: 12px 42px 12px 14px;
-            border-radius: 10px; border: 1px solid var(--border2);
-            background: var(--input-bg); color: var(--text);
-            font-size: 0.92rem; outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            font-family: inherit;
-        }
-        .input-group input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-dim);
-        }
-        .eye-btn {
-            position: absolute; right: 10px; top: 50%;
-            transform: translateY(-50%);
-            background: none; border: none;
-            color: var(--text3); cursor: pointer;
-            font-size: 0.95rem; padding: 4px;
-        }
-        .eye-btn:hover { color: var(--text); }
-
-        .auth-btn {
-            width: 100%; padding: 13px; border: none;
-            border-radius: 11px; background: var(--gradient2);
-            color: #fff; font-size: 0.92rem; font-weight: 700;
-            cursor: pointer; margin-top: 6px; transition: all 0.2s;
-            font-family: inherit; letter-spacing: 0.01em;
-        }
-        .auth-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 28px var(--accent-glow); }
-        .auth-error { color: #f87171; font-size: 0.8rem; margin-top: 10px; min-height: 18px; }
-        .auth-switch { margin-top: 16px; font-size: 0.83rem; color: var(--text3); }
-        .auth-switch a { color: var(--accent); cursor: pointer; text-decoration: none; }
-        .auth-switch a:hover { text-decoration: underline; }
-
-        /* ─── App Shell ──────────────────────────────────── */
-        .app { display: none; height: 100vh; overflow: hidden; }
-        .app.active { display: flex; }
-
-        /* Sidebar */
-        .sidebar {
-            width: 256px; background: var(--bg2);
-            border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; flex-shrink: 0;
-        }
-        .sidebar-header {
-            padding: 14px 12px;
-            border-bottom: 1px solid var(--border);
-        }
-        .new-chat-btn {
-            width: 100%; padding: 10px 14px; border-radius: 10px;
-            border: 1px solid var(--border2); background: transparent;
-            color: var(--text2); font-size: 0.85rem; font-weight: 600;
-            cursor: pointer; display: flex; align-items: center; gap: 8px;
-            transition: all 0.15s; font-family: inherit;
-        }
-        .new-chat-btn:hover {
-            background: var(--accent-dim);
-            border-color: rgba(240,160,48,0.3);
-            color: var(--accent);
-        }
-        .sidebar-section-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.68rem; letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--text4);
-            padding: 14px 14px 6px;
-        }
-
-        .chat-list { flex: 1; overflow-y: auto; padding: 6px 8px; }
-        .chat-list::-webkit-scrollbar { width: 3px; }
-        .chat-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-        .chat-list-item {
-            padding: 9px 12px; border-radius: 9px; font-size: 0.83rem;
-            color: var(--text2); cursor: pointer;
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 1px; transition: all 0.12s;
-            white-space: nowrap; overflow: hidden;
-        }
-        .chat-list-item:hover { background: var(--surface); color: var(--text); }
-        .chat-list-item.active {
-            background: var(--accent-dim);
-            color: var(--text);
-            border: 1px solid rgba(240,160,48,0.2);
-        }
-        .chat-list-item .chat-title { overflow: hidden; text-overflow: ellipsis; flex: 1; }
-        .chat-list-item .delete-btn {
-            opacity: 0; background: none; border: none;
-            color: var(--text3); cursor: pointer; font-size: 1rem;
-            padding: 0 4px; flex-shrink: 0;
-        }
-        .chat-list-item:hover .delete-btn { opacity: 1; }
-        .chat-list-item .delete-btn:hover { color: #f87171; }
-
-        .sidebar-footer {
-            padding: 10px 12px;
-            border-top: 1px solid var(--border);
-            position: relative;
-        }
-        .user-banner {
-            display: flex; align-items: center; gap: 10px;
-            padding: 8px 10px; border-radius: 10px; cursor: pointer;
-            transition: background 0.15s;
-        }
-        .user-banner:hover { background: var(--surface); }
-        .user-info { font-size: 0.84rem; color: var(--text2); display: flex; align-items: center; gap: 9px; flex:1; }
-        .user-avatar {
-            width: 30px; height: 30px; border-radius: 8px;
-            background: var(--gradient2); display: flex; align-items: center;
-            justify-content: center; font-size: 0.78rem; font-weight: 800; color: #fff;
-            flex-shrink: 0;
-        }
-        .user-menu {
-            display: none; position: absolute; bottom: 100%; left: 8px; right: 8px;
-            background: var(--bg2); border: 1px solid var(--border2);
-            border-radius: 14px; padding: 6px; margin-bottom: 6px;
-            box-shadow: 0 12px 40px var(--shadow); z-index: 100;
-        }
-        .user-menu.active { display: block; }
-        .user-menu-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 9px 12px; border-radius: 8px; font-size: 0.84rem;
-            color: var(--text2); cursor: pointer; border: none;
-            background: none; width: 100%; text-align: left;
-            transition: all 0.12s; font-family: inherit;
-        }
-        .user-menu-item:hover { background: var(--surface); color: var(--text); }
-        .user-menu-item.danger:hover { color: #f87171; background: rgba(248,113,113,0.06); }
-        .user-menu-item .menu-icon { font-size: 0.95rem; width: 20px; text-align: center; }
-        .user-menu-sep { height: 1px; background: var(--border); margin: 4px 0; }
-
-        /* Main chat */
-        .main { flex: 1; display: flex; flex-direction: column; background: var(--bg); min-width: 0; }
-        .main-header {
-            padding: 14px 26px;
-            border-bottom: 1px solid var(--border);
-            font-weight: 600; font-size: 0.92rem;
-            display: flex; align-items: center; gap: 10px;
-            background: var(--bg);
-        }
-        .model-badge {
-            font-size: 0.72rem; font-weight: 600;
-            padding: 3px 10px; border-radius: 100px;
-            background: var(--accent-dim);
-            color: var(--accent);
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 0.04em;
-        }
-
-        .messages { flex: 1; overflow-y: auto; padding: 28px 0; }
-        .messages::-webkit-scrollbar { width: 4px; }
-        .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-        .welcome-screen {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; height: 100%; text-align: center;
-            padding: 20px;
-        }
-        .welcome-logo {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 2rem; font-weight: 600;
-            color: var(--text);
-            margin-bottom: 10px;
-            display: flex; align-items: center; justify-content: center; gap: 14px;
-        }
-        .welcome-logo-icon {
-            width: 48px; height: 48px; border-radius: 14px;
-            background: var(--gradient2);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem;
-            box-shadow: 0 6px 24px var(--accent-glow);
-        }
-        .welcome-sub { color: var(--text3); font-size: 0.95rem; margin-bottom: 44px; }
-        .suggestions {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 10px; max-width: 540px; width: 100%;
-        }
-        .suggestion {
-            padding: 14px 18px; border-radius: 13px;
-            border: 1px solid var(--border);
-            background: var(--bg2);
-            cursor: pointer; text-align: left; font-size: 0.83rem;
-            color: var(--text2); transition: all 0.15s;
-        }
-        .suggestion:hover {
-            background: var(--card-hover);
-            border-color: rgba(240,160,48,0.25);
-            color: var(--text);
-            transform: translateY(-1px);
-        }
-        .suggestion strong {
-            display: block; color: var(--text);
-            margin-bottom: 3px; font-size: 0.86rem; font-weight: 700;
-        }
-
-        .message {
-            max-width: 760px; margin: 0 auto 6px;
-            padding: 12px 28px; display: flex; gap: 14px;
-        }
-        .message:hover { background: rgba(255,255,255,0.01); border-radius: 12px; }
-        .msg-avatar {
-            width: 32px; height: 32px; border-radius: 9px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.78rem; font-weight: 800;
-            flex-shrink: 0; margin-top: 2px;
-        }
-        .msg-avatar.user { background: var(--gradient2); color: #fff; }
-        .msg-avatar.ai {
-            background: linear-gradient(135deg, #0ecfb0, #0a9ef0);
-            color: #fff;
-        }
-        .msg-content { flex: 1; min-width: 0; }
-        .msg-role {
-            font-size: 0.77rem; font-weight: 700; margin-bottom: 6px;
-            color: var(--text3); letter-spacing: 0.03em; text-transform: uppercase;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .msg-text { font-size: 0.91rem; line-height: 1.7; color: var(--text); word-wrap: break-word; }
-        .msg-text code {
-            background: var(--code-bg);
-            border: 1px solid var(--code-border);
-            padding: 2px 7px; border-radius: 5px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.83em; color: var(--accent);
-        }
-        .msg-text pre {
-            background: var(--code-bg);
-            border: 1px solid var(--code-border);
-            border-radius: 12px; padding: 18px 20px;
-            margin: 12px 0; overflow-x: auto;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.84em; line-height: 1.7;
-        }
-        .msg-text pre code {
-            background: none; border: none; padding: 0; color: inherit;
-        }
-
-        .typing-indicator { display: none; max-width: 760px; margin: 0 auto; padding: 12px 28px; }
-        .typing-indicator.active { display: flex; gap: 14px; }
-        .typing-dots { display: flex; gap: 5px; padding: 12px 0; align-items: center; }
-        .typing-dots span {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: var(--accent);
-            animation: blink 1.4s infinite;
-        }
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes blink {
-            0%, 60%, 100% { opacity: 0.25; transform: scale(0.9); }
-            30% { opacity: 1; transform: scale(1.1); }
-        }
-
-        .input-area { padding: 14px 22px 22px; }
-        .input-wrap-chat { max-width: 760px; margin: 0 auto; position: relative; }
-        .input-box {
-            width: 100%; padding: 15px 52px 15px 20px;
-            border-radius: 15px; border: 1px solid var(--border2);
-            background: var(--bg2); color: var(--text);
-            font-size: 0.92rem; font-family: inherit;
-            outline: none; resize: none; min-height: 52px; max-height: 200px;
-            line-height: 1.5; transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .input-box:focus {
-            border-color: rgba(240,160,48,0.4);
-            box-shadow: 0 0 0 3px var(--accent-dim);
-        }
-        .input-box::placeholder { color: var(--text4); }
-        .send-btn {
-            position: absolute; right: 10px; bottom: 10px;
-            width: 36px; height: 36px; border-radius: 10px; border: none;
-            background: var(--gradient2); color: #fff; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1rem; transition: all 0.15s;
-            box-shadow: 0 2px 10px var(--accent-glow);
-        }
-        .send-btn:hover { transform: scale(1.06); box-shadow: 0 4px 18px var(--accent-glow); }
-        .send-btn:disabled { opacity: 0.3; cursor: default; transform: none; box-shadow: none; }
-        .input-hint { text-align: center; font-size: 0.7rem; color: var(--text4); margin-top: 8px; letter-spacing: 0.01em; }
-
-        /* Divider in message list */
-        .msg-divider {
-            max-width: 760px; margin: 4px auto;
-            height: 1px; background: var(--border);
-            opacity: 0.6;
-        }
-
-        /* Mobile */
-        @media (max-width: 700px) {
-            .sidebar { display: none; }
-            .suggestions { grid-template-columns: 1fr; }
-            .modal-card { margin: 20px; padding: 36px 24px; }
-            .hero h1 { font-size: 2.4rem; }
-            .nav-links a { display: none; }
-            .messages { padding: 16px 0; }
-            .message { padding: 8px 16px; }
-        }
-    </style>
+@media (max-width: 768px) {
+  .hero { grid-template-columns: 1fr; padding: 120px 24px 60px; gap: 36px; }
+  .hero-card { grid-template-columns: 1fr; }
+  .hero-card-right { min-height: 280px; }
+  .stats-section { grid-template-columns: 1fr; }
+  .stat { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); padding: 24px 0; }
+  .about-section { grid-template-columns: 1fr; gap: 20px; }
+  .model-inner { grid-template-columns: 1fr; }
+  .principles-hed { grid-template-columns: 1fr; gap: 16px; }
+  .principles-grid { grid-template-columns: 1fr; }
+  .principle { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); padding: 28px 0; }
+  nav { padding: 0 20px; }
+  .nav-links a:not(.nav-cta) { display: none; }
+  .hero-card-wrap { padding: 0 20px 60px; }
+}
+</style>
 </head>
 <body>
 
-<!-- Theme Toggle -->
-<button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">&#9790;</button>
-<!-- Settings Toggle (always visible) -->
-<button class="theme-toggle" id="settingsBtnGlobal" title="Settings" style="right:62px">&#9881;</button>
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">AcumenAI</a>
+  <div class="nav-links">
+    <a href="#research">Research</a>
+    <a href="#model">ClawCow Agent</a>
+    <a href="#about">Mission</a>
+    <a href="clawcow_agent.html" class="nav-cta btn">Try ClawCow ↗</a>
+  </div>
+</nav>
 
-<div class="bg-glow"></div>
-
-<!-- ═══════════════ LANDING PAGE ═══════════════ -->
-<div class="landing" id="landing">
-    <div class="container">
-        <nav>
-            <div class="logo">
-                <div class="logo-dot"></div>
-                ClawCow Agent
-            </div>
-            <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#quickstart">Get Started</a>
-                <button class="nav-btn nav-btn-outline" onclick="openModal('login')">Log In</button>
-                <button class="nav-btn nav-btn-primary" onclick="openModal('signup')">Sign Up</button>
-            </div>
-        </nav>
-
-        <section class="hero">
-            <div class="badge">Open Source AI Agent</div>
-            <h1>Your own <span class="gradient">AI coding agent</span><br>that actually works</h1>
-            <p>A fully local AI assistant powered by its own evolving brain — no API keys, no subscriptions, no external services. Pure local intelligence.</p>
-            <div class="btn-group">
-                <button class="btn btn-primary" onclick="openModal('signup')">&#9733; Get Started Free</button>
-                <a href="#quickstart" class="btn btn-secondary">&#8594; Quick Start</a>
-            </div>
-        </section>
-
-        <section id="features">
-            <div class="section-label">What it can do</div>
-            <div class="features">
-                <div class="card">
-                    <div class="card-icon icon-blue">&#129504;</div>
-                    <h3>Any Model Backend</h3>
-                    <p>Zero API keys needed. Runs 100% locally on your machine with any Ollama model.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon icon-purple">&#128269;</div>
-                    <h3>Web Search</h3>
-                    <p>DuckDuckGo search built in — no API key, no limit, no tracking.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon icon-green">&#128025;</div>
-                    <h3>GitHub Explorer</h3>
-                    <p>Search repos, browse notable coders, and read code files directly.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon icon-orange">&#128196;</div>
-                    <h3>File Read &amp; Write</h3>
-                    <p>Read, write, and list local files. Works with your codebase directly.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon icon-pink">&#9889;</div>
-                    <h3>Code Execution</h3>
-                    <p>Run Python and JS snippets in a secure sandboxed subprocess.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon icon-cyan">&#128375;</div>
-                    <h3>Background Crawler</h3>
-                    <p>Silently explores trending GitHub repos and learns while you're idle.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="code-section" id="quickstart">
-            <div class="section-label">Quick Start</div>
-            <h2>Up and running in 60 seconds</h2>
-            <p class="subtitle">Clone the repo, install dependencies, run.</p>
-            <div class="code-block">
-                <span class="comment"># Clone the repo</span><br>
-                <span class="cmd">git clone</span> https://github.com/belugaman9981/AcumenAI.git<br>
-                <span class="cmd">cd</span> AcumenAI/local-ai-agent<br><br>
-                <span class="comment"># Install dependencies</span><br>
-                <span class="cmd">pip install</span> <span class="flag">-r</span> requirements.txt<br><br>
-                <span class="comment"># No API key needed — just run:</span><br>
-                <span class="cmd">python</span> main.py
-            </div>
-        </section>
-
-        <footer>
-            Built with &#128156; &mdash; <a href="https://github.com/belugaman9981/AcumenAI" target="_blank">Source on GitHub</a>
-        </footer>
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-left fade-in">
+    <div class="hero-eyebrow">AcumenAI · Est. 2026</div>
+    <h1>Local AI that<br><em>thinks</em> and<br><u>learns</u> for itself</h1>
+  </div>
+  <div class="hero-right fade-in" style="transition-delay:0.12s">
+    <p>AcumenAI is an independent AI lab building local-first agents that evolve through experience — no cloud, no API keys, no limits. Intelligence that stays on your machine.</p>
+    <div class="hero-btns">
+      <a href="clawcow_agent.html" class="btn btn-dark">Try ClawCow Agent</a>
+      <a href="#research" class="btn btn-outline">Our research</a>
     </div>
+  </div>
+</section>
+
+<!-- DARK FEATURE CARD -->
+<div class="hero-card-wrap fade-in" style="transition-delay:0.22s">
+  <div class="hero-card">
+    <div class="hero-card-left">
+      <div>
+        <div class="hero-card-eyebrow">Flagship Model — 2026</div>
+        <div class="hero-card-title">ClawCow<br>Agent</div>
+        <p class="hero-card-sub">Our first public agent — self-training, Wikipedia-crawling, and evolving its own understanding every 45 seconds. Zero cloud dependency.</p>
+      </div>
+      <div>
+        <a href="#model" class="btn" style="background:rgba(255,255,255,0.1);color:#fff;margin-top:32px;display:inline-flex">
+          Explore the model →
+        </a>
+      </div>
+    </div>
+    <div class="hero-card-right">
+      <canvas class="neural-canvas" id="neuralCanvas"></canvas>
+    </div>
+  </div>
 </div>
 
-<!-- ════════════ AUTH MODALS ════════════ -->
-<!-- Login -->
-<div class="modal-overlay" id="loginModal">
-    <div class="modal-card">
-        <button class="modal-close" onclick="closeModals()">&times;</button>
-        <div class="modal-logo"><div class="modal-logo-dot"></div>ClawCow Agent</div>
-        <div class="modal-sub">Welcome back</div>
-        <div class="input-group">
-            <label>Username</label>
-            <input type="text" id="loginUser" placeholder="Enter username" autocomplete="off">
-        </div>
-        <div class="input-group">
-            <label>Password</label>
-            <div class="input-wrap-field">
-                <input type="password" id="loginPass" placeholder="Enter password">
-                <button class="eye-btn" onclick="togglePass('loginPass', this)" type="button">&#128065;</button>
-            </div>
-        </div>
-        <button class="auth-btn" id="loginBtn">Log In</button>
-        <div class="auth-error" id="loginError"></div>
-        <div class="auth-switch">Don't have an account? <a onclick="switchModal('signup')">Sign up</a></div>
+<!-- STATS -->
+<section class="stats-section" id="research">
+  <div class="stat fade-in">
+    <div class="stat-num">100%</div>
+    <div class="stat-label">Local — no external API calls</div>
+  </div>
+  <div class="stat fade-in" style="transition-delay:0.1s">
+    <div class="stat-num">45s</div>
+    <div class="stat-label">Auto-learn cycle interval</div>
+  </div>
+  <div class="stat fade-in" style="transition-delay:0.2s">
+    <div class="stat-num">∞</div>
+    <div class="stat-label">Knowledge — grows continuously</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="about-label fade-in">Our mission</div>
+  <div class="about-body fade-in" style="transition-delay:0.1s">
+    <h2>Intelligence should belong to the person using it — not a server farm in Virginia.</h2>
+    <p>AcumenAI was built out of frustration with AI systems that phone home, charge monthly fees, and keep your data on someone else's machine. We believe a model that runs entirely on your hardware — one that grows smarter from your use — is fundamentally more trustworthy.</p>
+    <p>Our research focuses on evolutionary learning: small populations of neural bots that compete, breed, and mutate to improve their predictions over time. No gradient descent. No GPUs required. Just relentless iteration.</p>
+  </div>
+</section>
+
+<!-- MODEL SECTION -->
+<section class="model-section" id="model">
+  <div class="model-inner">
+    <div class="fade-in">
+      <div class="model-eyebrow">Flagship Agent · ClawCow Agent</div>
+      <div class="model-title">ClawCow<br><em>Agent</em></div>
+      <p class="model-desc">A self-evolving AI agent that crawls Wikipedia, ingests PDFs, searches the web, and runs code — all locally on your machine. It learns while you sleep.</p>
+      <a href="clawcow_agent.html" class="btn" style="background:var(--rust);color:#fff">Try ClawCow Agent →</a>
     </div>
-</div>
-
-<!-- Signup -->
-<div class="modal-overlay" id="signupModal">
-    <div class="modal-card">
-        <button class="modal-close" onclick="closeModals()">&times;</button>
-        <div class="modal-logo"><div class="modal-logo-dot"></div>ClawCow Agent</div>
-        <div class="modal-sub">Create your account</div>
-        <div class="input-group">
-            <label>Username</label>
-            <input type="text" id="signupUser" placeholder="Choose a username" autocomplete="off">
+    <div class="model-features fade-in" style="transition-delay:0.15s">
+      <div class="model-feature">
+        <div class="mf-icon">&#129504;</div>
+        <div class="mf-body">
+          <h4>Evolutionary Brain</h4>
+          <p>A population of bots compete and breed to improve prediction accuracy — no neural network, no GPU needed.</p>
         </div>
-        <div class="input-group">
-            <label>Password</label>
-            <div class="input-wrap-field">
-                <input type="password" id="signupPass" placeholder="Create a password">
-                <button class="eye-btn" onclick="togglePass('signupPass', this)" type="button">&#128065;</button>
-            </div>
+      </div>
+      <div class="model-feature">
+        <div class="mf-icon">&#128025;</div>
+        <div class="mf-body">
+          <h4>Auto-Wikipedia Crawler</h4>
+          <p>Every 45 seconds when idle, ClawCow ingests new Wikipedia articles and trains on them automatically.</p>
         </div>
-        <div class="input-group">
-            <label>Confirm Password</label>
-            <div class="input-wrap-field">
-                <input type="password" id="signupPass2" placeholder="Confirm password">
-                <button class="eye-btn" onclick="togglePass('signupPass2', this)" type="button">&#128065;</button>
-            </div>
+      </div>
+      <div class="model-feature">
+        <div class="mf-icon">&#128269;</div>
+        <div class="mf-body">
+          <h4>Web Search</h4>
+          <p>DuckDuckGo integration — no API key, no tracking. Live answers when the brain doesn't know.</p>
         </div>
-        <button class="auth-btn" id="signupBtn">Sign Up</button>
-        <div class="auth-error" id="signupError"></div>
-        <div class="auth-switch">Already have an account? <a onclick="switchModal('login')">Log in</a></div>
+      </div>
+      <div class="model-feature">
+        <div class="mf-icon">&#9889;</div>
+        <div class="mf-body">
+          <h4>Code Execution</h4>
+          <p>Runs Python and JavaScript in sandboxed subprocesses. Writes, tests, and iterates on real code.</p>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
+</section>
 
-<!-- Settings Modal -->
-<div class="modal-overlay" id="settingsModal">
-    <div class="modal-card" style="max-width:440px;text-align:left">
-        <button class="modal-close" onclick="document.getElementById('settingsModal').classList.remove('active')">&times;</button>
-        <div class="modal-logo" style="text-align:center;justify-content:center">&#9881; Settings</div>
-        <div class="modal-sub" style="text-align:center">No API keys needed &mdash; 100% local brain.</div>
-
-        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:12px;padding:14px;margin-bottom:14px">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em">Brain Server</div>
-            <div id="serverStatus" style="font-size:.88rem;color:var(--text2)">Checking...</div>
-        </div>
-
-        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:12px;padding:14px;margin-bottom:14px">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text4);margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em">Start Server</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent);line-height:1.8">
-                cd G:\Python\AcumenAI\local-ai-agent<br>
-                python api_server.py
-            </div>
-        </div>
-
-        <div style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:12px;padding:14px;margin-bottom:14px">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text4);margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em">Train Brain (PDF)</div>
-            <input type="file" id="pdfUploadInput" accept=".pdf" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border2);background:var(--input-bg);color:var(--text);font-size:.83rem;cursor:pointer;font-family:inherit">
-            <button class="auth-btn" onclick="uploadPDF()" style="margin-top:8px;font-size:.84rem;padding:10px">Upload &amp; Ingest PDF</button>
-            <div id="pdfUploadStatus" style="margin-top:8px;font-size:.8rem;color:var(--text3)"></div>
-        </div>
-
-        <button class="auth-btn" onclick="saveSettings()" style="margin-top:4px">Close</button>
-        <div id="settingsStatus" style="margin-top:10px;font-size:.8rem;color:var(--text3);text-align:center"></div>
+<!-- PRINCIPLES -->
+<section class="principles" id="principles">
+  <div class="principles-hed">
+    <h2 class="fade-in">Built on a few hard principles</h2>
+    <p class="fade-in" style="transition-delay:0.1s">We made choices that cost us convenience — they're the right choices anyway.</p>
+  </div>
+  <div class="principles-grid">
+    <div class="principle fade-in">
+      <div class="p-num">01</div>
+      <div class="p-title">Your data stays yours</div>
+      <p class="p-desc">No telemetry, no cloud sync, no training on your conversations. Everything lives on your machine.</p>
     </div>
-</div>
-
-<!-- Profile Modal -->
-<div class="modal-overlay" id="profileModal">
-    <div class="modal-card" style="max-width:420px;text-align:left">
-        <button class="modal-close" onclick="document.getElementById('profileModal').classList.remove('active')">&times;</button>
-        <div class="modal-logo" style="text-align:center;justify-content:center">Profile</div>
-        <div style="text-align:center;margin:16px 0">
-            <div class="user-avatar" id="profileAvatar" style="width:56px;height:56px;font-size:1.5rem;border-radius:16px;margin:0 auto 10px"></div>
-            <div style="font-size:1.1rem;font-weight:700;color:var(--text)" id="profileName"></div>
-            <div style="font-size:.82rem;color:var(--text3);margin-top:4px" id="profileStats"></div>
-        </div>
+    <div class="principle fade-in" style="transition-delay:0.08s">
+      <div class="p-num">02</div>
+      <div class="p-title">Open by default</div>
+      <p class="p-desc">The source is on GitHub. Read it, fork it, audit it. We don't hide what ClawCow does.</p>
     </div>
-</div>
-
-<!-- Brain Dashboard Modal -->
-<div class="modal-overlay" id="brainModal">
-    <div class="modal-card" style="max-width:560px;text-align:left">
-        <button class="modal-close" onclick="document.getElementById('brainModal').classList.remove('active')">&times;</button>
-        <div class="modal-logo" style="text-align:center;justify-content:center">&#129504; Brain Dashboard</div>
-        <div class="modal-sub" style="text-align:center">Your self-learning AI brain &mdash; no API needed for local intelligence.</div>
-        <div id="brainStatus" style="background:var(--code-bg);border:1px solid var(--code-border);border-radius:12px;padding:14px;font-size:.84rem;color:var(--text2);line-height:1.7;white-space:pre-line;margin-bottom:14px;font-family:'JetBrains Mono',monospace">Loading...</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <button class="auth-btn" onclick="brainAction('train')" style="font-size:.84rem;padding:10px">&#9881; Train (5 gens)</button>
-            <button class="auth-btn" onclick="brainAction('wiki-random')" style="font-size:.84rem;padding:10px">&#127760; Random Wikipedia</button>
-            <button class="auth-btn" onclick="brainWikiSearch()" style="font-size:.84rem;padding:10px">&#128269; Search Wikipedia</button>
-            <button class="auth-btn" onclick="brainAction('wiki-crawl')" style="font-size:.84rem;padding:10px">&#129432; Auto-Crawl Wiki</button>
-            <button class="auth-btn" onclick="brainAction('wiki-crawl')" style="font-size:.84rem;padding:10px">&#128218; Auto-Crawl</button>
-            <button class="auth-btn" onclick="brainAction('internet-learn')" style="font-size:.84rem;padding:10px">&#128421; Internet Learn</button>
-        </div>
-        <div id="brainActionStatus" style="margin-top:10px;font-size:.8rem;color:var(--text3);text-align:center"></div>
+    <div class="principle fade-in" style="transition-delay:0.16s">
+      <div class="p-num">03</div>
+      <div class="p-title">Continuous learning</div>
+      <p class="p-desc">Models that don't evolve become stale. ClawCow gets smarter every time it runs — by design.</p>
     </div>
-</div>
-
-<!-- ═══════════════ APP SHELL ═══════════════ -->
-<div class="app" id="app">
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <button class="new-chat-btn" id="newChatBtn">&#10010; New chat</button>
-        </div>
-        <div class="chat-list" id="chatList"></div>
-        <div class="sidebar-footer" id="sidebarFooter">
-            <div class="user-menu" id="userMenu">
-                <button class="user-menu-item" onclick="openSettings()"><span class="menu-icon">&#9881;</span> Settings</button>
-                <button class="user-menu-item" onclick="openProfile()"><span class="menu-icon">&#9786;</span> Profile</button>
-                <button class="user-menu-item" onclick="openBrainDashboard()"><span class="menu-icon">&#129504;</span> Brain Dashboard</button>
-                <div class="user-menu-sep"></div>
-                <button class="user-menu-item danger" id="logoutBtn"><span class="menu-icon">&#8617;</span> Log out</button>
-            </div>
-            <div class="user-banner" id="userBanner">
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar"></div>
-                    <span id="userName"></span>
-                </div>
-                <span style="color:var(--text3);font-size:0.7rem">&#9679;&#9679;&#9679;</span>
-            </div>
-        </div>
+    <div class="principle fade-in" style="transition-delay:0.08s">
+      <div class="p-num">04</div>
+      <div class="p-title">No subscription required</div>
+      <p class="p-desc">One download, yours forever. Intelligence shouldn't come with a monthly invoice.</p>
     </div>
-
-    <div class="main">
-        <div class="main-header">
-            <span id="chatTitle">New chat</span>
-            <span class="model-badge">ClawCow Agent</span>
-            <button id="settingsBtn" style="margin-left:auto;background:none;border:none;color:var(--text2);font-size:1.1rem;cursor:pointer;padding:6px 10px;border-radius:9px;transition:all .2s" title="Settings">&#9881;</button>
-        </div>
-        <div class="messages" id="messages">
-            <div class="welcome-screen" id="welcomeScreen">
-                <div class="welcome-logo">
-                    <div class="welcome-logo-icon">&#129504;</div>
-                    ClawCow Agent
-                </div>
-                <div class="welcome-sub">Local intelligence. No cloud. How can I help?</div>
-                <div class="suggestions">
-                    <div class="suggestion" onclick="useSuggestion(this)"><strong>Write code</strong>Help me write a Python script</div>
-                    <div class="suggestion" onclick="useSuggestion(this)"><strong>Debug an issue</strong>Find and fix a bug in my code</div>
-                    <div class="suggestion" onclick="useSuggestion(this)"><strong>Explain a concept</strong>How does async/await work?</div>
-                    <div class="suggestion" onclick="useSuggestion(this)"><strong>Explore GitHub</strong>Find trending Python repos</div>
-                </div>
-            </div>
-        </div>
-        <div class="typing-indicator" id="typingIndicator">
-            <div class="msg-avatar ai">A</div>
-            <div class="typing-dots"><span></span><span></span><span></span></div>
-        </div>
-        <div class="input-area">
-            <div class="input-wrap-chat">
-                <textarea class="input-box" id="msgInput" placeholder="Message ClawCow Agent..." rows="1"></textarea>
-                <button class="send-btn" id="sendBtn">&#8593;</button>
-            </div>
-            <div class="input-hint">ClawCow Agent can make mistakes. Verify important information.</div>
-        </div>
+    <div class="principle fade-in" style="transition-delay:0.16s">
+      <div class="p-num">05</div>
+      <div class="p-title">Hardware accessible</div>
+      <p class="p-desc">Runs on a laptop from 2018. No CUDA, no 24GB VRAM. Designed for real hardware.</p>
     </div>
-</div>
+    <div class="principle fade-in" style="transition-delay:0.24s">
+      <div class="p-num">06</div>
+      <div class="p-title">Research first</div>
+      <p class="p-desc">Every product decision is grounded in our evolutionary AI research. No hype, no vaporware.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="fade-in">Ready to run an AI<br>that <em>actually</em> learns?</h2>
+  <p class="fade-in" style="transition-delay:0.1s">Download ClawCow Agent. No account needed. No credit card. Just clone and run.</p>
+  <div class="cta-btns fade-in" style="transition-delay:0.2s">
+    <a href="https://github.com/belugaman9981/AcumenAI" target="_blank" class="btn btn-dark">Get ClawCow Agent ↗</a>
+    <a href="#research" class="btn btn-outline">Read the docs</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:-0.2px;color:var(--ink)">AcumenAI</div>
+  <div class="footer-links">
+    <a href="#">Research</a>
+    <a href="#">GitHub</a>
+    <a href="#">Docs</a>
+    <a href="#">Privacy</a>
+  </div>
+  <div>© 2026 AcumenAI</div>
+</footer>
 
 <script>
-const $ = id => document.getElementById(id);
+// ── Neural canvas animation ──────────────────────────────
+const canvas = document.getElementById('neuralCanvas');
+const ctx    = canvas.getContext('2d');
+let nodes = [], W, H, raf;
 
-// ── Theme ──────────────────────────────────────────────────
-function initTheme() {
-    const saved = localStorage.getItem('acumen_theme');
-    if (saved === 'light') document.body.classList.add('light');
-    updateThemeIcon();
-}
-function updateThemeIcon() {
-    $('themeToggle').innerHTML = document.body.classList.contains('light') ? '&#9728;' : '&#9790;';
-}
-$('themeToggle').addEventListener('click', () => {
-    document.body.classList.toggle('light');
-    localStorage.setItem('acumen_theme', document.body.classList.contains('light') ? 'light' : 'dark');
-    updateThemeIcon();
-});
-initTheme();
-
-// ── Auth Modals ────────────────────────────────────────────
-function openModal(type) {
-    closeModals();
-    $(type + 'Modal').classList.add('active');
-}
-function closeModals() {
-    $('loginModal').classList.remove('active');
-    $('signupModal').classList.remove('active');
-    $('loginError').textContent = '';
-    $('signupError').textContent = '';
-}
-function switchModal(type) {
-    closeModals();
-    openModal(type);
+function resize() {
+  const r = canvas.getBoundingClientRect();
+  W = canvas.width  = r.width;
+  H = canvas.height = r.height;
 }
 
-['loginModal', 'signupModal'].forEach(id => {
-    $(id).addEventListener('click', e => { if (e.target === $(id)) closeModals(); });
-});
+function initNodes() {
+  nodes = Array.from({ length: 38 }, () => ({
+    x:  Math.random() * W,
+    y:  Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.45,
+    vy: (Math.random() - 0.5) * 0.45,
+    r:  Math.random() * 2.5 + 1,
+  }));
+}
 
-function togglePass(inputId, btn) {
-    const inp = $(inputId);
-    if (inp.type === 'password') {
-        inp.type = 'text';
-        btn.innerHTML = '&#128064;';
-    } else {
-        inp.type = 'password';
-        btn.innerHTML = '&#128065;';
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  nodes.forEach(n => {
+    n.x += n.vx; n.y += n.vy;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+  });
+
+  // Draw edges
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const d  = Math.sqrt(dx * dx + dy * dy);
+      if (d < 120) {
+        const alpha = (1 - d / 120) * 0.4;
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(200,87,58,${alpha})`;
+        ctx.lineWidth = 0.8;
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.stroke();
+      }
     }
+  }
+
+  // Draw nodes
+  nodes.forEach(n => {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(200,87,58,0.7)';
+    ctx.fill();
+  });
+
+  raf = requestAnimationFrame(draw);
 }
 
-// ── State ──────────────────────────────────────────────────
-let currentUser = null;
-let chats = [];
-let activeChatId = null;
+window.addEventListener('resize', () => { resize(); initNodes(); });
+resize(); initNodes(); draw();
 
-// ── Auto-login ─────────────────────────────────────────────
-function initAuth() {
-    const saved = localStorage.getItem('acumen_user');
-    if (saved) {
-        currentUser = saved;
-        loadChats();
-        showApp();
-    }
-}
 
-// ── Sign Up ────────────────────────────────────────────────
-$('signupBtn').addEventListener('click', doSignup);
-$('signupPass2').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
+// ── Scroll fade-in ───────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
 
-function doSignup() {
-    const user = $('signupUser').value.trim();
-    const pass = $('signupPass').value;
-    const pass2 = $('signupPass2').value;
-    if (!user) { $('signupError').textContent = 'Please enter a username.'; return; }
-    if (user.length < 3) { $('signupError').textContent = 'Username must be at least 3 characters.'; return; }
-    if (!pass) { $('signupError').textContent = 'Please enter a password.'; return; }
-    if (pass.length < 4) { $('signupError').textContent = 'Password must be at least 4 characters.'; return; }
-    if (pass !== pass2) { $('signupError').textContent = 'Passwords do not match.'; return; }
-    const existing = localStorage.getItem('acumen_cred_' + user);
-    if (existing) { $('signupError').textContent = 'Username already taken.'; return; }
-
-    localStorage.setItem('acumen_cred_' + user, pass);
-    localStorage.setItem('acumen_user', user);
-    currentUser = user;
-    loadChats();
-    closeModals();
-    showApp();
-}
-
-// ── Log In ─────────────────────────────────────────────────
-$('loginBtn').addEventListener('click', doLogin);
-$('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-$('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginPass').focus(); });
-
-function doLogin() {
-    const user = $('loginUser').value.trim();
-    const pass = $('loginPass').value;
-    if (!user) { $('loginError').textContent = 'Please enter a username.'; return; }
-    if (!pass) { $('loginError').textContent = 'Please enter a password.'; return; }
-    const stored = localStorage.getItem('acumen_cred_' + user);
-    if (!stored) { $('loginError').textContent = 'Account not found. Sign up first.'; return; }
-    if (stored !== pass) { $('loginError').textContent = 'Incorrect password.'; return; }
-
-    localStorage.setItem('acumen_user', user);
-    currentUser = user;
-    loadChats();
-    closeModals();
-    showApp();
-}
-
-// ── Show App ───────────────────────────────────────────────
-function showApp() {
-    $('landing').classList.add('hidden');
-    $('app').classList.add('active');
-    $('userAvatar').textContent = currentUser[0].toUpperCase();
-    $('userName').textContent = currentUser;
-    renderChatList();
-}
-
-$('userBanner').addEventListener('click', (e) => {
-    e.stopPropagation();
-    $('userMenu').classList.toggle('active');
-});
-document.addEventListener('click', (e) => {
-    if (!$('sidebarFooter').contains(e.target)) {
-        $('userMenu').classList.remove('active');
-    }
-});
-
-function openProfile() {
-    $('userMenu').classList.remove('active');
-    $('profileAvatar').textContent = currentUser[0].toUpperCase();
-    $('profileName').textContent = currentUser;
-    const chatCount = chats.length;
-    const msgCount = chats.reduce((n, c) => n + c.messages.length, 0);
-    $('profileStats').textContent = chatCount + ' chats \u00b7 ' + msgCount + ' messages';
-    $('profileModal').classList.add('active');
-}
-$('profileModal').addEventListener('click', e => { if (e.target === $('profileModal')) $('profileModal').classList.remove('active'); });
-
-function openBrainDashboard() {
-    $('userMenu').classList.remove('active');
-    $('brainModal').classList.add('active');
-    fetchBrainStatus();
-}
-$('brainModal').addEventListener('click', e => { if (e.target === $('brainModal')) $('brainModal').classList.remove('active'); });
-
-async function fetchBrainStatus() {
-    try {
-        const resp = await fetch('http://localhost:5820/brain/status');
-        const data = await resp.json();
-        $('brainStatus').textContent = data.status || 'No status available';
-    } catch (e) {
-        $('brainStatus').textContent = 'Brain server not running. Start with: python api_server.py';
-    }
-}
-
-async function brainAction(action) {
-    const statusEl = $('brainActionStatus');
-    statusEl.textContent = 'Working...';
-    try {
-        const resp = await fetch('http://localhost:5820/brain/' + action, { method: 'POST' });
-        const data = await resp.json();
-        statusEl.textContent = data.result || 'Done!';
-        fetchBrainStatus();
-    } catch (e) {
-        statusEl.textContent = 'Error: ' + e.message;
-    }
-}
-
-// ── Log Out ────────────────────────────────────────────────
-$('logoutBtn').addEventListener('click', () => {
-    $('userMenu').classList.remove('active');
-    localStorage.removeItem('acumen_user');
-    currentUser = null;
-    chats = [];
-    activeChatId = null;
-    $('app').classList.remove('active');
-    $('landing').classList.remove('hidden');
-});
-
-// ── Chat Persistence ───────────────────────────────────────
-function loadChats() {
-    const raw = localStorage.getItem('acumen_chats_' + currentUser);
-    chats = raw ? JSON.parse(raw) : [];
-}
-function saveChats() {
-    localStorage.setItem('acumen_chats_' + currentUser, JSON.stringify(chats));
-}
-
-// ── Chat List ──────────────────────────────────────────────
-function renderChatList() {
-    const list = $('chatList');
-    list.innerHTML = '';
-    chats.forEach(c => {
-        const el = document.createElement('div');
-        el.className = 'chat-list-item' + (c.id === activeChatId ? ' active' : '');
-        el.innerHTML = `<span class="chat-title">${esc(c.title)}</span>
-            <button class="delete-btn" onclick="event.stopPropagation(); deleteChat('${c.id}')">&times;</button>`;
-        el.addEventListener('click', () => openChat(c.id));
-        list.appendChild(el);
-    });
-}
-
-function deleteChat(id) {
-    chats = chats.filter(c => c.id !== id);
-    saveChats();
-    if (activeChatId === id) { activeChatId = null; showWelcome(); }
-    renderChatList();
-}
-
-// ── New Chat ───────────────────────────────────────────────
-$('newChatBtn').addEventListener('click', () => {
-    activeChatId = null;
-    showWelcome();
-    renderChatList();
-    $('chatTitle').textContent = 'New chat';
-});
-
-function createChat(firstMsg) {
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    const title = firstMsg.length > 40 ? firstMsg.slice(0, 40) + '\u2026' : firstMsg;
-    const chat = { id, title, messages: [] };
-    chats.unshift(chat);
-    activeChatId = id;
-    saveChats();
-    renderChatList();
-    $('chatTitle').textContent = title;
-    return chat;
-}
-
-function openChat(id) {
-    activeChatId = id;
-    const chat = chats.find(c => c.id === id);
-    $('chatTitle').textContent = chat.title;
-    renderMessages(chat.messages);
-    renderChatList();
-}
-
-// ── Messages ───────────────────────────────────────────────
-function showWelcome() {
-    $('messages').innerHTML = `
-        <div class="welcome-screen">
-            <div class="welcome-logo">
-                <div class="welcome-logo-icon">&#129504;</div>
-                ClawCow Agent
-            </div>
-            <div class="welcome-sub">Local intelligence. No cloud. How can I help?</div>
-            <div class="suggestions">
-                <div class="suggestion" onclick="useSuggestion(this)"><strong>Write code</strong>Help me write a Python script</div>
-                <div class="suggestion" onclick="useSuggestion(this)"><strong>Debug an issue</strong>Find and fix a bug in my code</div>
-                <div class="suggestion" onclick="useSuggestion(this)"><strong>Explain a concept</strong>How does async/await work?</div>
-                <div class="suggestion" onclick="useSuggestion(this)"><strong>Explore GitHub</strong>Find trending Python repos</div>
-            </div>
-        </div>`;
-}
-
-function renderMessages(msgs) {
-    const container = $('messages');
-    container.innerHTML = '';
-    msgs.forEach(m => container.appendChild(makeMsgEl(m.role, m.text)));
-    container.scrollTop = container.scrollHeight;
-}
-
-function makeMsgEl(role, text) {
-    const div = document.createElement('div');
-    div.className = 'message';
-    const initial = role === 'user' ? (currentUser ? currentUser[0].toUpperCase() : 'U') : 'A';
-    div.innerHTML = `
-        <div class="msg-avatar ${role === 'user' ? 'user' : 'ai'}">${initial}</div>
-        <div class="msg-content">
-            <div class="msg-role">${role === 'user' ? 'You' : 'ClawCow Agent'}</div>
-            <div class="msg-text">${formatText(text)}</div>
-        </div>`;
-    return div;
-}
-
-function appendMessage(role, text) {
-    const welcome = document.querySelector('.welcome-screen');
-    if (welcome) welcome.remove();
-    const container = $('messages');
-    container.appendChild(makeMsgEl(role, text));
-    container.scrollTop = container.scrollHeight;
-}
-
-// ── Send ───────────────────────────────────────────────────
-$('sendBtn').addEventListener('click', sendMessage);
-$('msgInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-});
-$('msgInput').addEventListener('input', autoResize);
-
-function autoResize() {
-    const el = $('msgInput');
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 200) + 'px';
-}
-
-function sendMessage() {
-    const input = $('msgInput');
-    const text = input.value.trim();
-    if (!text) return;
-
-    let chat = chats.find(c => c.id === activeChatId);
-    if (!chat) chat = createChat(text);
-
-    chat.messages.push({ role: 'user', text });
-    appendMessage('user', text);
-    saveChats();
-
-    input.value = '';
-    input.style.height = 'auto';
-
-    $('typingIndicator').classList.add('active');
-    $('sendBtn').disabled = true;
-
-    generateReply(text).then(reply => {
-        chat.messages.push({ role: 'ai', text: reply });
-        $('typingIndicator').classList.remove('active');
-        appendMessage('ai', reply);
-        saveChats();
-        $('sendBtn').disabled = false;
-    });
-}
-
-// -- Settings (no API keys needed) --
-const LOCAL_API = 'http://localhost:5820';
-let serverOnline = false;
-
-async function checkServer() {
-    try {
-        const r = await fetch(LOCAL_API + '/health', { signal: AbortSignal.timeout(2000) });
-        const d = await r.json();
-        serverOnline = true;
-        $('serverStatus').textContent = '🟢 Brain server online — ' + d.bots + ' bots';
-        $('serverStatus').style.color = '#22c55e';
-    } catch(e) {
-        serverOnline = false;
-        $('serverStatus').textContent = '🔴 Brain server offline — run: python api_server.py';
-        $('serverStatus').style.color = '#ef4444';
-    }
-}
-setInterval(checkServer, 5000);
-checkServer();
-
-function openSettings() { $('settingsModal').classList.add('active'); checkServer(); }
-function saveSettings() { $('settingsModal').classList.remove('active'); }
-$('settingsBtn').addEventListener('click', openSettings);
-$('settingsBtnGlobal') && $('settingsBtnGlobal').addEventListener('click', openSettings);
-$('settingsModal').addEventListener('click', e => {
-    if (e.target === $('settingsModal')) $('settingsModal').classList.remove('active');
-});
-
-let conversationHistory = [];
-function resetConversation() { conversationHistory = []; }
-
-// -- AI Replies via local brain (no API key needed) --
-async function generateReply(msg) {
-    if (!serverOnline) {
-        return '⚠️ Brain server is offline. Open PowerShell and run:\n\n  cd G:\\Python\\AcumenAI\\local-ai-agent\n  python api_server.py\n\nThen refresh this page.';
-    }
-    conversationHistory.push({ role: 'user', content: msg });
-    if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
-    try {
-        const resp = await fetch(LOCAL_API + '/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: msg }),
-        });
-        if (!resp.ok) throw new Error('Server error ' + resp.status);
-        const data = await resp.json();
-        const reply = data.reply || '(no reply)';
-        const source = data.source || 'brain';
-        const badge = source === 'live search' ? ' 🔍' : source === 'cached search' ? ' 📦' : ' 🧠';
-        conversationHistory.push({ role: 'assistant', content: reply });
-        return reply + badge;
-    } catch(e) {
-        conversationHistory.pop();
-        return 'Error connecting to brain server: ' + e.message;
-    }
-}
-
-// -- PDF Upload --
-async function uploadPDF() {
-    const input = $('pdfUploadInput');
-    const status = $('pdfUploadStatus');
-    if (!input.files.length) { status.textContent = 'Please choose a PDF file first.'; return; }
-    if (!serverOnline) { status.textContent = 'Brain server is offline. Start it first.'; return; }
-    const formData = new FormData();
-    formData.append('file', input.files[0]);
-    status.textContent = 'Uploading and ingesting...';
-    try {
-        const resp = await fetch(LOCAL_API + '/pdf', { method: 'POST', body: formData });
-        const data = await resp.json();
-        status.textContent = data.result || data.error || 'Done!';
-        status.style.color = data.error ? '#ef4444' : '#22c55e';
-        fetchBrainStatus();
-    } catch(e) {
-        status.textContent = 'Error: ' + e.message;
-        status.style.color = '#ef4444';
-    }
-}
-
-async function brainWikiSearch() {
-    const q = prompt('Enter a topic to search on Wikipedia:');
-    if (!q) return;
-    const statusEl = $('brainActionStatus');
-    statusEl.textContent = 'Searching Wikipedia for: ' + q + '...';
-    try {
-        const resp = await fetch(LOCAL_API + '/brain/wiki-search', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: q })
-        });
-        const data = await resp.json();
-        statusEl.textContent = data.result || 'Done!';
-        fetchBrainStatus();
-    } catch(e) { statusEl.textContent = 'Error: ' + e.message; }
-}
-
-// -- Helpers --
-function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-
-function formatText(text) {
-    let html = esc(text);
-    html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\n/g, '<br>');
-    return html;
-}
-
-function useSuggestion(el) {
-    const text = el.querySelector('strong').textContent + ' \u2014 ' + el.childNodes[1].textContent.trim();
-    $('msgInput').value = text;
-    sendMessage();
-}
-
-// -- Init --
-initAuth();
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 </script>
 </body>
 </html>
