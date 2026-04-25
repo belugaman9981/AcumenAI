@@ -302,163 +302,6 @@ nav {
 }
 .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-/* ── LIVE CHAT ───────────────────────────────────── */
-.live-chat-section {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 40px 100px;
-}
-.live-chat-shell {
-  background: linear-gradient(180deg, rgba(24,22,20,0.98), rgba(33,29,26,0.98));
-  color: var(--card-fg);
-  border-radius: 24px;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  box-shadow: 0 18px 60px rgba(0,0,0,0.12);
-}
-.live-chat-side {
-  padding: 36px;
-  border-right: 1px solid rgba(255,255,255,0.08);
-}
-.live-chat-side h3 {
-  font-family: 'Instrument Serif', serif;
-  font-size: 2rem;
-  font-weight: 400;
-  line-height: 1.1;
-  margin-bottom: 14px;
-}
-.live-chat-side p {
-  color: rgba(255,255,255,0.62);
-  font-size: 0.95rem;
-  line-height: 1.75;
-  margin-bottom: 26px;
-}
-.live-chat-meta {
-  display: grid;
-  gap: 14px;
-}
-.live-chat-meta div {
-  padding-top: 14px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-.live-chat-meta strong {
-  display: block;
-  font-size: 0.76rem;
-  font-family: 'DM Mono', monospace;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.38);
-  margin-bottom: 8px;
-}
-.live-chat-meta span {
-  color: rgba(255,255,255,0.78);
-  font-size: 0.92rem;
-}
-.chat-panel {
-  min-height: 560px;
-  display: flex;
-  flex-direction: column;
-}
-.chat-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 22px 26px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-.chat-panel-title {
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.server-pill {
-  border-radius: 999px;
-  padding: 7px 12px;
-  font-size: 0.8rem;
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.74);
-}
-.chat-log {
-  flex: 1;
-  padding: 24px 26px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: auto;
-  background:
-    radial-gradient(circle at top right, rgba(200,87,58,0.14), transparent 28%),
-    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
-}
-.chat-row {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-}
-.chat-row.user {
-  flex-direction: row-reverse;
-}
-.chat-avatar {
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.78rem;
-  font-weight: 700;
-  background: rgba(255,255,255,0.08);
-  color: #fff;
-}
-.chat-row.user .chat-avatar {
-  background: var(--rust);
-}
-.chat-bubble {
-  max-width: min(560px, 100%);
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.07);
-  color: rgba(255,255,255,0.9);
-  line-height: 1.7;
-  white-space: pre-wrap;
-}
-.chat-row.user .chat-bubble {
-  background: rgba(200,87,58,0.16);
-}
-.chat-composer {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-  padding: 18px 26px 26px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-.chat-composer textarea {
-  width: 100%;
-  min-height: 58px;
-  max-height: 180px;
-  resize: vertical;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 18px;
-  background: rgba(255,255,255,0.05);
-  color: #fff;
-  padding: 16px 18px;
-  font: inherit;
-}
-.chat-composer textarea::placeholder {
-  color: rgba(255,255,255,0.35);
-}
-.chat-composer button {
-  align-self: end;
-}
-.chat-footnote {
-  padding: 0 26px 24px;
-  color: rgba(255,255,255,0.42);
-  font-size: 0.8rem;
-}
-
 /* ── FOOTER ─────────────────────────────────────── */
 footer {
   border-top: 1px solid rgba(0,0,0,0.1);
@@ -487,10 +330,6 @@ footer a:hover { color: var(--ink); }
   .stat { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); padding: 24px 0; }
   .about-section { grid-template-columns: 1fr; gap: 20px; }
   .model-inner { grid-template-columns: 1fr; }
-  .live-chat-section { padding: 0 20px 80px; }
-  .live-chat-shell { grid-template-columns: 1fr; }
-  .live-chat-side { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
-  .chat-composer { grid-template-columns: 1fr; }
   .principles-hed { grid-template-columns: 1fr; gap: 16px; }
   .principles-grid { grid-template-columns: 1fr; }
   .principle { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); padding: 28px 0; }
@@ -509,7 +348,7 @@ footer a:hover { color: var(--ink); }
     <a href="#research">Research</a>
     <a href="#model">ClawCow Agent</a>
     <a href="#about">Mission</a>
-    <a href="#live-chat" class="nav-cta btn">Try ClawCow ↗</a>
+    <a href="clawcow_agent.html" class="nav-cta btn">Try ClawCow ↗</a>
   </div>
 </nav>
 
@@ -522,7 +361,7 @@ footer a:hover { color: var(--ink); }
   <div class="hero-right fade-in" style="transition-delay:0.12s">
     <p>AcumenAI is an independent AI lab building local-first agents that evolve through experience — no cloud, no API keys, no limits. Intelligence that stays on your machine.</p>
     <div class="hero-btns">
-      <a href="#live-chat" class="btn btn-dark">Try ClawCow Agent</a>
+      <a href="clawcow_agent.html" class="btn btn-dark">Try ClawCow Agent</a>
       <a href="#research" class="btn btn-outline">Our research</a>
     </div>
   </div>
@@ -582,7 +421,7 @@ footer a:hover { color: var(--ink); }
       <div class="model-eyebrow">Flagship Agent · ClawCow Agent</div>
       <div class="model-title">ClawCow<br><em>Agent</em></div>
       <p class="model-desc">A self-evolving AI agent that crawls Wikipedia, ingests PDFs, searches the web, and runs code — all locally on your machine. It learns while you sleep.</p>
-      <a href="#live-chat" class="btn" style="background:var(--rust);color:#fff">Try ClawCow Agent →</a>
+      <a href="clawcow_agent.html" class="btn" style="background:var(--rust);color:#fff">Try ClawCow Agent →</a>
     </div>
     <div class="model-features fade-in" style="transition-delay:0.15s">
       <div class="model-feature">
@@ -613,47 +452,6 @@ footer a:hover { color: var(--ink); }
           <p>Runs Python and JavaScript in sandboxed subprocesses. Writes, tests, and iterates on real code.</p>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- LIVE CHAT -->
-<section class="live-chat-section fade-in" id="live-chat">
-  <div class="live-chat-shell">
-    <div class="live-chat-side">
-      <h3>Talk to ClawCow Agent live.</h3>
-      <p>This page now connects directly to your local agent server. Start the API, then chat from the landing page without leaving the site.</p>
-      <div class="live-chat-meta">
-        <div>
-          <strong>API server</strong>
-          <span id="chatServerUrl">http://localhost:5820</span>
-        </div>
-        <div>
-          <strong>Status</strong>
-          <span id="chatServerStatus">Checking local agent...</span>
-        </div>
-        <div>
-          <strong>Start command</strong>
-          <span>cd local-ai-agent && python api_server.py</span>
-        </div>
-      </div>
-    </div>
-    <div class="chat-panel">
-      <div class="chat-panel-header">
-        <div class="chat-panel-title">Local Chat Console</div>
-        <div class="server-pill" id="chatServerPill">Offline</div>
-      </div>
-      <div class="chat-log" id="chatLog">
-        <div class="chat-row agent">
-          <div class="chat-avatar">C</div>
-          <div class="chat-bubble">I am ready when the local API is up. Ask a question, run a prompt, or test the browser bridge from here.</div>
-        </div>
-      </div>
-      <div class="chat-composer">
-        <textarea id="chatInput" placeholder="Message ClawCow Agent..."></textarea>
-        <button class="btn btn-dark" id="chatSendBtn">Send</button>
-      </div>
-      <div class="chat-footnote">Responses come from your local Python agent over the existing /chat endpoint.</div>
     </div>
   </div>
 </section>
@@ -721,8 +519,6 @@ footer a:hover { color: var(--ink); }
 </footer>
 
 <script>
-const LOCAL_API = 'http://localhost:5820';
-
 // ── Neural canvas animation ──────────────────────────────
 const canvas = document.getElementById('neuralCanvas');
 const ctx    = canvas.getContext('2d');
@@ -783,88 +579,6 @@ function draw() {
 
 window.addEventListener('resize', () => { resize(); initNodes(); });
 resize(); initNodes(); draw();
-
-
-// ── Local chat bridge ────────────────────────────────────
-const chatLog = document.getElementById('chatLog');
-const chatInput = document.getElementById('chatInput');
-const chatSendBtn = document.getElementById('chatSendBtn');
-const chatServerStatus = document.getElementById('chatServerStatus');
-const chatServerPill = document.getElementById('chatServerPill');
-
-function appendChatMessage(role, text) {
-  const row = document.createElement('div');
-  row.className = 'chat-row ' + role;
-
-  const avatar = document.createElement('div');
-  avatar.className = 'chat-avatar';
-  avatar.textContent = role === 'user' ? 'Y' : 'C';
-
-  const bubble = document.createElement('div');
-  bubble.className = 'chat-bubble';
-  bubble.textContent = text;
-
-  row.appendChild(avatar);
-  row.appendChild(bubble);
-  chatLog.appendChild(row);
-  chatLog.scrollTop = chatLog.scrollHeight;
-}
-
-function setServerState(online, label) {
-  chatServerStatus.textContent = label;
-  chatServerPill.textContent = online ? 'Online' : 'Offline';
-  chatServerPill.style.background = online ? 'rgba(34,197,94,0.14)' : 'rgba(239,68,68,0.14)';
-  chatServerPill.style.color = online ? '#86efac' : '#fca5a5';
-}
-
-async function checkChatServer() {
-  try {
-    const response = await fetch(LOCAL_API + '/health', { signal: AbortSignal.timeout(2000) });
-    const data = await response.json();
-    setServerState(true, 'Local agent online with ' + data.bots + ' bots ready.');
-  } catch (error) {
-    setServerState(false, 'Local agent offline. Start it with: cd local-ai-agent && python api_server.py');
-  }
-}
-
-async function sendChatMessage() {
-  const message = chatInput.value.trim();
-  if (!message) return;
-
-  chatInput.value = '';
-  appendChatMessage('user', message);
-  chatSendBtn.disabled = true;
-  chatSendBtn.textContent = 'Sending...';
-
-  try {
-    const response = await fetch(LOCAL_API + '/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
-    });
-    if (!response.ok) throw new Error('Server error ' + response.status);
-    const data = await response.json();
-    appendChatMessage('agent', data.reply || '(no reply)');
-    setServerState(true, 'Local agent online and responding.');
-  } catch (error) {
-    appendChatMessage('agent', 'Connection failed: ' + error.message);
-    setServerState(false, 'Local agent offline. Start it with: cd local-ai-agent && python api_server.py');
-  } finally {
-    chatSendBtn.disabled = false;
-    chatSendBtn.textContent = 'Send';
-  }
-}
-
-chatSendBtn.addEventListener('click', sendChatMessage);
-chatInput.addEventListener('keydown', event => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    sendChatMessage();
-  }
-});
-
-checkChatServer();
-setInterval(checkChatServer, 5000);
 
 
 // ── Scroll fade-in ───────────────────────────────────────
