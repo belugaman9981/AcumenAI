@@ -913,6 +913,7 @@ async function doCommit(){
   const path=$('commitPath').value.trim();
   const msg=$('commitMsg').value.trim()||'🤖 ClawCow Agent: update';
   const branch=clawcowBranch||activeRepo.default_branch;
+  const clawcowAuthor={name:'ClawCow Agent',email:'clawcow-agent@users.noreply.github.com'};
   if(!path){$('commitError').textContent='Please enter a file path.';$('commitError').style.color='#f87171';return;}
   $('commitDoBtn').textContent='Committing…';$('commitDoBtn').disabled=true;
   $('commitError').textContent='';
@@ -926,7 +927,13 @@ async function doCommit(){
     }catch(e){}
 
     // Commit the file
-    const body={message:msg,content:btoa(unescape(encodeURIComponent(pendingCommitCode))),branch};
+    const body={
+      message:msg,
+      content:btoa(unescape(encodeURIComponent(pendingCommitCode))),
+      branch,
+      author:clawcowAuthor,
+      committer:clawcowAuthor
+    };
     if(existingSha) body.sha=existingSha;
     const rc=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/contents/${encodeURIComponent(path)}`,{
       method:'PUT',
