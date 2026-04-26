@@ -3,590 +3,1191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AcumenAI — Intelligence at the Frontier</title>
+<title>AcumenAI — ClawCow Agent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; }
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
 
-:root {
-  --cream:   #e9e4da;
-  --cream2:  #f2ede5;
-  --ink:     #181614;
-  --ink2:    #3a3632;
-  --ink3:    #7a756e;
-  --ink4:    #b0a99f;
-  --rust:    #c8573a;
-  --rust2:   #e06a4a;
-  --card-bg: #181614;
-  --card-fg: #f0ebe2;
+:root{
+  --bg:#0e0c18;--bg2:#13101f;--bg3:#1a1728;
+  --surface:rgba(255,255,255,0.04);--surface2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#eceaf5;--text2:#8a87a8;--text3:#55526a;--text4:#35334a;
+  --cl:#d4684a;--mx:#8b5cf6;
+  --grad:linear-gradient(135deg,#d4684a 0%,#9060f0 100%);
+  --grad3:linear-gradient(135deg,#d4684a,#a855f7,#6d28d9);
+  --cl-dim:rgba(212,104,74,0.12);--mx-dim:rgba(139,92,246,0.12);--mix-dim:rgba(160,80,150,0.1);
+  --code-bg:rgba(0,0,0,0.3);--code-br:rgba(255,255,255,0.08);
+  --inp-bg:rgba(255,255,255,0.05);--shadow:rgba(0,0,0,0.5);--overlay:rgba(8,6,16,0.8);
+  --gh:#2da44e;--gh-dim:rgba(45,164,78,0.12);--gh-br:rgba(45,164,78,0.25);
 }
-
-body {
-  background: var(--cream);
-  color: var(--ink);
-  font-family: 'Syne', sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-/* ── NAV ────────────────────────────────────────── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 999;
-  background: var(--cream);
-  border-bottom: 1px solid rgba(0,0,0,0.08);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 40px; height: 60px;
-}
-.nav-logo {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700; font-size: 1.1rem; letter-spacing: -0.2px;
-  color: var(--ink); text-decoration: none;
-}
-.nav-links {
-  display: flex; align-items: center; gap: 6px;
-}
-.nav-links a {
-  font-size: 0.875rem; font-weight: 500; color: var(--ink2);
-  text-decoration: none; padding: 6px 14px; border-radius: 6px;
-  transition: color 0.15s;
-}
-.nav-links a:hover { color: var(--ink); }
-.nav-cta {
-  background: var(--ink); color: var(--cream2) !important;
-  border-radius: 100px !important; padding: 8px 22px !important;
-  font-weight: 600 !important; font-size: 0.86rem !important;
-  transition: background 0.2s !important;
-}
-.nav-cta:hover { background: var(--ink2) !important; color: var(--cream2) !important; }
-
-/* ── HERO ───────────────────────────────────────── */
-.hero {
-  padding: 140px 40px 100px;
-  max-width: 1200px; margin: 0 auto;
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 60px; align-items: end;
-}
-.hero-eyebrow {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.76rem; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--ink3);
-  margin-bottom: 24px;
-}
-.hero h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
-  font-weight: 700; line-height: 1.12;
-  letter-spacing: -1px; color: var(--ink);
-  margin-bottom: 0;
-}
-.hero h1 u {
-  text-decoration: underline;
-  text-decoration-color: var(--rust);
-  text-underline-offset: 5px;
-  text-decoration-thickness: 2px;
-}
-.hero h1 em {
-  font-style: italic; font-family: 'Instrument Serif', serif;
-  font-weight: 400; font-size: 1.08em;
-}
-.hero-right {
-  padding-bottom: 8px;
-}
-.hero-right p {
-  font-size: 1.1rem; line-height: 1.75;
-  color: var(--ink2); margin-bottom: 32px;
-  font-weight: 400;
-}
-.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
-.btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 12px 26px; border-radius: 100px;
-  font-size: 0.9rem; font-weight: 600; font-family: 'Syne', sans-serif;
-  text-decoration: none; cursor: pointer; border: none;
-  transition: all 0.2s;
-}
-.btn-dark { background: var(--ink); color: var(--cream2); }
-.btn-dark:hover { background: var(--ink2); }
-.btn-outline {
-  background: transparent; color: var(--ink);
-  border: 1.5px solid rgba(0,0,0,0.25);
-}
-.btn-outline:hover { border-color: var(--ink); background: rgba(0,0,0,0.04); }
-
-/* ── DARK HERO CARD ─────────────────────────────── */
-.hero-card-wrap {
-  padding: 0 40px 80px;
-  max-width: 1200px; margin: 0 auto;
-}
-.hero-card {
-  background: var(--card-bg);
-  border-radius: 20px;
-  overflow: hidden;
-  min-height: 440px;
-  display: grid; grid-template-columns: 1fr 1fr;
-  position: relative;
-}
-.hero-card-left {
-  padding: 64px 60px;
-  display: flex; flex-direction: column; justify-content: space-between;
-}
-.hero-card-eyebrow {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.72rem; letter-spacing: 0.14em;
-  text-transform: uppercase; color: rgba(255,255,255,0.35);
-  margin-bottom: 20px;
-}
-.hero-card-title {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(2.4rem, 3.5vw, 3.8rem);
-  font-weight: 700; color: var(--card-fg);
-  line-height: 1.1; letter-spacing: -1px;
-}
-.hero-card-sub {
-  font-size: 0.92rem; color: rgba(255,255,255,0.45);
-  line-height: 1.7; max-width: 340px; margin-top: 28px;
-}
-.hero-card-right {
-  position: relative;
-  background: linear-gradient(135deg, #1e1b28 0%, #0e0c14 100%);
-  display: flex; align-items: center; justify-content: center; overflow: hidden;
+.light{
+  --bg:#f8f6f1;--bg2:#f0ece3;--bg3:#fff;
+  --surface:rgba(0,0,0,0.03);--surface2:rgba(0,0,0,0.055);
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1624;--text2:#6a6480;--text3:#9a96b0;--text4:#bcb8cc;
+  --cl:#b84e32;--mx:#6d28d9;
+  --cl-dim:rgba(184,78,50,0.09);--mx-dim:rgba(109,40,217,0.09);--mix-dim:rgba(140,60,130,0.07);
+  --code-bg:rgba(0,0,0,0.04);--code-br:rgba(0,0,0,0.09);
+  --inp-bg:rgba(0,0,0,0.04);--shadow:rgba(0,0,0,0.1);--overlay:rgba(0,0,0,0.5);
+  --gh:#1a7f37;--gh-dim:rgba(26,127,55,0.1);--gh-br:rgba(26,127,55,0.22);
 }
 
-/* Animated neural web */
-.neural-canvas {
-  position: absolute; inset: 0;
-  opacity: 0.7;
-}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;font-size:15px;}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
 
-/* ── STATS ──────────────────────────────────────── */
-.stats-section {
-  max-width: 1200px; margin: 0 auto;
-  padding: 60px 40px 80px;
-  border-top: 1px solid rgba(0,0,0,0.08);
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
-}
-.stat {
-  padding: 0 40px;
-  border-right: 1px solid rgba(0,0,0,0.08);
-}
-.stat:first-child { padding-left: 0; }
-.stat:last-child  { border-right: none; }
-.stat-num {
-  font-family: 'Instrument Serif', serif;
-  font-size: 3.2rem; font-weight: 400; line-height: 1;
-  color: var(--ink); margin-bottom: 8px;
-}
-.stat-label { font-size: 0.88rem; color: var(--ink3); font-weight: 500; }
+/* toggle btns */
+.toggle-btn{position:fixed;top:16px;z-index:9999;width:36px;height:36px;border-radius:10px;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.95rem;transition:all 0.2s;backdrop-filter:blur(16px);}
+.toggle-btn:hover{color:var(--text);background:var(--surface2);}
+#themeToggle{right:16px;}#settingsBtnGlobal{right:58px;}
 
-/* ── ABOUT SPLIT ─────────────────────────────────── */
-.about-section {
-  max-width: 1200px; margin: 0 auto;
-  padding: 80px 40px 100px;
-  display: grid; grid-template-columns: 320px 1fr; gap: 80px;
-  align-items: start;
-}
-.about-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.72rem; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--ink3);
-  padding-top: 8px;
-}
-.about-body h2 {
-  font-family: 'Instrument Serif', serif;
-  font-size: clamp(1.9rem, 3vw, 2.8rem);
-  font-weight: 400; line-height: 1.2;
-  margin-bottom: 24px; color: var(--ink);
-}
-.about-body p {
-  font-size: 1rem; line-height: 1.8;
-  color: var(--ink2); margin-bottom: 20px;
-}
+/* ── LANDING ── */
+.landing{position:relative;z-index:1;}.landing.hidden{display:none;}
+.container{max-width:880px;margin:0 auto;padding:0 28px;}
+nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--border);}
+.logo{font-size:1.15rem;font-weight:700;letter-spacing:-0.3px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-links{display:flex;align-items:center;gap:2px;}
+.nav-links a{color:var(--text2);text-decoration:none;padding:7px 14px;border-radius:8px;font-size:0.88rem;font-weight:500;transition:all 0.15s;}
+.nav-links a:hover{color:var(--text);background:var(--surface);}
+.nav-btn{padding:8px 18px;border-radius:100px;font-size:0.86rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-decoration:none;font-family:inherit;margin-left:6px;}
+.nav-outline{background:transparent;border:1px solid var(--border2);color:var(--text);}
+.nav-outline:hover{background:var(--surface);}
+.nav-primary{background:var(--grad);color:#fff;border:none;}
+.nav-primary:hover{opacity:.9;transform:translateY(-1px);}
+.hero{text-align:center;padding:100px 0 56px;}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:100px;background:var(--mix-dim);border:1px solid rgba(160,80,180,0.2);color:var(--mx);font-size:0.78rem;font-weight:600;letter-spacing:0.03em;margin-bottom:28px;}
+.eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--grad);flex-shrink:0;}
+.hero h1{font-size:3.4rem;font-weight:700;line-height:1.1;letter-spacing:-1.5px;margin-bottom:20px;}
+.hero h1 em{font-style:normal;background:var(--grad3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{font-size:1.05rem;color:var(--text2);line-height:1.75;max-width:490px;margin:0 auto 36px;}
+.hero-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:100px;font-weight:600;font-size:0.9rem;transition:all 0.2s;border:none;cursor:pointer;font-family:inherit;text-decoration:none;}
+.btn-fill{background:var(--grad);color:#fff;}
+.btn-fill:hover{opacity:.9;transform:translateY(-2px);}
+.btn-ghost{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{color:var(--text);}
+.btn-claw{background:linear-gradient(135deg,#2da44e,#1a7f37);color:#fff;border:none;padding:14px 32px;font-size:1rem;font-weight:700;box-shadow:0 4px 24px rgba(45,164,78,0.35);}
+.btn-claw:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(45,164,78,0.45);}
+.btn-claw-badge{display:inline-flex;align-items:center;font-size:0.72rem;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(255,255,255,0.18);}
+.section-hed{font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--mx);margin-bottom:12px;font-family:'DM Mono',monospace;}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:10px;padding:8px 0 60px;}
+.feat-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px 26px;transition:all 0.22s;}
+.feat-card:hover{border-color:rgba(139,92,246,0.25);transform:translateY(-2px);}
+.feat-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:14px;}
+.fi-a{background:var(--cl-dim);}.fi-b{background:var(--mx-dim);}.fi-c{background:rgba(16,185,129,0.1);}.fi-d{background:rgba(245,158,11,0.1);}.fi-e{background:rgba(236,72,153,0.1);}.fi-f{background:rgba(6,182,212,0.1);}
+.feat-card h3{font-size:0.95rem;font-weight:600;margin-bottom:7px;}
+.feat-card p{font-size:0.84rem;color:var(--text2);line-height:1.6;}
+.qs-section{padding:0 0 60px;}
+.qs-section h2{font-size:1.75rem;font-weight:700;letter-spacing:-0.8px;margin-bottom:6px;}
+.qs-sub{color:var(--text3);font-size:0.9rem;margin-bottom:24px;}
+.code-block{background:var(--code-bg);border:1px solid var(--code-br);border-radius:14px;padding:24px 28px;font-family:'DM Mono',monospace;font-size:0.84rem;line-height:1.9;overflow-x:auto;position:relative;}
+.code-block::after{content:'bash';position:absolute;top:12px;right:16px;font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--text4);letter-spacing:0.08em;}
+.c-comment{color:var(--text3);}.c-cmd{color:#5eead4;}.c-flag{color:#c084fc;}
+footer{text-align:center;padding:36px 0;border-top:1px solid var(--border);color:var(--text4);font-size:0.82rem;}
+footer a{color:var(--mx);text-decoration:none;}
 
-/* ── MODEL CARD ─────────────────────────────────── */
-.model-section {
-  background: var(--ink); color: var(--card-fg);
-  padding: 100px 40px;
-}
-.model-inner {
-  max-width: 1200px; margin: 0 auto;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
-}
-.model-eyebrow {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.72rem; letter-spacing: 0.14em;
-  text-transform: uppercase; color: rgba(255,255,255,0.38);
-  margin-bottom: 18px;
-}
-.model-title {
-  font-family: 'Instrument Serif', serif;
-  font-size: clamp(2.8rem, 4.5vw, 5rem);
-  font-weight: 400; line-height: 1.05;
-  margin-bottom: 24px; color: #fff;
-}
-.model-title em {
-  font-style: italic; color: var(--rust2);
-}
-.model-desc {
-  font-size: 1rem; line-height: 1.8;
-  color: rgba(255,255,255,0.6); margin-bottom: 36px;
-}
-.model-features {
-  display: flex; flex-direction: column; gap: 0;
-}
-.model-feature {
-  display: flex; align-items: flex-start; gap: 16px;
-  padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.08);
-}
-.model-feature:last-child { border-bottom: 1px solid rgba(255,255,255,0.08); }
-.mf-icon {
-  width: 36px; height: 36px; border-radius: 8px;
-  background: rgba(255,255,255,0.07);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem; flex-shrink: 0;
-}
-.mf-body h4 { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; color: #fff; }
-.mf-body p  { font-size: 0.84rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+/* ── MODALS ── */
+.modal-bg{display:none;position:fixed;inset:0;background:var(--overlay);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.modal-bg.active{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:40px 36px;width:100%;max-width:400px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.45);position:relative;max-height:90vh;overflow-y:auto;}
+.modal::-webkit-scrollbar{width:3px;}.modal::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.modal-x{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--text3);font-size:1.1rem;cursor:pointer;width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.modal-x:hover{background:var(--surface);color:var(--text);}
+.modal-logo{font-size:1.5rem;font-weight:700;letter-spacing:-0.3px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;}
+.modal-sub{color:var(--text3);font-size:0.84rem;margin-bottom:26px;}
+.field{text-align:left;margin-bottom:12px;}
+.field label{display:block;font-size:0.77rem;font-weight:600;color:var(--text2);margin-bottom:5px;letter-spacing:0.02em;}
+.field-wrap{position:relative;}
+.field input,.field select{width:100%;padding:11px 40px 11px 13px;border-radius:10px;border:1px solid var(--border2);background:var(--inp-bg);color:var(--text);font-size:0.9rem;outline:none;transition:all 0.18s;font-family:inherit;}
+.field select{padding-right:13px;cursor:pointer;}
+.field input:focus,.field select:focus{border-color:var(--mx);box-shadow:0 0 0 3px var(--mx-dim);}
+.field input.ok{border-color:#22c55e;}.field input.err{border-color:#f87171;}
+.eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.92rem;padding:3px;}
+.eye:hover{color:var(--text);}
+.pw-match{position:absolute;right:36px;top:50%;transform:translateY(-50%);font-size:0.88rem;font-weight:700;}
+.pw-match.ok{color:#22c55e;}.pw-match.err{color:#f87171;}
+.submit-btn{width:100%;padding:12px;border:none;border-radius:100px;background:var(--grad);color:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:6px;transition:all 0.2s;font-family:inherit;}
+.submit-btn:hover{opacity:.92;transform:translateY(-1px);}
+.auth-err{color:#f87171;font-size:0.79rem;margin-top:9px;min-height:17px;}
+.auth-sw{margin-top:14px;font-size:0.82rem;color:var(--text3);}
+.auth-sw a{color:var(--mx);cursor:pointer;text-decoration:none;}
+.or-div{display:flex;align-items:center;gap:12px;margin:14px 0;color:var(--text4);font-size:0.78rem;}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:var(--border);}
 
-/* ── PRINCIPLES ─────────────────────────────────── */
-.principles {
-  max-width: 1200px; margin: 0 auto; padding: 100px 40px;
-}
-.principles-hed {
-  display: grid; grid-template-columns: 320px 1fr; gap: 80px;
-  margin-bottom: 60px;
-}
-.principles-hed h2 {
-  font-family: 'Instrument Serif', serif;
-  font-size: clamp(1.9rem, 2.8vw, 2.6rem); font-weight: 400;
-  line-height: 1.2; color: var(--ink);
-}
-.principles-hed p { font-size: 1rem; color: var(--ink2); line-height: 1.8; padding-top: 8px; }
-.principles-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
-  border-top: 1px solid rgba(0,0,0,0.1);
-}
-.principle {
-  padding: 36px 28px 36px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.08);
-  border-right: 1px solid rgba(0,0,0,0.08);
-}
-.principle:nth-child(3n) { border-right: none; }
-.principle:nth-child(n+4) { border-bottom: none; }
-.principle + .principle { padding-left: 28px; }
-.principle:nth-child(3n+1) { padding-left: 0; }
-.p-num {
-  font-family: 'DM Mono', monospace; font-size: 0.72rem;
-  color: var(--ink4); margin-bottom: 16px; letter-spacing: 0.08em;
-}
-.p-title { font-size: 1rem; font-weight: 700; margin-bottom: 10px; color: var(--ink); }
-.p-desc  { font-size: 0.88rem; color: var(--ink3); line-height: 1.7; }
+/* ── GH MODAL ── */
+.gh-step{display:none;}.gh-step.active{display:block;}
+.gh-logo{font-size:2rem;margin-bottom:8px;}
+.repo-list{max-height:240px;overflow-y:auto;margin:12px 0;text-align:left;}
+.repo-list::-webkit-scrollbar{width:3px;}.repo-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.repo-card{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--inp-bg);cursor:pointer;margin-bottom:5px;transition:all 0.15s;}
+.repo-card:hover{border-color:var(--gh-br);background:var(--gh-dim);}
+.repo-card.selected{border-color:var(--gh);background:var(--gh-dim);}
+.repo-card-icon{font-size:0.95rem;flex-shrink:0;margin-top:2px;}
+.repo-card-body{flex:1;min-width:0;}
+.repo-card-name{font-size:0.87rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.repo-card-desc{font-size:0.77rem;color:var(--text3);margin-top:2px;line-height:1.4;}
+.repo-card-meta{display:flex;gap:10px;margin-top:4px;font-size:0.71rem;color:var(--text4);font-family:'DM Mono',monospace;}
+.repo-card-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;}
+.repo-card.selected .repo-card-check{background:var(--gh);border-color:var(--gh);color:#fff;}
+.gh-loading{text-align:center;padding:24px;color:var(--text3);font-size:0.88rem;}
+.gh-token-help{font-size:0.74rem;color:var(--text3);margin-top:6px;text-align:left;line-height:1.5;}
+.gh-token-help a{color:var(--mx);}
 
-/* ── CTA SECTION ────────────────────────────────── */
-.cta-section {
-  background: var(--cream2); border-top: 1px solid rgba(0,0,0,0.07);
-  padding: 100px 40px; text-align: center;
-}
-.cta-section h2 {
-  font-family: 'Instrument Serif', serif;
-  font-size: clamp(2.2rem, 4vw, 3.6rem); font-weight: 400;
-  line-height: 1.15; max-width: 600px; margin: 0 auto 24px;
-  color: var(--ink);
-}
-.cta-section h2 em { font-style: italic; }
-.cta-section p {
-  font-size: 1rem; color: var(--ink3); margin-bottom: 40px; line-height: 1.7;
-}
-.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+/* ── APP ── */
+.app{display:none;height:100vh;overflow:hidden;}
+.app.active{display:flex;}
 
-/* ── FOOTER ─────────────────────────────────────── */
-footer {
-  border-top: 1px solid rgba(0,0,0,0.1);
-  padding: 40px 40px;
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 0.84rem; color: var(--ink4);
-}
-footer a { color: var(--ink3); text-decoration: none; }
-footer a:hover { color: var(--ink); }
-.footer-links { display: flex; gap: 24px; }
+/* left sidebar */
+.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.sb-top{padding:10px 8px;border-bottom:1px solid var(--border);}
+.new-chat{width:100%;padding:8px 14px;border-radius:100px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:0.83rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.15s;font-family:inherit;}
+.new-chat:hover{background:var(--mix-dim);border-color:rgba(160,80,200,0.3);color:var(--text);}
+.repo-pill{margin:6px 8px 0;padding:8px 10px;border-radius:10px;background:var(--gh-dim);border:1px solid var(--gh-br);display:none;align-items:center;gap:7px;}
+.repo-pill.active{display:flex;}
+.repo-pill-name{font-size:0.76rem;font-weight:700;color:var(--gh);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.repo-pill-sub{font-size:0.66rem;color:var(--text3);}
+.repo-worked-pill{font-size:0.64rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;padding:2px 8px;border-radius:100px;background:rgba(212,104,74,0.14);color:var(--cl);border:1px solid rgba(212,104,74,0.28);display:none;align-items:center;gap:4px;white-space:nowrap;}
+.repo-worked-pill.active{display:inline-flex;}
+.repo-pill-x{background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.85rem;padding:1px;}
+.repo-pill-x:hover{color:#f87171;}
+.sb-label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text4);padding:12px 11px 4px;}
+.chat-list{flex:1;overflow-y:auto;padding:4px 5px;}
+.chat-list::-webkit-scrollbar{width:3px;}.chat-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.chat-item{padding:7px 10px;border-radius:8px;font-size:0.82rem;color:var(--text2);cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:1px;transition:all 0.12s;white-space:nowrap;overflow:hidden;}
+.chat-item:hover{background:var(--surface2);color:var(--text);}
+.chat-item.active{background:var(--mix-dim);color:var(--text);border:1px solid rgba(160,80,200,0.18);}
+.chat-item .chat-ttl{overflow:hidden;text-overflow:ellipsis;flex:1;}
+.chat-item .del{opacity:0;background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.9rem;padding:0 2px;flex-shrink:0;}
+.chat-item:hover .del{opacity:1;}.chat-item .del:hover{color:#f87171;}
+.sb-foot{padding:8px 8px;border-top:1px solid var(--border);position:relative;}
+.user-menu{display:none;position:absolute;bottom:100%;left:5px;right:5px;background:var(--bg2);border:1px solid var(--border2);border-radius:13px;padding:5px;margin-bottom:5px;box-shadow:0 10px 36px var(--shadow);z-index:100;}
+.user-menu.active{display:block;}
+.umenu-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;font-size:0.82rem;color:var(--text2);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all 0.1s;font-family:inherit;}
+.umenu-item:hover{background:var(--surface);color:var(--text);}
+.umenu-item.danger:hover{color:#f87171;background:rgba(248,113,113,0.06);}
+.umenu-item.gh-item:hover{color:var(--gh);background:var(--gh-dim);}
+.umenu-sep{height:1px;background:var(--border);margin:3px 0;}
+.user-banner{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:9px;cursor:pointer;transition:background 0.12s;}
+.user-banner:hover{background:var(--surface);}
+.uavatar{width:26px;height:26px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;color:#fff;flex-shrink:0;}
+.uname{font-size:0.82rem;color:var(--text2);flex:1;}
 
-/* ── SCROLL ANIMATIONS ──────────────────────────── */
-.fade-in {
-  opacity: 0; transform: translateY(24px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
-}
-.fade-in.visible {
-  opacity: 1; transform: translateY(0);
-}
+/* main chat */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg);}
+.chat-header{padding:11px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--bg);flex-shrink:0;}
+.chat-header-title{font-weight:600;font-size:0.88rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.model-pill{font-size:0.69rem;font-weight:600;padding:2px 9px;border-radius:100px;background:var(--mx-dim);color:var(--mx);font-family:'DM Mono',monospace;white-space:nowrap;}
+.repo-ctx-pill{font-size:0.69rem;font-weight:600;padding:2px 9px;border-radius:100px;background:var(--gh-dim);color:var(--gh);font-family:'DM Mono',monospace;display:none;align-items:center;gap:4px;white-space:nowrap;cursor:pointer;}
+.repo-ctx-pill.active{display:flex;}
+.repo-ctx-pill:hover{background:rgba(45,164,78,0.2);}
+.messages{flex:1;overflow-y:auto;padding-bottom:40px;}
+.messages::-webkit-scrollbar{width:4px;}.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;text-align:center;padding:40px 20px;}
+.welcome-icon{width:54px;height:54px;border-radius:16px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:14px;box-shadow:0 8px 28px rgba(120,60,200,0.3);}
+.welcome h2{font-size:1.5rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:7px;}
+.welcome-sub{color:var(--text3);font-size:0.88rem;margin-bottom:32px;}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-width:480px;width:100%;}
+.chip{padding:12px 14px;border-radius:11px;border:1px solid var(--border);background:var(--bg2);cursor:pointer;text-align:left;font-size:0.82rem;color:var(--text2);transition:all 0.15s;}
+.chip:hover{border-color:rgba(139,92,246,0.3);background:var(--mix-dim);color:var(--text);transform:translateY(-1px);}
+.chip strong{display:block;color:var(--text);font-size:0.84rem;margin-bottom:2px;}
+.chip-gh{border-color:var(--gh-br);background:var(--gh-dim);}
+.chip-gh:hover{border-color:var(--gh);}
+.chip-gh strong{color:var(--gh);}
+.msg-row{max-width:700px;margin:0 auto;padding:12px 22px;display:flex;gap:12px;}
+.msg-row:hover{background:rgba(255,255,255,0.01);}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;flex-shrink:0;margin-top:2px;}
+.avatar.user{background:var(--grad);color:#fff;}
+.avatar.ai{background:linear-gradient(135deg,#c96040,#9060f0);color:#fff;}
+.msg-body{flex:1;min-width:0;}
+.msg-name{font-size:0.76rem;font-weight:700;margin-bottom:5px;color:var(--text3);letter-spacing:0.02em;}
+.msg-text{font-size:0.9rem;line-height:1.72;color:var(--text);word-wrap:break-word;}
+.msg-text code{background:var(--code-bg);border:1px solid var(--code-br);padding:1px 6px;border-radius:5px;font-family:'DM Mono',monospace;font-size:0.83em;color:#c084fc;}
 
-@media (max-width: 768px) {
-  .hero { grid-template-columns: 1fr; padding: 120px 24px 60px; gap: 36px; }
-  .hero-card { grid-template-columns: 1fr; }
-  .hero-card-right { min-height: 280px; }
-  .stats-section { grid-template-columns: 1fr; }
-  .stat { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); padding: 24px 0; }
-  .about-section { grid-template-columns: 1fr; gap: 20px; }
-  .model-inner { grid-template-columns: 1fr; }
-  .principles-hed { grid-template-columns: 1fr; gap: 16px; }
-  .principles-grid { grid-template-columns: 1fr; }
-  .principle { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); padding: 28px 0; }
-  nav { padding: 0 20px; }
-  .nav-links a:not(.nav-cta) { display: none; }
-  .hero-card-wrap { padding: 0 20px 60px; }
+/* ── CODE BLOCKS with GitHub actions ── */
+.msg-code-wrap{margin:10px 0;border-radius:12px;overflow:hidden;border:1px solid var(--code-br);}
+.msg-code-header{background:rgba(0,0,0,0.25);padding:7px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--code-br);}
+.msg-code-lang{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text4);letter-spacing:0.08em;}
+.msg-code-actions{display:flex;gap:5px;}
+.code-action-btn{padding:3px 10px;border-radius:100px;font-size:0.71rem;font-weight:600;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:inherit;transition:all 0.15s;display:flex;align-items:center;gap:4px;}
+.code-action-btn:hover{background:var(--surface);color:var(--text);}
+.code-action-btn.gh{border-color:var(--gh-br);color:var(--gh);background:var(--gh-dim);}
+.code-action-btn.gh:hover{background:rgba(45,164,78,0.22);}
+.code-action-btn.pr{border-color:rgba(139,92,246,0.3);color:var(--mx);background:var(--mx-dim);}
+.code-action-btn.pr:hover{background:rgba(139,92,246,0.2);}
+.msg-code-pre{background:var(--code-bg);padding:14px 18px;margin:0;overflow-x:auto;font-family:'DM Mono',monospace;font-size:0.83em;line-height:1.7;}
+.msg-code-pre code{background:none;border:none;padding:0;color:var(--text);}
+
+/* commit toast */
+.commit-toast{position:fixed;bottom:56px;right:20px;background:var(--bg2);border:1px solid var(--gh-br);border-radius:12px;padding:12px 16px;font-size:0.82rem;color:var(--text);z-index:2000;box-shadow:0 8px 24px var(--shadow);display:none;max-width:320px;animation:slideUp 0.2s ease;}
+.commit-toast.active{display:block;}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.commit-toast a{color:var(--gh);text-decoration:none;font-weight:700;}
+.commit-toast a:hover{text-decoration:underline;}
+
+.typing{display:none;max-width:700px;margin:0 auto;padding:12px 22px;}
+.typing.active{display:flex;gap:12px;align-items:center;}
+.dots{display:flex;gap:4px;}
+.dots span{width:6px;height:6px;border-radius:50%;background:var(--mx);animation:blink 1.4s infinite;}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.2;transform:scale(.9)}30%{opacity:1;transform:scale(1.1)}}
+.input-area{padding:10px 18px 18px;}
+.input-wrap{max-width:700px;margin:0 auto;position:relative;}
+.input-pill{width:100%;padding:13px 48px 13px 16px;border-radius:15px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-size:0.9rem;font-family:inherit;outline:none;resize:none;min-height:48px;max-height:200px;line-height:1.55;transition:border-color 0.2s,box-shadow 0.2s;}
+.input-pill:focus{border-color:rgba(139,92,246,0.45);box-shadow:0 0 0 3px var(--mx-dim);}
+.input-pill::placeholder{color:var(--text4);}
+.send-btn{position:absolute;right:8px;bottom:8px;width:33px;height:33px;border-radius:9px;border:none;background:var(--grad);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.88rem;transition:all 0.15s;}
+.send-btn:hover{transform:scale(1.05);}
+.send-btn:disabled{opacity:.3;cursor:default;transform:none;}
+.input-hint{text-align:center;font-size:0.69rem;color:var(--text4);margin-top:6px;}
+
+/* ── RIGHT REPO PANEL ── */
+.repo-panel{width:280px;background:var(--bg2);border-left:1px solid var(--border);display:none;flex-direction:column;flex-shrink:0;}
+.repo-panel.active{display:flex;}
+.rp-header{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.rp-tabs{display:flex;gap:2px;}
+.rp-tab{padding:5px 12px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;color:var(--text2);border:none;background:none;font-family:inherit;transition:all 0.12s;}
+.rp-tab.active{background:var(--surface2);color:var(--text);}
+.rp-tab:hover{color:var(--text);}
+.rp-close{margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.9rem;padding:4px;border-radius:6px;}
+.rp-close:hover{background:var(--surface);color:var(--text);}
+.rp-body{flex:1;overflow-y:auto;padding:8px 10px;}
+.rp-body::-webkit-scrollbar{width:3px;}.rp-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* file tree */
+.file-tree{}
+.file-item{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;cursor:pointer;font-size:0.8rem;color:var(--text2);transition:all 0.12s;white-space:nowrap;overflow:hidden;}
+.file-item:hover{background:var(--surface);color:var(--text);}
+.file-item.dir{font-weight:600;color:var(--text);}
+.file-item .fi-icon{flex-shrink:0;font-size:0.85rem;}
+.file-item .fi-name{overflow:hidden;text-overflow:ellipsis;}
+.file-indent{padding-left:16px;}
+
+/* activity log */
+.activity-item{padding:10px 8px;border-bottom:1px solid var(--border);font-size:0.8rem;}
+.activity-item:last-child{border-bottom:none;}
+.act-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:100px;font-size:0.68rem;font-weight:700;margin-bottom:5px;}
+.act-badge.commit{background:var(--gh-dim);color:var(--gh);}
+.act-badge.pr{background:var(--mx-dim);color:var(--mx);}
+.act-badge.branch{background:rgba(245,158,11,0.12);color:#f59e0b;}
+.act-title{color:var(--text);font-weight:600;margin-bottom:2px;line-height:1.4;}
+.act-meta{color:var(--text3);font-size:0.74rem;font-family:'DM Mono',monospace;}
+.act-link{color:var(--gh);text-decoration:none;font-size:0.74rem;}
+.act-link:hover{text-decoration:underline;}
+.act-empty{text-align:center;padding:32px 12px;color:var(--text3);font-size:0.84rem;line-height:1.6;}
+
+/* autolearn bar */
+.learn-bar{display:none;position:fixed;bottom:0;left:240px;right:0;background:var(--bg2);border-top:1px solid var(--border);padding:5px 20px;z-index:500;align-items:center;gap:10px;font-size:0.76rem;color:var(--text3);}
+.app.active .learn-bar{display:flex;}
+.learn-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--text4);transition:background 0.4s;}
+.learn-dot.active{background:#22c55e;animation:pulseD 2s infinite;}
+.learn-dot.busy{background:#f59e0b;animation:pulseD 0.8s infinite;}
+.learn-dot.paused{background:#6b7280;}
+@keyframes pulseD{0%,100%{opacity:1}50%{opacity:0.35}}
+.learn-text{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.learn-toggle,.learn-now{padding:2px 9px;border-radius:100px;font-size:0.7rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;flex-shrink:0;}
+.learn-toggle{border:1px solid var(--border2);background:transparent;color:var(--text2);}
+.learn-now{border:none;background:var(--grad);color:#fff;}
+.learn-stats{color:var(--text4);font-size:0.69rem;flex-shrink:0;font-family:'DM Mono',monospace;}
+
+/* commit modal (custom inline) */
+#commitModal .modal{max-width:420px;text-align:left;}
+
+@media(max-width:900px){.repo-panel{display:none!important;}}
+@media(max-width:700px){
+  .sidebar{display:none}.chips{grid-template-columns:1fr}.modal{margin:16px;padding:28px 18px}
+  .hero h1{font-size:2.4rem}.nav-links a{display:none}.msg-row{padding:8px 12px}.learn-bar{left:0}
 }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <a class="nav-logo" href="#">AcumenAI</a>
-  <div class="nav-links">
-    <a href="#research">Research</a>
-    <a href="#model">ClawCow Agent</a>
-    <a href="#about">Mission</a>
-    <a href="clawcow_agent.html" class="nav-cta btn">Try ClawCow ↗</a>
-  </div>
-</nav>
+<button class="toggle-btn" id="themeToggle">&#9790;</button>
+<button class="toggle-btn" id="settingsBtnGlobal">&#9881;</button>
 
-<!-- HERO -->
-<section class="hero" id="top">
-  <div class="hero-left fade-in">
-    <div class="hero-eyebrow">AcumenAI · Est. 2026</div>
-    <h1>Local AI that<br><em>thinks</em> and<br><u>learns</u> for itself</h1>
+<!-- LANDING -->
+<div class="landing" id="landing" style="position:relative;z-index:1">
+  <div class="container">
+    <nav>
+      <div class="logo">AcumenAI</div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#quickstart">Get started</a>
+        <button class="nav-btn nav-outline" onclick="openModal('login')">Log in</button>
+        <button class="nav-btn nav-primary" onclick="openModal('signup')">Sign up</button>
+      </div>
+    </nav>
+    <section class="hero">
+      <div class="eyebrow"><span class="eyebrow-dot"></span>Open Source AI Agent</div>
+      <h1>Your own <em>AI coding agent</em><br>that actually learns</h1>
+      <p>A fully local AI assistant powered by its own evolving brain — no API keys, no cloud. Connects to your GitHub repos and commits real changes.</p>
+      <div class="hero-btns">
+        <button class="btn btn-claw" onclick="launchOnline()">&#129438; Try ClawCow Agent <span class="btn-claw-badge">FREE</span></button>
+        <a href="#quickstart" class="btn btn-ghost">Run locally ↓</a>
+      </div>
+    </section>
+    <section id="features">
+      <div class="section-hed">Capabilities</div>
+      <div class="feat-grid">
+        <div class="feat-card"><div class="feat-icon fi-a">&#129504;</div><h3>Evolutionary brain</h3><p>Learns and evolves every 45 seconds automatically — no GPU, no cloud.</p></div>
+        <div class="feat-card"><div class="feat-icon fi-b">&#128269;</div><h3>Web search</h3><p>DuckDuckGo built in — no API key, no limit, no tracking.</p></div>
+        <div class="feat-card"><div class="feat-icon fi-c">&#128025;</div><h3>GitHub integration</h3><p>Connects to your repos, reads files, commits changes, and opens pull requests.</p></div>
+        <div class="feat-card"><div class="feat-icon fi-d">&#128196;</div><h3>File read &amp; write</h3><p>Read, write, and list local files. Works with your codebase directly.</p></div>
+        <div class="feat-card"><div class="feat-icon fi-e">&#9889;</div><h3>Code execution</h3><p>Run Python and JS snippets inside a secure sandboxed subprocess.</p></div>
+        <div class="feat-card"><div class="feat-icon fi-f">&#128375;</div><h3>Real commits</h3><p>Every change ClawCow makes shows up as a real commit in your repo history.</p></div>
+      </div>
+    </section>
+    <section class="qs-section" id="quickstart">
+      <div class="section-hed">Quick start</div>
+      <h2>Up and running in 60 seconds</h2>
+      <p class="qs-sub">Clone, install, run. No configuration needed.</p>
+      <div class="code-block">
+        <span class="c-comment"># Clone the repo</span><br>
+        <span class="c-cmd">git clone</span> https://github.com/belugaman9981/AcumenAI.git<br>
+        <span class="c-comment"># Go to the folder with api_server.py</span><br>
+        <span class="c-cmd">cd</span> your/path/to/local-ai-agent<br><br>
+        <span class="c-comment"># Install and run (or set the path in Settings)</span><br>
+        <span class="c-cmd">pip install</span> <span class="c-flag">-r</span> requirements.txt<br>
+        <span class="c-cmd">python</span> api_server.py
+      </div>
+    </section>
+    <footer>Built with &#128156; &mdash; <a href="https://github.com/belugaman9981/AcumenAI" target="_blank">Source on GitHub</a></footer>
   </div>
-  <div class="hero-right fade-in" style="transition-delay:0.12s">
-    <p>AcumenAI is an independent AI lab building local-first agents that evolve through experience — no cloud, no API keys, no limits. Intelligence that stays on your machine.</p>
-    <div class="hero-btns">
-      <a href="clawcow_agent.html" class="btn btn-dark">Try ClawCow Agent</a>
-      <a href="#research" class="btn btn-outline">Our research</a>
-    </div>
-  </div>
-</section>
+</div>
 
-<!-- DARK FEATURE CARD -->
-<div class="hero-card-wrap fade-in" style="transition-delay:0.22s">
-  <div class="hero-card">
-    <div class="hero-card-left">
-      <div>
-        <div class="hero-card-eyebrow">Flagship Model — 2026</div>
-        <div class="hero-card-title">ClawCow<br>Agent</div>
-        <p class="hero-card-sub">Our first public agent — self-training, Wikipedia-crawling, and evolving its own understanding every 45 seconds. Zero cloud dependency.</p>
-      </div>
-      <div>
-        <a href="#model" class="btn" style="background:rgba(255,255,255,0.1);color:#fff;margin-top:32px;display:inline-flex">
-          Explore the model →
-        </a>
+<!-- MODALS -->
+<div class="modal-bg" id="loginModal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModals()">&times;</button>
+    <div class="modal-logo">AcumenAI</div>
+    <div class="modal-sub">Welcome back</div>
+    <div class="field"><label>Username</label><input type="text" id="loginUser" placeholder="Enter username" autocomplete="off"></div>
+    <div class="field"><label>Password</label><div class="field-wrap"><input type="password" id="loginPass" placeholder="Enter password"><button class="eye" onclick="togglePass('loginPass',this)" type="button">&#128065;</button></div></div>
+    <button class="submit-btn" id="loginBtn">Log in</button>
+    <div class="auth-err" id="loginError"></div>
+    <div class="or-div">or</div>
+    <button class="submit-btn" onclick="closeModals();openModal('github')" style="background:linear-gradient(135deg,#24292e,#40464f)">&#128025; Continue with GitHub</button>
+    <div class="auth-sw">No account? <a onclick="switchModal('signup')">Sign up</a></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="signupModal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModals()">&times;</button>
+    <div class="modal-logo">AcumenAI</div>
+    <div class="modal-sub">Create your account</div>
+    <div class="field"><label>Username</label><input type="text" id="signupUser" placeholder="Choose a username" autocomplete="off"></div>
+    <div class="field"><label>Password</label><div class="field-wrap"><input type="password" id="signupPass" placeholder="Create a password"><button class="eye" onclick="togglePass('signupPass',this)" type="button">&#128065;</button></div></div>
+    <div class="field">
+      <label>Confirm password</label>
+      <div class="field-wrap">
+        <input type="password" id="signupPass2" placeholder="Confirm password" oninput="checkPwMatch()">
+        <span class="pw-match" id="pwMatchIcon"></span>
+        <button class="eye" onclick="togglePass('signupPass2',this)" type="button" style="right:36px">&#128065;</button>
       </div>
     </div>
-    <div class="hero-card-right">
-      <canvas class="neural-canvas" id="neuralCanvas"></canvas>
+    <div class="auth-err" id="pwMatchMsg" style="min-height:14px;margin-top:-4px;margin-bottom:6px"></div>
+    <button class="submit-btn" id="signupBtn">Create account</button>
+    <div class="auth-err" id="signupError"></div>
+    <div class="auth-sw">Already have an account? <a onclick="switchModal('login')">Log in</a></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="githubModal">
+  <div class="modal" style="max-width:460px">
+    <button class="modal-x" onclick="closeModals()">&times;</button>
+    <div class="gh-step active" id="ghStep1">
+      <div class="gh-logo">&#128025;</div>
+      <div class="modal-logo" style="font-size:1.25rem">Connect GitHub</div>
+      <div class="modal-sub">Enter a personal access token to browse &amp; commit to your repos</div>
+      <div class="field">
+        <label>Personal Access Token</label>
+        <div class="field-wrap"><input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"><button class="eye" onclick="togglePass('ghToken',this)" type="button">&#128065;</button></div>
+        <div class="gh-token-help">Need a token? <a href="https://github.com/settings/tokens/new?scopes=repo,read:user" target="_blank">Create one on GitHub</a> — needs <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--mx)">repo</code> and <code style="font-family:'DM Mono',monospace;font-size:0.82em;color:var(--mx)">read:user</code> scopes.</div>
+      </div>
+      <button class="submit-btn" onclick="connectGitHub()">Connect &#128025;</button>
+      <div class="auth-err" id="ghTokenError"></div>
+      <div class="auth-sw"><a onclick="closeModals();loginGuestOrOpen()">Skip — just chat</a></div>
+    </div>
+    <div class="gh-step" id="ghStep2">
+      <div class="gh-logo">&#128025;</div>
+      <div class="modal-logo" style="font-size:1.15rem" id="ghUserLabel">Your repos</div>
+      <div class="modal-sub">Pick a repo for ClawCow to work on</div>
+      <div class="field"><input type="text" id="repoSearch" placeholder="Search repos…" oninput="filterRepos()" autocomplete="off"></div>
+      <div class="repo-list" id="repoList"><div class="gh-loading">&#128257; Loading repos…</div></div>
+      <button class="submit-btn" id="repoSelectBtn" onclick="confirmRepo()" disabled style="opacity:0.4">Work on this repo →</button>
+      <div class="auth-sw" style="margin-top:8px"><a onclick="ghStep(1)">← Change token</a></div>
     </div>
   </div>
 </div>
 
-<!-- STATS -->
-<section class="stats-section" id="research">
-  <div class="stat fade-in">
-    <div class="stat-num">100%</div>
-    <div class="stat-label">Local — no external API calls</div>
+<!-- Commit modal -->
+<div class="modal-bg" id="commitModal">
+  <div class="modal" style="max-width:440px;text-align:left">
+    <button class="modal-x" onclick="$('commitModal').classList.remove('active')">&times;</button>
+    <div class="modal-logo" style="font-size:1.2rem">&#128025; Commit to GitHub</div>
+    <div class="modal-sub" id="commitRepoLabel" style="text-align:center"></div>
+    <div class="field"><label>File path in repo</label><input type="text" id="commitPath" placeholder="e.g. src/utils.py"></div>
+    <div class="field"><label>Commit message</label><input type="text" id="commitMsg" placeholder="🤖 ClawCow Agent: ..."></div>
+    <div class="field"><label>Branch</label><input type="text" id="commitBranch" placeholder="clawcow/changes" readonly style="opacity:0.7"></div>
+    <div style="background:var(--code-bg);border:1px solid var(--code-br);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-family:'DM Mono',monospace;font-size:0.78rem;max-height:140px;overflow-y:auto;color:var(--text2)" id="commitPreview"></div>
+    <button class="submit-btn" id="commitDoBtn" onclick="doCommit()" style="background:linear-gradient(135deg,#2da44e,#1a7f37)">&#128025; Commit + Open PR</button>
+    <div class="auth-err" id="commitError" style="color:var(--text2)"></div>
   </div>
-  <div class="stat fade-in" style="transition-delay:0.1s">
-    <div class="stat-num">45s</div>
-    <div class="stat-label">Auto-learn cycle interval</div>
-  </div>
-  <div class="stat fade-in" style="transition-delay:0.2s">
-    <div class="stat-num">∞</div>
-    <div class="stat-label">Knowledge — grows continuously</div>
-  </div>
-</section>
+</div>
 
-<!-- ABOUT -->
-<section class="about-section" id="about">
-  <div class="about-label fade-in">Our mission</div>
-  <div class="about-body fade-in" style="transition-delay:0.1s">
-    <h2>Intelligence should belong to the person using it — not a server farm in Virginia.</h2>
-    <p>AcumenAI was built out of frustration with AI systems that phone home, charge monthly fees, and keep your data on someone else's machine. We believe a model that runs entirely on your hardware — one that grows smarter from your use — is fundamentally more trustworthy.</p>
-    <p>Our research focuses on evolutionary learning: small populations of neural bots that compete, breed, and mutate to improve their predictions over time. No gradient descent. No GPUs required. Just relentless iteration.</p>
-  </div>
-</section>
-
-<!-- MODEL SECTION -->
-<section class="model-section" id="model">
-  <div class="model-inner">
-    <div class="fade-in">
-      <div class="model-eyebrow">Flagship Agent · ClawCow Agent</div>
-      <div class="model-title">ClawCow<br><em>Agent</em></div>
-      <p class="model-desc">A self-evolving AI agent that crawls Wikipedia, ingests PDFs, searches the web, and runs code — all locally on your machine. It learns while you sleep.</p>
-      <a href="clawcow_agent.html" class="btn" style="background:var(--rust);color:#fff">Try ClawCow Agent →</a>
+<div class="modal-bg" id="settingsModal">
+  <div class="modal" style="max-width:440px;text-align:left">
+    <button class="modal-x" onclick="$('settingsModal').classList.remove('active')">&times;</button>
+    <div class="modal-logo" style="text-align:center">&#9881; Settings</div>
+    <div class="modal-sub" style="text-align:center">100% local brain — no API keys</div>
+    <div style="background:var(--code-bg);border:1px solid var(--code-br);border-radius:11px;padding:12px;margin-bottom:10px">
+      <div style="font-family:'DM Mono',monospace;font-size:.67rem;color:var(--text4);margin-bottom:4px;text-transform:uppercase;letter-spacing:.1em">Server</div>
+      <div id="serverStatus" style="font-size:.85rem;color:var(--text2)">Checking…</div>
     </div>
-    <div class="model-features fade-in" style="transition-delay:0.15s">
-      <div class="model-feature">
-        <div class="mf-icon">&#129504;</div>
-        <div class="mf-body">
-          <h4>Evolutionary Brain</h4>
-          <p>A population of bots compete and breed to improve prediction accuracy — no neural network, no GPU needed.</p>
+    <div style="background:var(--code-bg);border:1px solid var(--code-br);border-radius:11px;padding:12px;margin-bottom:10px">
+      <div style="font-family:'DM Mono',monospace;font-size:.67rem;color:var(--text4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em">Start server</div>
+      <div id="serverStartCmd" style="font-family:'DM Mono',monospace;font-size:.77rem;color:#c084fc;line-height:1.8">python api_server.py</div>
+      <div class="field" style="margin-top:8px;margin-bottom:0">
+        <label style="margin-bottom:4px">Agent path (folder or full api_server.py path)</label>
+        <input type="text" id="serverPathInput" placeholder="e.g. G:/Python/AcumenAI/local-ai-agent" style="font-family:'DM Mono',monospace;font-size:.78rem">
+      </div>
+      <button class="submit-btn" onclick="saveServerPath()" style="margin-top:7px;font-size:.82rem;padding:9px">Save path</button>
+      <div id="serverPathStatus" style="margin-top:6px;font-size:.78rem;color:var(--text3)"></div>
+    </div>
+    <div style="background:var(--code-bg);border:1px solid var(--code-br);border-radius:11px;padding:12px;margin-bottom:10px">
+      <div style="font-family:'DM Mono',monospace;font-size:.67rem;color:var(--text4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em">Train (PDF)</div>
+      <input type="file" id="pdfUploadInput" accept=".pdf" style="width:100%;padding:6px;border-radius:8px;border:1px solid var(--border2);background:var(--inp-bg);color:var(--text);font-size:.8rem;cursor:pointer;font-family:inherit">
+      <button class="submit-btn" onclick="uploadPDF()" style="margin-top:7px;font-size:.82rem;padding:9px">Upload &amp; ingest</button>
+      <div id="pdfUploadStatus" style="margin-top:6px;font-size:.78rem;color:var(--text3)"></div>
+    </div>
+    <button class="submit-btn" onclick="$('settingsModal').classList.remove('active')">Close</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="brainModal">
+  <div class="modal" style="max-width:540px;text-align:left">
+    <button class="modal-x" onclick="$('brainModal').classList.remove('active')">&times;</button>
+    <div class="modal-logo" style="text-align:center">&#129504; Brain dashboard</div>
+    <div id="brainStatus" style="background:var(--code-bg);border:1px solid var(--code-br);border-radius:10px;padding:12px;font-size:.82rem;color:var(--text2);line-height:1.7;white-space:pre-line;margin-bottom:12px;font-family:'DM Mono',monospace">Loading…</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <button class="submit-btn" onclick="brainAction('train')" style="font-size:.82rem;padding:8px">&#9881; Train</button>
+      <button class="submit-btn" onclick="brainAction('wiki-random')" style="font-size:.82rem;padding:8px">&#127760; Random wiki</button>
+      <button class="submit-btn" onclick="brainWikiSearch()" style="font-size:.82rem;padding:8px">&#128269; Search wiki</button>
+      <button class="submit-btn" onclick="brainAction('wiki-crawl')" style="font-size:.82rem;padding:8px">&#129432; Auto-crawl</button>
+    </div>
+    <div id="brainActionStatus" style="margin-top:8px;font-size:.78rem;color:var(--text3);text-align:center"></div>
+  </div>
+</div>
+
+<!-- commit toast -->
+<div class="commit-toast" id="commitToast"></div>
+
+<!-- learn bar -->
+<div class="learn-bar" id="learnBar">
+  <div class="learn-dot" id="learnDot"></div>
+  <span class="learn-text" id="learnText">Auto-learn: waiting…</span>
+  <span class="learn-stats" id="learnStats"></span>
+  <button class="learn-now" onclick="learnNow()">Learn now</button>
+  <button class="learn-toggle" id="learnToggle" onclick="toggleLearn()">Pause</button>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <!-- Left sidebar -->
+  <div class="sidebar">
+    <div class="sb-top">
+      <button class="new-chat" id="newChatBtn">&#43; New conversation</button>
+    </div>
+    <div class="repo-pill" id="repoPill">
+      <span style="font-size:0.85rem">&#128025;</span>
+      <div style="flex:1;min-width:0">
+        <div class="repo-pill-name" id="repoPillName">—</div>
+        <div class="repo-pill-sub" id="repoPillSub">Active repo</div>
+      </div>
+      <div class="repo-worked-pill" id="repoWorkedPill">Worked by ClawCow</div>
+      <button class="repo-pill-x" onclick="disconnectRepo()">&times;</button>
+    </div>
+    <div class="sb-label">Chats</div>
+    <div class="chat-list" id="chatList"></div>
+    <div class="sb-foot" id="sidebarFooter">
+      <div class="user-menu" id="userMenu">
+        <button class="umenu-item" onclick="openSettings()">&#9881; Settings</button>
+        <button class="umenu-item" onclick="openBrainDashboard()">&#129504; Brain dashboard</button>
+        <button class="umenu-item gh-item" onclick="$('userMenu').classList.remove('active');openModal('github')">&#128025; Connect GitHub repo</button>
+        <div class="umenu-sep"></div>
+        <button class="umenu-item danger" id="logoutBtn">&#8617; Log out</button>
+      </div>
+      <div class="user-banner" id="userBanner">
+        <div class="uavatar" id="userAvatar"></div>
+        <span class="uname" id="userName"></span>
+        <span style="color:var(--text4);font-size:.68rem">&#9679;&#9679;&#9679;</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main chat -->
+  <div class="main">
+    <div class="chat-header">
+      <span class="chat-header-title" id="chatTitle">New conversation</span>
+      <span class="model-pill">ClawCow Agent</span>
+      <div class="repo-ctx-pill" id="repoCtxPill" onclick="toggleRepoPanel()">
+        &#128025; <span id="repoCtxName">—</span>
+      </div>
+      <button id="settingsBtn" style="background:none;border:none;color:var(--text2);font-size:1rem;cursor:pointer;padding:5px 8px;border-radius:7px;margin-left:auto">&#9881;</button>
+    </div>
+    <div class="messages" id="messages">
+      <div class="welcome">
+        <div class="welcome-icon">&#129438;</div>
+        <h2>How can I help you?</h2>
+        <div class="welcome-sub" id="welcomeSub">ClawCow Agent · Local intelligence · No cloud</div>
+        <div class="chips">
+          <div class="chip" onclick="useSuggestion(this)"><strong>Write code</strong>Help me write a Python script</div>
+          <div class="chip" onclick="useSuggestion(this)"><strong>Debug an issue</strong>Find and fix a bug in my code</div>
+          <div class="chip" onclick="useSuggestion(this)"><strong>Explain a concept</strong>How does async/await work?</div>
+          <div class="chip chip-gh" id="ghChip" onclick="openModal('github')"><strong>&#128025; Connect GitHub</strong>Commit real changes to a repo</div>
         </div>
       </div>
-      <div class="model-feature">
-        <div class="mf-icon">&#128025;</div>
-        <div class="mf-body">
-          <h4>Auto-Wikipedia Crawler</h4>
-          <p>Every 45 seconds when idle, ClawCow ingests new Wikipedia articles and trains on them automatically.</p>
-        </div>
+    </div>
+    <div class="typing" id="typingIndicator">
+      <div class="avatar ai">C</div>
+      <div class="dots"><span></span><span></span><span></span></div>
+    </div>
+    <div class="input-area">
+      <div class="input-wrap">
+        <textarea class="input-pill" id="msgInput" placeholder="Message ClawCow Agent…" rows="1"></textarea>
+        <button class="send-btn" id="sendBtn">&#8593;</button>
       </div>
-      <div class="model-feature">
-        <div class="mf-icon">&#128269;</div>
-        <div class="mf-body">
-          <h4>Web Search</h4>
-          <p>DuckDuckGo integration — no API key, no tracking. Live answers when the brain doesn't know.</p>
-        </div>
+      <div class="input-hint">ClawCow Agent can make mistakes · verify important information</div>
+    </div>
+  </div>
+
+  <!-- Right repo panel -->
+  <div class="repo-panel" id="repoPanel">
+    <div class="rp-header">
+      <div class="rp-tabs">
+        <button class="rp-tab active" id="tabFiles" onclick="switchRpTab('files')">Files</button>
+        <button class="rp-tab" id="tabActivity" onclick="switchRpTab('activity')">Activity</button>
       </div>
-      <div class="model-feature">
-        <div class="mf-icon">&#9889;</div>
-        <div class="mf-body">
-          <h4>Code Execution</h4>
-          <p>Runs Python and JavaScript in sandboxed subprocesses. Writes, tests, and iterates on real code.</p>
-        </div>
-      </div>
+      <button class="rp-close" onclick="toggleRepoPanel()">&#8592;</button>
+    </div>
+    <div class="rp-body" id="rpBody">
+      <div class="act-empty">Connect a GitHub repo to browse files and see ClawCow's activity.</div>
     </div>
   </div>
-</section>
-
-<!-- PRINCIPLES -->
-<section class="principles" id="principles">
-  <div class="principles-hed">
-    <h2 class="fade-in">Built on a few hard principles</h2>
-    <p class="fade-in" style="transition-delay:0.1s">We made choices that cost us convenience — they're the right choices anyway.</p>
-  </div>
-  <div class="principles-grid">
-    <div class="principle fade-in">
-      <div class="p-num">01</div>
-      <div class="p-title">Your data stays yours</div>
-      <p class="p-desc">No telemetry, no cloud sync, no training on your conversations. Everything lives on your machine.</p>
-    </div>
-    <div class="principle fade-in" style="transition-delay:0.08s">
-      <div class="p-num">02</div>
-      <div class="p-title">Open by default</div>
-      <p class="p-desc">The source is on GitHub. Read it, fork it, audit it. We don't hide what ClawCow does.</p>
-    </div>
-    <div class="principle fade-in" style="transition-delay:0.16s">
-      <div class="p-num">03</div>
-      <div class="p-title">Continuous learning</div>
-      <p class="p-desc">Models that don't evolve become stale. ClawCow gets smarter every time it runs — by design.</p>
-    </div>
-    <div class="principle fade-in" style="transition-delay:0.08s">
-      <div class="p-num">04</div>
-      <div class="p-title">No subscription required</div>
-      <p class="p-desc">One download, yours forever. Intelligence shouldn't come with a monthly invoice.</p>
-    </div>
-    <div class="principle fade-in" style="transition-delay:0.16s">
-      <div class="p-num">05</div>
-      <div class="p-title">Hardware accessible</div>
-      <p class="p-desc">Runs on a laptop from 2018. No CUDA, no 24GB VRAM. Designed for real hardware.</p>
-    </div>
-    <div class="principle fade-in" style="transition-delay:0.24s">
-      <div class="p-num">06</div>
-      <div class="p-title">Research first</div>
-      <p class="p-desc">Every product decision is grounded in our evolutionary AI research. No hype, no vaporware.</p>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="cta-section">
-  <h2 class="fade-in">Ready to run an AI<br>that <em>actually</em> learns?</h2>
-  <p class="fade-in" style="transition-delay:0.1s">Download ClawCow Agent. No account needed. No credit card. Just clone and run.</p>
-  <div class="cta-btns fade-in" style="transition-delay:0.2s">
-    <a href="https://github.com/belugaman9981/AcumenAI" target="_blank" class="btn btn-dark">Get ClawCow Agent ↗</a>
-    <a href="#research" class="btn btn-outline">Read the docs</a>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:-0.2px;color:var(--ink)">AcumenAI</div>
-  <div class="footer-links">
-    <a href="#">Research</a>
-    <a href="#">GitHub</a>
-    <a href="#">Docs</a>
-    <a href="#">Privacy</a>
-  </div>
-  <div>© 2026 AcumenAI</div>
-</footer>
+</div>
 
 <script>
-// ── Neural canvas animation ──────────────────────────────
-const canvas = document.getElementById('neuralCanvas');
-const ctx    = canvas.getContext('2d');
-let nodes = [], W, H, raf;
+const $ = id => document.getElementById(id);
 
-function resize() {
-  const r = canvas.getBoundingClientRect();
-  W = canvas.width  = r.width;
-  H = canvas.height = r.height;
+// ── Theme ──────────────────────────────────────────────────────
+function initTheme(){
+  if(localStorage.getItem('acumen_theme')==='light') document.body.classList.add('light');
+  updateThemeIcon();
 }
-
-function initNodes() {
-  nodes = Array.from({ length: 38 }, () => ({
-    x:  Math.random() * W,
-    y:  Math.random() * H,
-    vx: (Math.random() - 0.5) * 0.45,
-    vy: (Math.random() - 0.5) * 0.45,
-    r:  Math.random() * 2.5 + 1,
-  }));
+function updateThemeIcon(){
+  $('themeToggle').innerHTML = document.body.classList.contains('light')?'&#9728;':'&#9790;';
 }
+$('themeToggle').addEventListener('click',()=>{
+  document.body.classList.toggle('light');
+  localStorage.setItem('acumen_theme',document.body.classList.contains('light')?'light':'dark');
+  updateThemeIcon();
+});
+initTheme();
 
-function draw() {
-  ctx.clearRect(0, 0, W, H);
-  nodes.forEach(n => {
-    n.x += n.vx; n.y += n.vy;
-    if (n.x < 0 || n.x > W) n.vx *= -1;
-    if (n.y < 0 || n.y > H) n.vy *= -1;
+// ── Modals ─────────────────────────────────────────────────────
+function openModal(t){ closeModals(); $(t+'Modal').classList.add('active'); }
+function closeModals(){
+  ['login','signup','github','commit','settings','brain'].forEach(t=>{
+    const m=$(t+'Modal'); if(m) m.classList.remove('active');
   });
+  $('loginError').textContent=''; $('signupError').textContent=''; $('ghTokenError').textContent='';
+}
+function switchModal(t){ closeModals(); openModal(t); }
+['loginModal','signupModal','githubModal','settingsModal','brainModal','commitModal'].forEach(id=>{
+  $(id).addEventListener('click',e=>{ if(e.target===$(id)) $(id).classList.remove('active'); });
+});
+function togglePass(id,btn){
+  const i=$(id); if(i.type==='password'){i.type='text';btn.innerHTML='&#128064;';}
+  else{i.type='password';btn.innerHTML='&#128065;';}
+}
 
-  // Draw edges
-  for (let i = 0; i < nodes.length; i++) {
-    for (let j = i + 1; j < nodes.length; j++) {
-      const dx = nodes[i].x - nodes[j].x;
-      const dy = nodes[i].y - nodes[j].y;
-      const d  = Math.sqrt(dx * dx + dy * dy);
-      if (d < 120) {
-        const alpha = (1 - d / 120) * 0.4;
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(200,87,58,${alpha})`;
-        ctx.lineWidth = 0.8;
-        ctx.moveTo(nodes[i].x, nodes[i].y);
-        ctx.lineTo(nodes[j].x, nodes[j].y);
-        ctx.stroke();
-      }
-    }
+// ── Password match ─────────────────────────────────────────────
+function checkPwMatch(){
+  const p1=$('signupPass').value, p2=$('signupPass2').value;
+  const icon=$('pwMatchIcon'), msg=$('pwMatchMsg'), inp=$('signupPass2');
+  if(!p2){icon.textContent='';icon.className='pw-match';inp.className='';msg.textContent='';return;}
+  if(p1===p2){
+    icon.textContent='✓';icon.className='pw-match ok';
+    inp.classList.add('ok');inp.classList.remove('err');msg.textContent='';
+  } else {
+    icon.textContent='✗';icon.className='pw-match err';
+    inp.classList.add('err');inp.classList.remove('ok');
+    msg.textContent='Passwords do not match';msg.style.color='#f87171';
   }
-
-  // Draw nodes
-  nodes.forEach(n => {
-    ctx.beginPath();
-    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(200,87,58,0.7)';
-    ctx.fill();
-  });
-
-  raf = requestAnimationFrame(draw);
 }
 
-window.addEventListener('resize', () => { resize(); initNodes(); });
-resize(); initNodes(); draw();
+// ── State ──────────────────────────────────────────────────────
+let currentUser=null, chats=[], activeChatId=null;
+let ghToken=null, ghUser=null, activeRepo=null, allRepos=[], selectedRepo=null;
+let clawcowBranch=null, activity=[], currentRpTab='files';
+let pendingCommitCode='', pendingCommitLang='';
 
+// ── Launch ─────────────────────────────────────────────────────
+function launchOnline(){
+  const s=localStorage.getItem('acumen_user');
+  if(s){currentUser=s;loadChats();showApp();}else{openModal('signup');}
+}
+function loginGuestOrOpen(){
+  const s=localStorage.getItem('acumen_user');
+  if(s){currentUser=s;loadChats();closeModals();showApp();}else{closeModals();openModal('signup');}
+}
+function initAuth(){
+  const s=localStorage.getItem('acumen_user');
+  if(s){currentUser=s;loadChats();showApp();}
+}
 
-// ── Scroll fade-in ───────────────────────────────────────
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.12 });
+// ── Sign Up ────────────────────────────────────────────────────
+$('signupBtn').addEventListener('click',doSignup);
+$('signupPass2').addEventListener('keydown',e=>{if(e.key==='Enter')doSignup();});
+function doSignup(){
+  const u=$('signupUser').value.trim(),p=$('signupPass').value,p2=$('signupPass2').value;
+  $('signupError').textContent='';
+  if(!u||u.length<3){$('signupError').textContent='Username must be at least 3 characters.';return;}
+  if(!p||p.length<4){$('signupError').textContent='Password must be at least 4 characters.';return;}
+  if(p!==p2){$('signupError').textContent='Passwords do not match.';return;}
+  if(localStorage.getItem('acumen_cred_'+u)){$('signupError').textContent='Username already taken.';return;}
+  localStorage.setItem('acumen_cred_'+u,p);localStorage.setItem('acumen_user',u);
+  currentUser=u;loadChats();closeModals();showApp();
+}
 
-document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+// ── Log In ─────────────────────────────────────────────────────
+$('loginBtn').addEventListener('click',doLogin);
+$('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+$('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginPass').focus();});
+function doLogin(){
+  const u=$('loginUser').value.trim(),p=$('loginPass').value;
+  $('loginError').textContent='';
+  if(!u){$('loginError').textContent='Please enter a username.';return;}
+  if(!p){$('loginError').textContent='Please enter a password.';return;}
+  const s=localStorage.getItem('acumen_cred_'+u);
+  if(!s){$('loginError').textContent='Account not found. Sign up first.';return;}
+  if(s!==p){$('loginError').textContent='Incorrect password.';return;}
+  localStorage.setItem('acumen_user',u);currentUser=u;loadChats();closeModals();showApp();
+}
+
+// ── App ────────────────────────────────────────────────────────
+function showApp(){
+  $('landing').classList.add('hidden');$('app').classList.add('active');
+  $('userAvatar').textContent=currentUser[0].toUpperCase();
+  $('userName').textContent=currentUser;
+  const t=localStorage.getItem('acumen_gh_token_'+currentUser);
+  const r=localStorage.getItem('acumen_gh_repo_'+currentUser);
+  const b=localStorage.getItem('acumen_gh_branch_'+currentUser);
+  const a=localStorage.getItem('acumen_activity_'+currentUser);
+  if(t) ghToken=t;
+  if(b) clawcowBranch=b;
+  if(a) try{activity=JSON.parse(a);}catch(e){}
+  if(r) try{activeRepo=JSON.parse(r);applyActiveRepo();}catch(e){}
+  renderChatList();
+}
+
+$('userBanner').addEventListener('click',e=>{e.stopPropagation();$('userMenu').classList.toggle('active');});
+document.addEventListener('click',e=>{if(!$('sidebarFooter').contains(e.target))$('userMenu').classList.remove('active');});
+
+function openBrainDashboard(){$('userMenu').classList.remove('active');$('brainModal').classList.add('active');fetchBrainStatus();}
+async function fetchBrainStatus(){
+  try{const r=await fetch('http://localhost:5820/brain/status');const d=await r.json();$('brainStatus').textContent=d.status||'No status';}
+  catch(e){$('brainStatus').textContent='Brain server not running.';}
+}
+async function brainAction(a){
+  const s=$('brainActionStatus');s.textContent='Working…';
+  try{const r=await fetch('http://localhost:5820/brain/'+a,{method:'POST'});const d=await r.json();s.textContent=d.result||'Done!';}
+  catch(e){s.textContent='Error: '+e.message;}
+}
+async function brainWikiSearch(){
+  const q=prompt('Search Wikipedia:');if(!q)return;
+  const s=$('brainActionStatus');s.textContent='Searching…';
+  try{const r=await fetch('http://localhost:5820/brain/wiki-search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q})});const d=await r.json();s.textContent=d.result||'Done!';}
+  catch(e){s.textContent='Error: '+e.message;}
+}
+
+$('logoutBtn').addEventListener('click',()=>{
+  $('userMenu').classList.remove('active');
+  localStorage.removeItem('acumen_user');
+  currentUser=null;chats=[];activeChatId=null;ghToken=null;ghUser=null;activeRepo=null;clawcowBranch=null;activity=[];
+  $('app').classList.remove('active');$('landing').classList.remove('hidden');
+});
+
+// ── GitHub connect ─────────────────────────────────────────────
+function ghStep(n){document.querySelectorAll('.gh-step').forEach(s=>s.classList.remove('active'));$('ghStep'+n).classList.add('active');}
+
+async function connectGitHub(){
+  const token=$('ghToken').value.trim();
+  $('ghTokenError').textContent='';
+  if(!token){$('ghTokenError').textContent='Please enter a token.';return;}
+  $('ghTokenError').textContent='Verifying…';$('ghTokenError').style.color='var(--text3)';
+  try{
+    const r=await fetch('https://api.github.com/user',{headers:{Authorization:'token '+token,Accept:'application/vnd.github.v3+json'}});
+    if(!r.ok) throw new Error('Invalid token (HTTP '+r.status+')');
+    const u=await r.json();
+    ghToken=token;ghUser=u.login;
+    if(currentUser) localStorage.setItem('acumen_gh_token_'+currentUser,token);
+    $('ghUserLabel').textContent=u.login+"'s repos";
+    $('ghTokenError').textContent='';
+    ghStep(2);loadRepos();
+  }catch(e){$('ghTokenError').textContent=e.message;$('ghTokenError').style.color='#f87171';}
+}
+
+async function loadRepos(){
+  $('repoList').innerHTML='<div class="gh-loading">&#128257; Loading…</div>';
+  try{
+    const r=await fetch('https://api.github.com/user/repos?sort=updated&per_page=80',{headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});
+    allRepos=await r.json();renderRepos(allRepos);
+  }catch(e){$('repoList').innerHTML='<div class="gh-loading" style="color:#f87171">Failed: '+e.message+'</div>';}
+}
+function renderRepos(repos){
+  const list=$('repoList');
+  if(!repos.length){list.innerHTML='<div class="gh-loading">No repos found.</div>';return;}
+  list.innerHTML=repos.map(r=>`
+    <div class="repo-card" id="rc_${r.id}" onclick="selectRepo(${r.id})">
+      <div class="repo-card-icon">${r.private?'&#128274;':'&#128196;'}</div>
+      <div class="repo-card-body">
+        <div class="repo-card-name">${esc(r.name)}</div>
+        <div class="repo-card-desc">${esc(r.description||'No description')}</div>
+        <div class="repo-card-meta"><span>${r.language||'—'}</span><span>&#11088; ${r.stargazers_count}</span><span>${r.private?'Private':'Public'}</span></div>
+      </div>
+      <div class="repo-card-check"></div>
+    </div>`).join('');
+}
+function filterRepos(){
+  const q=$('repoSearch').value.toLowerCase();
+  renderRepos(allRepos.filter(r=>r.name.toLowerCase().includes(q)||(r.description||'').toLowerCase().includes(q)));
+  if(selectedRepo){const el=$('rc_'+selectedRepo.id);if(el)el.classList.add('selected');}
+}
+function selectRepo(id){
+  document.querySelectorAll('.repo-card').forEach(c=>c.classList.remove('selected'));
+  const card=$('rc_'+id);if(card)card.classList.add('selected');
+  selectedRepo=allRepos.find(r=>r.id===id);
+  $('repoSelectBtn').disabled=false;$('repoSelectBtn').style.opacity='1';
+}
+
+async function confirmRepo(){
+  if(!selectedRepo) return;
+  activeRepo=selectedRepo;
+  if(currentUser) localStorage.setItem('acumen_gh_repo_'+currentUser,JSON.stringify(activeRepo));
+  // Create ClawCow working branch
+  await ensureClawcowBranch();
+  applyActiveRepo();
+  closeModals();
+  appendMessage('ai',`&#128025; Connected to **${activeRepo.full_name}**!\n\nI've created a working branch \`${clawcowBranch}\` where all my changes will go. You'll see real commits in your repo history with my name on them.\n\nAsk me to read a file, write code, fix a bug — I'll commit the changes directly to GitHub. 🤖`);
+  loadFileTree();
+}
+
+function applyActiveRepo(){
+  if(!activeRepo) return;
+  $('repoPill').classList.add('active');$('repoPillName').textContent=activeRepo.name;
+  $('repoPillSub').textContent='Worked on by ClawCow Agent';
+  $('repoWorkedPill').classList.add('active');
+  $('repoCtxPill').classList.add('active');$('repoCtxName').textContent=activeRepo.name;
+  const sub=$('welcomeSub');if(sub) sub.textContent='ClawCow Agent · '+activeRepo.full_name;
+  const chip=$('ghChip');if(chip){chip.querySelector('strong').textContent='&#128025; Switch repo';chip.querySelector('strong').innerHTML='&#128025; Switch repo';}
+  $('repoPanel').classList.add('active');
+  loadFileTree();renderActivity();
+}
+
+function disconnectRepo(){
+  activeRepo=null;clawcowBranch=null;selectedRepo=null;
+  $('repoPill').classList.remove('active');$('repoCtxPill').classList.remove('active');
+  $('repoPillSub').textContent='Active repo';
+  $('repoWorkedPill').classList.remove('active');
+  $('repoPanel').classList.remove('active');
+  if(currentUser){localStorage.removeItem('acumen_gh_repo_'+currentUser);localStorage.removeItem('acumen_gh_branch_'+currentUser);}
+}
+
+// ── Repo panel ─────────────────────────────────────────────────
+function toggleRepoPanel(){
+  if(!activeRepo) return;
+  $('repoPanel').classList.toggle('active');
+}
+function switchRpTab(tab){
+  currentRpTab=tab;
+  $('tabFiles').classList.toggle('active',tab==='files');
+  $('tabActivity').classList.toggle('active',tab==='activity');
+  if(tab==='files') loadFileTree(); else renderActivity();
+}
+
+async function loadFileTree(){
+  if(!activeRepo||!ghToken) return;
+  const body=$('rpBody');
+  body.innerHTML='<div class="act-empty">&#128257; Loading files…</div>';
+  try{
+    const r=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/git/trees/${activeRepo.default_branch}?recursive=1`,
+      {headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});
+    const d=await r.json();
+    if(!d.tree){body.innerHTML='<div class="act-empty">Could not load file tree.</div>';return;}
+    const files=d.tree.filter(n=>n.type==='blob').slice(0,120);
+    body.innerHTML='<div class="file-tree">'+files.map(f=>`
+      <div class="file-item" onclick="readFile('${esc(f.path)}')" title="${esc(f.path)}">
+        <span class="fi-icon">${fileIcon(f.path)}</span>
+        <span class="fi-name">${esc(f.path)}</span>
+      </div>`).join('')+'</div>';
+  }catch(e){body.innerHTML='<div class="act-empty" style="color:#f87171">'+e.message+'</div>';}
+}
+
+function fileIcon(p){
+  const ext=p.split('.').pop().toLowerCase();
+  const map={py:'🐍',js:'🟨',ts:'🔷',jsx:'⚛️',tsx:'⚛️',html:'🌐',css:'🎨',json:'📋',md:'📝',txt:'📄',sh:'⚙️',yml:'⚙️',yaml:'⚙️',env:'🔒',gitignore:'🙈',rs:'🦀',go:'🐹',java:'☕',cpp:'⚡',c:'⚡',rb:'💎',php:'🐘',sql:'🗄️'};
+  return map[ext]||'📄';
+}
+
+async function readFile(path){
+  if(!activeRepo||!ghToken) return;
+  try{
+    const r=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/contents/${encodeURIComponent(path)}`,
+      {headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});
+    const d=await r.json();
+    const content=d.encoding==='base64'?atob(d.content.replace(/\n/g,'')):d.content;
+    // Send file content to chat
+    appendMessage('ai',`📂 **${path}**\n\`\`\`\n${content.slice(0,3000)}${content.length>3000?'\n…(truncated)':''}\n\`\`\``);
+    if(!document.querySelector('.welcome')) return;
+  }catch(e){ appendMessage('ai','Could not read file: '+e.message); }
+}
+
+// ── Activity log ───────────────────────────────────────────────
+function addActivity(entry){
+  activity.unshift({...entry, ts: new Date().toLocaleTimeString()});
+  if(activity.length>50) activity.pop();
+  if(currentUser) localStorage.setItem('acumen_activity_'+currentUser,JSON.stringify(activity));
+  if(currentRpTab==='activity') renderActivity();
+}
+function renderActivity(){
+  const body=$('rpBody');
+  if(!activity.length){
+    body.innerHTML='<div class="act-empty">&#128025; No activity yet.<br><br>When ClawCow commits code or opens a pull request, it will show up here with a link.</div>';return;
+  }
+  body.innerHTML=activity.map(a=>`
+    <div class="activity-item">
+      <div class="act-badge ${a.type}">${a.type==='commit'?'&#128025; Commit':a.type==='pr'?'&#129395; Pull Request':'&#127808; Branch'}</div>
+      <div class="act-title">${esc(a.title)}</div>
+      <div class="act-meta">${a.ts} · ${esc(a.repo||'')}</div>
+      ${a.url?`<a class="act-link" href="${a.url}" target="_blank">View on GitHub →</a>`:''}
+    </div>`).join('');
+}
+
+// ── ClawCow branch ─────────────────────────────────────────────
+async function ensureClawcowBranch(){
+  if(!activeRepo||!ghToken) return;
+  if(clawcowBranch) return; // already exists
+  const branchName='clawcow/'+Date.now().toString(36);
+  try{
+    // Get default branch SHA
+    const r1=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/git/refs/heads/${activeRepo.default_branch}`,
+      {headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});
+    const d1=await r1.json();
+    const sha=d1.object.sha;
+    // Create branch
+    const r2=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/git/refs`,{
+      method:'POST',
+      headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify({ref:`refs/heads/${branchName}`,sha})
+    });
+    if(r2.ok){
+      clawcowBranch=branchName;
+      if(currentUser) localStorage.setItem('acumen_gh_branch_'+currentUser,clawcowBranch);
+      addActivity({type:'branch',title:'Created branch '+branchName,repo:activeRepo.full_name,url:`https://github.com/${activeRepo.full_name}/tree/${branchName}`});
+    }
+  }catch(e){console.warn('Branch create failed:',e); clawcowBranch='main';}
+}
+
+// ── Open commit modal ──────────────────────────────────────────
+function openCommitModal(code,lang){
+  if(!activeRepo){openModal('github');return;}
+  pendingCommitCode=code;pendingCommitLang=lang;
+  $('commitRepoLabel').textContent=activeRepo.full_name;
+  $('commitPath').value=lang?`clawcow_output.${lang}`:'clawcow_output.txt';
+  $('commitMsg').value='🤖 ClawCow Agent: add '+( lang||'file');
+  $('commitBranch').value=clawcowBranch||'clawcow/changes';
+  $('commitPreview').textContent=code.slice(0,400)+(code.length>400?'\n…':'' );
+  $('commitError').textContent='';$('commitDoBtn').textContent='&#128025; Commit + Open PR';
+  $('commitModal').classList.add('active');
+}
+
+// ── Do commit + PR ─────────────────────────────────────────────
+async function doCommit(){
+  const path=$('commitPath').value.trim();
+  const msg=$('commitMsg').value.trim()||'🤖 ClawCow Agent: update';
+  const branch=clawcowBranch||activeRepo.default_branch;
+  const clawcowAuthor={name:'ClawCow Agent',email:'clawcow-agent@users.noreply.github.com'};
+  if(!path){$('commitError').textContent='Please enter a file path.';$('commitError').style.color='#f87171';return;}
+  $('commitDoBtn').textContent='Committing…';$('commitDoBtn').disabled=true;
+  $('commitError').textContent='';
+  try{
+    // Check if file exists (need SHA to update)
+    let existingSha=null;
+    try{
+      const re=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/contents/${encodeURIComponent(path)}?ref=${branch}`,
+        {headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});
+      if(re.ok){const de=await re.json();existingSha=de.sha;}
+    }catch(e){}
+
+    // Commit the file
+    const body={
+      message:msg,
+      content:btoa(unescape(encodeURIComponent(pendingCommitCode))),
+      branch,
+      author:clawcowAuthor,
+      committer:clawcowAuthor
+    };
+    if(existingSha) body.sha=existingSha;
+    const rc=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/contents/${encodeURIComponent(path)}`,{
+      method:'PUT',
+      headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(!rc.ok){const e=await rc.json();throw new Error(e.message);}
+    const dc=await rc.json();
+    const commitUrl=dc.commit.html_url;
+    addActivity({type:'commit',title:msg,repo:activeRepo.full_name,url:commitUrl});
+    showToast(`&#128025; Committed! <a href="${commitUrl}" target="_blank">View commit →</a>`);
+
+    // Open PR
+    try{
+      const rp=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/pulls`,{
+        method:'POST',
+        headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
+        body:JSON.stringify({
+          title:'🤖 ClawCow Agent: '+msg.replace('🤖 ClawCow Agent: ',''),
+          body:`This pull request was opened automatically by **ClawCow Agent** (AcumenAI).\n\n**Changes:** ${path}\n**Commit message:** ${msg}\n\n---\n*🤖 Generated by [ClawCow Agent](https://github.com/belugaman9981/AcumenAI)*`,
+          head:branch,
+          base:activeRepo.default_branch
+        })
+      });
+      if(rp.ok){
+        const dp=await rp.json();
+        addActivity({type:'pr',title:dp.title,repo:activeRepo.full_name,url:dp.html_url});
+        showToast(`&#129395; PR opened! <a href="${dp.html_url}" target="_blank">View PR #${dp.number} →</a>`);
+      }
+    }catch(e){ console.warn('PR failed:',e); }
+
+    $('commitModal').classList.remove('active');
+    appendMessage('ai',`&#128025; Done! I committed \`${path}\` to \`${branch}\` with message: *"${msg}"*\n\nYou'll see the commit in your GitHub repo history — it shows ClawCow Agent as the author. A pull request has been opened for review.`);
+  }catch(e){
+    $('commitError').textContent='Error: '+e.message;$('commitError').style.color='#f87171';
+  }finally{
+    $('commitDoBtn').textContent='&#128025; Commit + Open PR';$('commitDoBtn').disabled=false;
+  }
+}
+
+function showToast(html,ms=6000){
+  const t=$('commitToast');t.innerHTML=html;t.classList.add('active');
+  setTimeout(()=>t.classList.remove('active'),ms);
+}
+
+// ── Chats ──────────────────────────────────────────────────────
+function loadChats(){const r=localStorage.getItem('acumen_chats_'+currentUser);chats=r?JSON.parse(r):[];}
+function saveChats(){localStorage.setItem('acumen_chats_'+currentUser,JSON.stringify(chats));}
+function renderChatList(){
+  const l=$('chatList');l.innerHTML='';
+  chats.forEach(c=>{
+    const el=document.createElement('div');
+    el.className='chat-item'+(c.id===activeChatId?' active':'');
+    el.innerHTML=`<span class="chat-ttl">${esc(c.title)}</span><button class="del" onclick="event.stopPropagation();deleteChat('${c.id}')">&times;</button>`;
+    el.addEventListener('click',()=>openChat(c.id));l.appendChild(el);
+  });
+}
+function deleteChat(id){chats=chats.filter(c=>c.id!==id);saveChats();if(activeChatId===id){activeChatId=null;showWelcome();}renderChatList();}
+$('newChatBtn').addEventListener('click',()=>{activeChatId=null;showWelcome();renderChatList();$('chatTitle').textContent='New conversation';});
+function createChat(msg){
+  const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const title=msg.length>40?msg.slice(0,40)+'…':msg;
+  const chat={id,title,messages:[]};chats.unshift(chat);
+  activeChatId=id;saveChats();renderChatList();$('chatTitle').textContent=title;return chat;
+}
+function openChat(id){activeChatId=id;const c=chats.find(x=>x.id===id);$('chatTitle').textContent=c.title;renderMessages(c.messages);renderChatList();}
+
+// ── Messages ───────────────────────────────────────────────────
+function showWelcome(){
+  $('messages').innerHTML=`
+  <div class="welcome">
+    <div class="welcome-icon">&#129438;</div>
+    <h2>How can I help you?</h2>
+    <div class="welcome-sub">${activeRepo?'ClawCow Agent · '+activeRepo.full_name:'ClawCow Agent · Local intelligence · No cloud'}</div>
+    <div class="chips">
+      <div class="chip" onclick="useSuggestion(this)"><strong>Write code</strong>Help me write a Python script</div>
+      <div class="chip" onclick="useSuggestion(this)"><strong>Debug an issue</strong>Find and fix a bug in my code</div>
+      <div class="chip" onclick="useSuggestion(this)"><strong>Explain a concept</strong>How does async/await work?</div>
+      <div class="chip chip-gh" onclick="openModal('github')"><strong>&#128025; ${activeRepo?'Switch repo':'Connect GitHub'}</strong>${activeRepo?activeRepo.full_name:'Commit real changes to a repo'}</div>
+    </div>
+  </div>`;
+}
+function renderMessages(msgs){const c=$('messages');c.innerHTML='';msgs.forEach(m=>c.appendChild(makeMsgEl(m.role,m.text)));c.scrollTop=c.scrollHeight;}
+function makeMsgEl(role,text){
+  const d=document.createElement('div');d.className='msg-row';
+  const init=role==='user'?(currentUser?currentUser[0].toUpperCase():'U'):'C';
+  d.innerHTML=`<div class="avatar ${role==='user'?'user':'ai'}">${init}</div>
+  <div class="msg-body"><div class="msg-name">${role==='user'?'You':'ClawCow Agent'}</div>
+  <div class="msg-text">${renderMsgText(text)}</div></div>`;
+  return d;
+}
+function appendMessage(role,text){
+  const w=document.querySelector('.welcome');if(w)w.remove();
+  const c=$('messages');c.appendChild(makeMsgEl(role,text));c.scrollTop=c.scrollHeight;
+}
+
+// ── Rich text rendering (with code block actions) ──────────────
+function renderMsgText(text){
+  let h=esc(text);
+  // Code blocks with GitHub action buttons
+  h=h.replace(/```(\w*)\n([\s\S]*?)```/g,(match,lang,code)=>{
+    const id='cb_'+Math.random().toString(36).slice(2,8);
+    const codeEsc=code.replace(/'/g,'&#39;');
+    const ghBtn=activeRepo?`<button class="code-action-btn gh" onclick="openCommitModal(document.getElementById('${id}').textContent,'${lang||'txt'}')">&#128025; Commit</button>`:'<button class="code-action-btn gh" onclick="openModal(\'github\')">&#128025; Connect &amp; Commit</button>';
+    return `<div class="msg-code-wrap">
+      <div class="msg-code-header">
+        <span class="msg-code-lang">${lang||'code'}</span>
+        <div class="msg-code-actions">
+          <button class="code-action-btn" onclick="copyCode('${id}')">&#128203; Copy</button>
+          ${ghBtn}
+        </div>
+      </div>
+      <pre class="msg-code-pre"><code id="${id}">${code}</code></pre>
+    </div>`;
+  });
+  h=h.replace(/`([^`]+)`/g,'<code>$1</code>');
+  h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  h=h.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  h=h.replace(/\n/g,'<br>');
+  return h;
+}
+function copyCode(id){
+  const el=document.getElementById(id);if(!el)return;
+  navigator.clipboard.writeText(el.textContent).then(()=>showToast('&#128203; Copied to clipboard',2000));
+}
+
+// ── Send ───────────────────────────────────────────────────────
+$('sendBtn').addEventListener('click',sendMessage);
+$('msgInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+$('msgInput').addEventListener('input',()=>{const el=$('msgInput');el.style.height='auto';el.style.height=Math.min(el.scrollHeight,200)+'px';});
+
+function sendMessage(){
+  const input=$('msgInput'),text=input.value.trim();if(!text)return;
+  let chat=chats.find(c=>c.id===activeChatId);if(!chat)chat=createChat(text);
+  chat.messages.push({role:'user',text});appendMessage('user',text);saveChats();
+  input.value='';input.style.height='auto';
+  $('typingIndicator').classList.add('active');$('sendBtn').disabled=true;
+  generateReply(text).then(reply=>{
+    chat.messages.push({role:'ai',text:reply});
+    $('typingIndicator').classList.remove('active');
+    appendMessage('ai',reply);saveChats();$('sendBtn').disabled=false;
+  });
+}
+
+// ── API ────────────────────────────────────────────────────────
+const LOCAL_API='http://localhost:5820';
+let serverOnline=false;
+
+function getConfiguredServerPath(){
+  return (localStorage.getItem('acumen_server_path')||'').trim();
+}
+function getServerRunCommand(){
+  const cfg=getConfiguredServerPath();
+  if(!cfg) return 'python api_server.py';
+  const clean=cfg.replace(/^"+|"+$/g,'').replace(/\\/g,'/').replace(/\/+$/,'');
+  if(clean.toLowerCase().endsWith('api_server.py')) return `python "${clean}"`;
+  return `python "${clean}/api_server.py"`;
+}
+function refreshServerCommandUI(){
+  const cmdEl=$('serverStartCmd');
+  if(cmdEl) cmdEl.textContent=getServerRunCommand();
+  const input=$('serverPathInput');
+  if(input) input.value=getConfiguredServerPath();
+}
+function saveServerPath(){
+  const input=$('serverPathInput');
+  const status=$('serverPathStatus');
+  if(!input||!status) return;
+  const path=input.value.trim();
+  if(path) localStorage.setItem('acumen_server_path',path);
+  else localStorage.removeItem('acumen_server_path');
+  refreshServerCommandUI();
+  status.textContent=path?'Saved. Start command updated.':'Cleared. Using default command.';
+  status.style.color='#22c55e';
+  checkServer();
+}
+
+async function checkServer(){
+  try{
+    const r=await fetch(LOCAL_API+'/health',{signal:AbortSignal.timeout(2000)});
+    const d=await r.json();serverOnline=true;
+    $('serverStatus').textContent='🟢 Online — '+d.bots+' bots';$('serverStatus').style.color='#22c55e';
+  }catch(e){
+    serverOnline=false;$('serverStatus').textContent='🔴 Offline — run: '+getServerRunCommand();$('serverStatus').style.color='#f87171';
+  }
+}
+setInterval(checkServer,5000);checkServer();
+
+function openSettings(){
+  $('settingsModal').classList.add('active');
+  refreshServerCommandUI();
+  const status=$('serverPathStatus');
+  if(status) status.textContent='';
+  checkServer();
+}
+$('settingsBtn').addEventListener('click',openSettings);
+$('settingsBtnGlobal')&&$('settingsBtnGlobal').addEventListener('click',openSettings);
+
+async function generateReply(msg){
+  let ctx=msg;
+  if(activeRepo) ctx=`[GitHub repo: ${activeRepo.full_name} | branch: ${clawcowBranch||activeRepo.default_branch} | url: ${activeRepo.html_url}]\n\n${msg}`;
+  if(!serverOnline) return '⚠️ Brain server is offline.\n\nRun:\n```bash\n'+getServerRunCommand()+'\n```\nThen refresh this page.';
+  try{
+    const resp=await fetch(LOCAL_API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:ctx})});
+    if(!resp.ok) throw new Error('Server error '+resp.status);
+    const data=await resp.json();
+    const reply=data.reply||'(no reply)';
+    const src=data.source||'brain';
+    return reply+(src==='live search'?' 🔍':src==='cached search'?' 📦':' 🧠');
+  }catch(e){return 'Error connecting to brain server: '+e.message;}
+}
+
+async function uploadPDF(){
+  const input=$('pdfUploadInput'),status=$('pdfUploadStatus');
+  if(!input.files.length){status.textContent='Please choose a PDF first.';return;}
+  if(!serverOnline){status.textContent='Server is offline.';return;}
+  const fd=new FormData();fd.append('file',input.files[0]);status.textContent='Uploading…';
+  try{const r=await fetch(LOCAL_API+'/pdf',{method:'POST',body:fd});const d=await r.json();status.textContent=d.result||d.error||'Done!';status.style.color=d.error?'#f87171':'#22c55e';}
+  catch(e){status.textContent='Error: '+e.message;status.style.color='#f87171';}
+}
+
+// ── Auto-learn ─────────────────────────────────────────────────
+async function pollLearnStatus(){
+  if(!serverOnline){$('learnDot').className='learn-dot paused';$('learnText').textContent='Auto-learn: server offline';$('learnStats').textContent='';return;}
+  try{
+    const r=await fetch(LOCAL_API+'/autolearn/status');const d=await r.json();
+    $('learnToggle').textContent=d.running?'Pause':'Resume';
+    if(!d.running){$('learnDot').className='learn-dot paused';$('learnText').textContent='Auto-learn paused';}
+    else if(d.busy){$('learnDot').className='learn-dot busy';$('learnText').textContent='Learning: '+d.phase+'…';}
+    else if(d.paused_for_chat){$('learnDot').className='learn-dot paused';$('learnText').textContent='Paused '+d.next_in+'s after chat…';}
+    else{$('learnDot').className='learn-dot active';$('learnText').textContent='Auto-learn active — next in '+d.next_in+'s';}
+    $('learnStats').textContent=d.total_articles+' articles · '+d.total_train_gens+' gens';
+  }catch(e){$('learnDot').className='learn-dot paused';$('learnText').textContent='Auto-learn: server offline';}
+}
+async function toggleLearn(){try{await fetch(LOCAL_API+'/autolearn/toggle',{method:'POST'});pollLearnStatus();}catch(e){}}
+async function learnNow(){try{$('learnDot').className='learn-dot busy';$('learnText').textContent='Learning now…';await fetch(LOCAL_API+'/autolearn/now',{method:'POST'});}catch(e){}}
+setInterval(pollLearnStatus,3000);pollLearnStatus();
+
+// ── Helpers ────────────────────────────────────────────────────
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function useSuggestion(el){
+  const text=el.querySelector('strong').textContent+' — '+el.childNodes[1].textContent.trim();
+  $('msgInput').value=text;sendMessage();
+}
+
+refreshServerCommandUI();
+initAuth();
 </script>
 </body>
 </html>
