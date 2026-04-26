@@ -149,6 +149,8 @@ footer a{color:var(--mx);text-decoration:none;}
 .repo-pill.active{display:flex;}
 .repo-pill-name{font-size:0.76rem;font-weight:700;color:var(--gh);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .repo-pill-sub{font-size:0.66rem;color:var(--text3);}
+.repo-worked-pill{font-size:0.64rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;padding:2px 8px;border-radius:100px;background:rgba(212,104,74,0.14);color:var(--cl);border:1px solid rgba(212,104,74,0.28);display:none;align-items:center;gap:4px;white-space:nowrap;}
+.repo-worked-pill.active{display:inline-flex;}
 .repo-pill-x{background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.85rem;padding:1px;}
 .repo-pill-x:hover{color:#f87171;}
 .sb-label{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text4);padding:12px 11px 4px;}
@@ -496,8 +498,9 @@ footer a{color:var(--mx);text-decoration:none;}
       <span style="font-size:0.85rem">&#128025;</span>
       <div style="flex:1;min-width:0">
         <div class="repo-pill-name" id="repoPillName">—</div>
-        <div class="repo-pill-sub">Active repo</div>
+        <div class="repo-pill-sub" id="repoPillSub">Active repo</div>
       </div>
+      <div class="repo-worked-pill" id="repoWorkedPill">Worked by ClawCow</div>
       <button class="repo-pill-x" onclick="disconnectRepo()">&times;</button>
     </div>
     <div class="sb-label">Chats</div>
@@ -779,6 +782,8 @@ async function confirmRepo(){
 function applyActiveRepo(){
   if(!activeRepo) return;
   $('repoPill').classList.add('active');$('repoPillName').textContent=activeRepo.name;
+  $('repoPillSub').textContent='Worked on by ClawCow Agent';
+  $('repoWorkedPill').classList.add('active');
   $('repoCtxPill').classList.add('active');$('repoCtxName').textContent=activeRepo.name;
   const sub=$('welcomeSub');if(sub) sub.textContent='ClawCow Agent · '+activeRepo.full_name;
   const chip=$('ghChip');if(chip){chip.querySelector('strong').textContent='&#128025; Switch repo';chip.querySelector('strong').innerHTML='&#128025; Switch repo';}
@@ -789,6 +794,8 @@ function applyActiveRepo(){
 function disconnectRepo(){
   activeRepo=null;clawcowBranch=null;selectedRepo=null;
   $('repoPill').classList.remove('active');$('repoCtxPill').classList.remove('active');
+  $('repoPillSub').textContent='Active repo';
+  $('repoWorkedPill').classList.remove('active');
   $('repoPanel').classList.remove('active');
   if(currentUser){localStorage.removeItem('acumen_gh_repo_'+currentUser);localStorage.removeItem('acumen_gh_branch_'+currentUser);}
 }
