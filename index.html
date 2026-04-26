@@ -1142,10 +1142,7 @@ $('settingsBtnGlobal')&&$('settingsBtnGlobal').addEventListener('click',openSett
 async function generateReply(msg){
   let ctx=msg;
   if(activeRepo) ctx=`[GitHub repo: ${activeRepo.full_name} | branch: ${clawcowBranch||activeRepo.default_branch} | url: ${activeRepo.html_url}]\n\n${msg}`;
-  if(!serverOnline) return `⚠️ Brain server is offline.\n\nRun:\n\
-\
-\
-${'```bash'}\n${getServerRunCommand()}\n${'```'}\nThen refresh this page.`;
+  if(!serverOnline) return '⚠️ Brain server is offline.\n\nRun:\n```bash\n'+getServerRunCommand()+'\n```\nThen refresh this page.';
   try{
     const resp=await fetch(LOCAL_API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:ctx})});
     if(!resp.ok) throw new Error('Server error '+resp.status);
