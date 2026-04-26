@@ -346,8 +346,9 @@ footer a{color:var(--mx);text-decoration:none;}
       <div class="code-block">
         <span class="c-comment"># Clone the repo</span><br>
         <span class="c-cmd">git clone</span> https://github.com/belugaman9981/AcumenAI.git<br>
-        <span class="c-cmd">cd</span> AcumenAI/local-ai-agent<br><br>
-        <span class="c-comment"># Install and run</span><br>
+        <span class="c-comment"># Go to the folder with api_server.py</span><br>
+        <span class="c-cmd">cd</span> your/path/to/local-ai-agent<br><br>
+        <span class="c-comment"># Install and run (or set the path in Settings)</span><br>
         <span class="c-cmd">pip install</span> <span class="c-flag">-r</span> requirements.txt<br>
         <span class="c-cmd">python</span> api_server.py
       </div>
@@ -448,7 +449,13 @@ footer a{color:var(--mx);text-decoration:none;}
     </div>
     <div style="background:var(--code-bg);border:1px solid var(--code-br);border-radius:11px;padding:12px;margin-bottom:10px">
       <div style="font-family:'DM Mono',monospace;font-size:.67rem;color:var(--text4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em">Start server</div>
-      <div style="font-family:'DM Mono',monospace;font-size:.77rem;color:#c084fc;line-height:1.8">python api_server.py</div>
+      <div id="serverStartCmd" style="font-family:'DM Mono',monospace;font-size:.77rem;color:#c084fc;line-height:1.8">python api_server.py</div>
+      <div class="field" style="margin-top:8px;margin-bottom:0">
+        <label style="margin-bottom:4px">Agent path (folder or full api_server.py path)</label>
+        <input type="text" id="serverPathInput" placeholder="e.g. G:/Python/AcumenAI/local-ai-agent" style="font-family:'DM Mono',monospace;font-size:.78rem">
+      </div>
+      <button class="submit-btn" onclick="saveServerPath()" style="margin-top:7px;font-size:.82rem;padding:9px">Save path</button>
+      <div id="serverPathStatus" style="margin-top:6px;font-size:.78rem;color:var(--text3)"></div>
     </div>
     <div style="background:var(--code-bg);border:1px solid var(--code-br);border-radius:11px;padding:12px;margin-bottom:10px">
       <div style="font-family:'DM Mono',monospace;font-size:.67rem;color:var(--text4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em">Train (PDF)</div>
@@ -1081,25 +1088,64 @@ function sendMessage(){
 // ── API ────────────────────────────────────────────────────────
 const LOCAL_API='http://localhost:5820';
 let serverOnline=false;
+
+function getConfiguredServerPath(){
+  return (localStorage.getItem('acumen_server_path')||'').trim();
+}
+function getServerRunCommand(){
+  const cfg=getConfiguredServerPath();
+  if(!cfg) return 'python api_server.py';
+  const clean=cfg.replace(/^"+|"+$/g,'').replace(/\\/g,'/').replace(/\/+$/,'');
+  if(clean.toLowerCase().endsWith('api_server.py')) return `python "${clean}"`;
+  return `python "${clean}/api_server.py"`;
+}
+function refreshServerCommandUI(){
+  const cmdEl=$('serverStartCmd');
+  if(cmdEl) cmdEl.textContent=getServerRunCommand();
+  const input=$('serverPathInput');
+  if(input) input.value=getConfiguredServerPath();
+}
+function saveServerPath(){
+  const input=$('serverPathInput');
+  const status=$('serverPathStatus');
+  if(!input||!status) return;
+  const path=input.value.trim();
+  if(path) localStorage.setItem('acumen_server_path',path);
+  else localStorage.removeItem('acumen_server_path');
+  refreshServerCommandUI();
+  status.textContent=path?'Saved. Start command updated.':'Cleared. Using default command.';
+  status.style.color='#22c55e';
+  checkServer();
+}
+
 async function checkServer(){
   try{
     const r=await fetch(LOCAL_API+'/health',{signal:AbortSignal.timeout(2000)});
     const d=await r.json();serverOnline=true;
     $('serverStatus').textContent='🟢 Online — '+d.bots+' bots';$('serverStatus').style.color='#22c55e';
   }catch(e){
-    serverOnline=false;$('serverStatus').textContent='🔴 Offline — run: python api_server.py';$('serverStatus').style.color='#f87171';
+    serverOnline=false;$('serverStatus').textContent='🔴 Offline — run: '+getServerRunCommand();$('serverStatus').style.color='#f87171';
   }
 }
 setInterval(checkServer,5000);checkServer();
 
-function openSettings(){$('settingsModal').classList.add('active');checkServer();}
+function openSettings(){
+  $('settingsModal').classList.add('active');
+  refreshServerCommandUI();
+  const status=$('serverPathStatus');
+  if(status) status.textContent='';
+  checkServer();
+}
 $('settingsBtn').addEventListener('click',openSettings);
 $('settingsBtnGlobal')&&$('settingsBtnGlobal').addEventListener('click',openSettings);
 
 async function generateReply(msg){
   let ctx=msg;
   if(activeRepo) ctx=`[GitHub repo: ${activeRepo.full_name} | branch: ${clawcowBranch||activeRepo.default_branch} | url: ${activeRepo.html_url}]\n\n${msg}`;
-  if(!serverOnline) return '⚠️ Brain server is offline.\n\nRun:\n```bash\npython api_server.py\n```\nThen refresh this page.';
+  if(!serverOnline) return `⚠️ Brain server is offline.\n\nRun:\n\
+\
+\
+${'```bash'}\n${getServerRunCommand()}\n${'```'}\nThen refresh this page.`;
   try{
     const resp=await fetch(LOCAL_API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:ctx})});
     if(!resp.ok) throw new Error('Server error '+resp.status);
@@ -1143,6 +1189,7 @@ function useSuggestion(el){
   $('msgInput').value=text;sendMessage();
 }
 
+refreshServerCommandUI();
 initAuth();
 </script>
 </body>
