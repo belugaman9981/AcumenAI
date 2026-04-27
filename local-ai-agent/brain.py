@@ -912,6 +912,15 @@ class EvolutionBrain:
         self.feedback["disliked_words"] = dict(disliked_words.most_common(120))
         self.save()
 
+    # ── Backwards compatibility shims ─────────────────────────────────────────
+    def _rebuild_char_counts(self) -> None:
+        """Called by wiki_ingest.py — rebuilds are now handled automatically."""
+        pass
+
+    def _rebuild_word_counts(self) -> None:
+        """Called by wiki_ingest.py — rebuilds are now handled automatically."""
+        pass
+
     def style_hint(self, current_prompt: str = "") -> str:
         likes    = int(self.feedback.get("likes", 0))
         dislikes = int(self.feedback.get("dislikes", 0))
