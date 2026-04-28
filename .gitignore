@@ -4,5 +4,10 @@ local-ai-agent/brain_state.ngrams.db-wal
 local-ai-agent/brain_state.ngrams.db-shm
 local-ai-agent/corpus_files/
 local-ai-agent/chat_history/
+__pycache__/
 **/__pycache__/
 *.pyc
+*.py[cod]
+*.pyo
+*.pyd
+.Python
