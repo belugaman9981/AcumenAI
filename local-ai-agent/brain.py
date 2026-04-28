@@ -380,7 +380,19 @@ class EvolutionBrain:
             "feedback": self.feedback,
             "saved_at": time.time(),
         }
-        self.state_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        tmp_path = self.state_path.with_suffix(".tmp")
+        try:
+            tmp_path.write_text(
+                json.dumps(payload, indent=2, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            if self.state_path.exists():
+                self.state_path.unlink()
+            tmp_path.rename(self.state_path)
+        except Exception:
+            if tmp_path.exists():
+                tmp_path.unlink()
+            raise
 
     # ── Corpus helpers ─────────────────────────────────────────────────────────
 
