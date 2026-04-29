@@ -5,7 +5,6 @@ No API keys. No subscriptions. No external AI services.
 
 > Try the website: https://belugaman9981.github.io/AcumenAI/
 
-
 ---
 
 ## How it works
