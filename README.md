@@ -9,7 +9,7 @@ No API keys. No subscriptions. No external AI services.
 
 ## How it works
 
-AcumenAI has a population of **48 evolved bots** that learn from Wikipedia,
+AcumenAI has a population of **Any Amount of bots the user want currently at 48 evolved bots** that learn from Wikipedia,
 text files, and PDF documents you feed it. The more you train it, the smarter
 it gets. Live questions (like crypto prices or news) are answered automatically
 via DuckDuckGo search — no API key needed.
