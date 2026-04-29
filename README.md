@@ -23,7 +23,6 @@ via DuckDuckGo search — no API key needed.
 winget install Python.Python.3.11
 ```
 
-
 **Step 2 — Install dependencies**
 ```powershell
 cd local-ai-agent
