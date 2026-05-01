@@ -748,9 +748,9 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
     <div class="settings-section">
       <h4>Brain server</h4>
       <div class="server-status-box" id="serverStatus">🔴 Checking…</div>
-      <div class="server-cmd" id="serverStartCmd">python api_server.py</div>
+      <div class="server-cmd" id="serverStartCmd">python brain_server.py</div>
       <div class="settings-row">
-        <input type="text" id="serverPathInput" placeholder="Custom path to api_server.py (optional)">
+        <input type="text" id="serverPathInput" placeholder="Custom path to brain_server.py (optional)">
         <button onclick="saveServerPath()">Save</button>
       </div>
       <div class="settings-note" id="serverPathStatus"></div>
@@ -857,7 +857,7 @@ function sendMessage(){const input=$('msgInput'),text=input.value.trim();if(!tex
 const LOCAL_API='http://localhost:5820';
 let serverOnline=false;
 function getConfiguredServerPath(){return (localStorage.getItem('acumen_server_path')||'').trim();}
-function getServerRunCommand(){const cfg=getConfiguredServerPath();if(!cfg)return 'python api_server.py';const clean=cfg.replace(/^"+|"+$/g,'').replace(/\\/g,'/').replace(/\/+$/,'');if(clean.toLowerCase().endsWith('api_server.py'))return `python "${clean}"`;return `python "${clean}/api_server.py"`;}
+function getServerRunCommand(){const cfg=getConfiguredServerPath();if(!cfg)return 'python brain_server.py';const clean=cfg.replace(/^"+|"+$/g,'').replace(/\\/g,'/').replace(/\/+$/,'');if(clean.toLowerCase().endsWith('brain_server.py'))return `python "${clean}"`;return `python "${clean}/brain_server.py"`;}
 function refreshServerCommandUI(){const cmdEl=$('serverStartCmd');if(cmdEl)cmdEl.textContent=getServerRunCommand();const input=$('serverPathInput');if(input)input.value=getConfiguredServerPath();}
 function saveServerPath(){const input=$('serverPathInput'),status=$('serverPathStatus');if(!input||!status)return;const path=input.value.trim();if(path)localStorage.setItem('acumen_server_path',path);else localStorage.removeItem('acumen_server_path');refreshServerCommandUI();status.textContent=path?'Saved.':'Cleared.';status.style.color='var(--gh)';checkServer();}
 async function checkServer(){try{const r=await fetch(LOCAL_API+'/health',{signal:AbortSignal.timeout(2000)});const d=await r.json();serverOnline=true;$('serverStatus').textContent='🟢 Online — '+d.bots+' bots';$('serverStatus').style.color='var(--gh)';}catch(e){serverOnline=false;$('serverStatus').textContent='🔴 Offline — run: '+getServerRunCommand();$('serverStatus').style.color='#f87171';}}

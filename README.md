@@ -51,7 +51,7 @@ to the brain. You need two PowerShell windows:
 **Window 1 — start the brain server:**
 ```powershell
 cd local-ai-agent
-python api_server.py
+python brain_server.py
 ```
 
 **Window 2 — open the website:**
@@ -71,7 +71,7 @@ AcumenAI/
 ├── index.html                  ← Website (open in browser)
 └── local-ai-agent/
     ├── main.py                 ← Terminal chat entry point
-    ├── api_server.py           ← Local web server (bridges website ↔ brain)
+    ├── brain_server.py         ← Local web server (bridges website ↔ brain)
     ├── agent.py                ← Response engine (brain + search)
     ├── brain.py                ← Evolutionary learning engine (48 bots)
     ├── search_cache.py         ← Smart DuckDuckGo search with caching
