@@ -866,7 +866,7 @@ $('sendBtn').addEventListener('click',sendMessage);
 $('msgInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
 $('msgInput').addEventListener('input',()=>{const el=$('msgInput');el.style.height='auto';el.style.height=Math.min(el.scrollHeight,200)+'px';});
 function sendMessage(){const input=$('msgInput'),text=input.value.trim();if(!text)return;let chat=chats.find(c=>c.id===activeChatId);if(!chat)chat=createChat(text);chat.messages.push({role:'user',text});appendMessage('user',text);saveChats();input.value='';input.style.height='auto';$('typingIndicator').classList.add('active');$('sendBtn').disabled=true;generateReply(text).then(reply=>{chat.messages.push({role:'ai',text:reply});$('typingIndicator').classList.remove('active');appendMessage('ai',reply);saveChats();$('sendBtn').disabled=false;});}
-const LOCAL_API='http://localhost:5820';
+const LOCAL_API='http://localhost:5820'; 
 let serverOnline=false;
 function getConfiguredServerPath(){return (localStorage.getItem('acumen_server_path')||'').trim();}
 function getServerRunCommand(){const cfg=getConfiguredServerPath();if(!cfg)return 'python brain_server.py';const clean=cfg.replace(/^"+|"+$/g,'').replace(/\\/g,'/').replace(/\/+$/,'');if(clean.toLowerCase().endsWith('brain_server.py'))return `python "${clean}"`;return `python "${clean}/brain_server.py"`;}
