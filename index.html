@@ -402,7 +402,8 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
     <p class="hero-sub">A population of 48 evolved neural bots that run on your hardware — no API keys, no subscriptions, no server farm in Virginia. The more you train it, the smarter it gets.</p>
     <div class="hero-actions">
       <button class="h-btn h-btn-main" onclick="launchOnline()">Try ClawCow Agent</button>
-      <a class="h-btn h-btn-sec" href="https://github.com/belugaman9981/AcumenAI" target="_blank">Read the docs</a>
+      <a class="h-btn h-btn-gh" href="https://github.com/belugaman9981/AcumenAI" target="_blank">★ GitHub</a>
+      <a class="h-btn h-btn-sec" href="#features">See how it works</a>
     </div>
   </section>
 
@@ -412,8 +413,8 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
       <div class="feat-left">
         <div class="feat-eyebrow"><span class="feat-eyebrow-line"></span>Flagship Agent · ClawCow</div>
         <h2><em>ClawCow</em><br>Agent</h2>
-        <p>Our first-party agent — a self-healing Wikipedia crawler and evolving human understanding using AcumenAI's evolutionary brain. ClawCow reads files, writes code, commits to GitHub, and opens pull requests entirely from your local machine.</p>
-        <a class="feat-explore-btn" onclick="launchOnline()">Explore the model →</a>
+        <p>ClawCow is AcumenAI's flagship agent — a self-improving system that crawls Wikipedia, reads your codebase, writes and commits code to GitHub, and opens pull requests, all from your local machine. No API key, no cloud, no data leaving your desk.</p>
+        <a class="feat-explore-btn" onclick="launchOnline()">Launch agent →</a>
       </div>
       <div class="feat-right">
         <div class="feat-neural">
@@ -496,8 +497,8 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
   <div class="manifesto">
     <div class="man-label">Our belief · AcumenAI</div>
     <h2>Intelligence should belong to the person using it —<br><em>not a server farm in Virginia.</em></h2>
-    <p>AcumenAI was built out of frustration with platforms that always home, always train, and keep your data to themselves. We believe a model that runs entirely on your hardware is fundamentally more trustworthy.</p>
-    <p>Our evolved brain runs on ideas from small-population evolution of neural nets that compounds predictions over time, the greatest dataset, the CPU required, and relentless iteration.</p>
+    <p>AcumenAI was built out of frustration with platforms that phone home, train on your data, and keep the results to themselves. A model that runs entirely on your hardware is fundamentally more trustworthy — and fundamentally more yours.</p>
+    <p>Our evolutionary brain is built on small-population neural evolution: a method that compounds prediction accuracy across generations, seeded by the world's largest open knowledge base, and constrained only by iteration speed and the CPU in front of you.</p>
   </div>
 
   <!-- CLAWCOW SECTION -->
@@ -576,7 +577,7 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
       <p>Download ClawCow Agent, throw it some Wikipedia articles, and run it for an hour. See for yourself what an AI looks like when it doesn't forget.</p>
       <div class="cta-btns">
         <button class="h-btn h-btn-main" onclick="launchOnline()">Get ClawCow Agent</button>
-        <a class="h-btn h-btn-sec" href="https://github.com/belugaman9981/AcumenAI" target="_blank">Read the docs</a>
+        <a class="h-btn h-btn-gh" href="https://github.com/belugaman9981/AcumenAI" target="_blank">★ GitHub</a>
       </div>
     </div>
   </div>
@@ -871,7 +872,7 @@ async function toggleLearn(){try{await fetch(LOCAL_API+'/autolearn/toggle',{meth
 async function learnNow(){try{$('learnDot').className='learn-dot busy';$('learnText').textContent='Learning now…';await fetch(LOCAL_API+'/autolearn/now',{method:'POST'});}catch(e){}}
 setInterval(pollLearnStatus,3000);pollLearnStatus();
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
-function useSuggestion(el){const text=el.querySelector('strong').textContent+' — '+el.childNodes[1].textContent.trim();$('msgInput').value=text;sendMessage();}
+function useSuggestion(el){const bodyNode=el.querySelector('strong').nextSibling;const text=bodyNode?bodyNode.textContent.trim():el.textContent.trim();$('msgInput').value=text;sendMessage();}
 refreshServerCommandUI();
 initAuth();
 </script>
