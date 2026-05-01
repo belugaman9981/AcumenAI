@@ -862,7 +862,7 @@
             <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text4);margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em">Start Server</div>
             <div style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent);line-height:1.8">
                 cd G:\Python\AcumenAI\local-ai-agent<br>
-                python api_server.py
+                python brain_server.py
             </div>
         </div>
 
@@ -1123,7 +1123,7 @@ async function fetchBrainStatus() {
         const data = await resp.json();
         $('brainStatus').textContent = data.status || 'No status available';
     } catch (e) {
-        $('brainStatus').textContent = 'Brain server not running. Start with: python api_server.py';
+        $('brainStatus').textContent = 'Brain server not running. Start with: python brain_server.py';
     }
 }
 
@@ -1308,7 +1308,7 @@ async function checkServer() {
         $('serverStatus').style.color = '#22c55e';
     } catch(e) {
         serverOnline = false;
-        $('serverStatus').textContent = '🔴 Brain server offline — run: python api_server.py';
+        $('serverStatus').textContent = '🔴 Brain server offline — run: python brain_server.py';
         $('serverStatus').style.color = '#ef4444';
     }
 }
@@ -1329,7 +1329,7 @@ function resetConversation() { conversationHistory = []; }
 // -- AI Replies via local brain (no API key needed) --
 async function generateReply(msg) {
     if (!serverOnline) {
-        return '⚠️ Brain server is offline. Open PowerShell and run:\n\n  cd G:\\Python\\AcumenAI\\local-ai-agent\n  python api_server.py\n\nThen refresh this page.';
+        return '⚠️ Brain server is offline. Open PowerShell and run:\n\n  cd G:\\Python\\AcumenAI\\local-ai-agent\n  python brain_server.py\n\nThen refresh this page.';
     }
     conversationHistory.push({ role: 'user', content: msg });
     if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);

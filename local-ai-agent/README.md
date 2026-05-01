@@ -125,7 +125,7 @@ Write-Host "Done!" -ForegroundColor Green
 Start the local server to use the website:
 
 ```powershell
-python api_server.py
+python brain_server.py
 ```
 
 Then open `../index.html` in your browser. The settings panel shows a
