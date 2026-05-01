@@ -1227,7 +1227,7 @@ function switchModal(t){closeModals();openModal(t);}
 ['loginModal','signupModal','githubModal','settingsModal','brainModal','commitModal'].forEach(id=>{$(id).addEventListener('click',e=>{if(e.target===$(id))$(id).classList.remove('active');});});
 
 function togglePass(id,btn){const i=$(id);if(i.type==='password'){i.type='text';btn.innerHTML='&#128064;';}else{i.type='password';btn.innerHTML='&#128065;';}}
-function checkPwMatch(){const p1=$('signupPass').value,p2=$('signupPass2').value,icon=$('pwMatchIcon'),msg=$('pwMatchMsg'),inp=$('signupPass2');if(!p2){icon.textContent='';icon.className='pw-match';inp.className='';msg.textContent='';return;}if(p1===p2){icon.textContent='✓';icon.className='pw-match ok';inp.classList.add('ok');inp.classList.remove('err');msg.textContent='';}else{icon.textContent='✗';icon.className='pw-match err';inp.classList.add('err');inp.classList.remove('ok');msg.textContent='Passwords do not match';}}
+function checkPwMatch(){const p1=$('signupPass').value,p2=$('signupPass2').value,icon=$('pwMatchIcon'),msg=$('pwMatchMsg'),inp=$('signupPass2');if(!p2){icon.textContent='';icon.className='pw-match';inp.className='';msg.textContent='';return;}if(p1===p2){icon.textContent='✓';icon.className='pw-match ok';inp.classList.add('ok');inp.classList.remove('err');msg.textContent='';}else{icon.textContent='✗';icon.className='pw-match err';inp.classList.add('err');inp.classList.remove('ok');msg.textContent='Passwords do not match.';}}
 
 let currentUser=null,chats=[],activeChatId=null;
 let ghToken=null,ghUser=null,activeRepo=null,allRepos=[],selectedRepo=null;
