@@ -4,9 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ClawCow Agent — by AcumenAI</title>
+<meta name="description" content="ClawCow Agent by AcumenAI — a self-improving local AI that runs on your hardware. No API keys, no subscriptions. Train it with Wikipedia, PDFs, and your codebase.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ClawCow Agent — by AcumenAI">
+<meta property="og:description" content="Local AI that thinks and learns for itself. A population of 48 evolved neural bots that run on your hardware — no API keys, no cloud.">
+<meta property="og:url" content="https://belugaman9981.github.io/AcumenAI/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ClawCow Agent — by AcumenAI">
+<meta name="twitter:description" content="Local AI that thinks and learns for itself. Runs on your CPU. No API keys, no subscriptions.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400;1,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐄</text></svg>">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -367,6 +376,45 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
 /* Scroll reveal */
 .reveal-target{opacity:0;transform:translateY(28px);transition:opacity 0.65s cubic-bezier(0.16,1,0.3,1),transform 0.65s cubic-bezier(0.16,1,0.3,1);}
 .reveal-target.reveal-visible{opacity:1;transform:none;}
+
+/* Neural net active path animation */
+@keyframes dash-flow{to{stroke-dashoffset:-24;}}
+.neural-active-path{stroke-dasharray:6 6;stroke-dashoffset:0;animation:dash-flow 0.9s linear infinite;}
+
+/* HOW IT WORKS */
+.how-section{padding:80px 40px;border-bottom:1px solid var(--border);}
+.how-inner{max-width:1100px;margin:0 auto;}
+.how-label{font-family:var(--mono);font-size:0.67rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
+.how-head{font-size:clamp(1.4rem,2.5vw,2rem);font-weight:800;letter-spacing:-0.8px;margin-bottom:48px;}
+.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.how-step{padding:28px;border-right:1px solid var(--border);}
+.how-step:last-child{border-right:none;}
+.how-step-num{font-family:var(--mono);font-size:0.65rem;color:var(--text4);margin-bottom:14px;letter-spacing:0.06em;}
+.how-step h4{font-size:0.88rem;font-weight:700;margin-bottom:7px;color:var(--text);}
+.how-step p{font-size:0.79rem;color:var(--text2);line-height:1.65;margin-bottom:12px;}
+.how-code{background:var(--code-bg);border:1px solid var(--code-br);border-radius:8px;padding:10px 14px;position:relative;margin-top:4px;}
+.how-code pre{margin:0;overflow-x:auto;}
+.how-code code{font-family:var(--mono);font-size:0.73rem;color:var(--cl);white-space:pre;}
+.how-copy{position:absolute;top:6px;right:6px;padding:2px 8px;border-radius:5px;border:1px solid var(--border2);background:var(--bg2);color:var(--text3);font-size:0.67rem;cursor:pointer;font-family:var(--font);transition:all 0.15s;}
+.how-copy:hover{color:var(--text);}
+/* MOBILE NAV */
+.hamburger{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:6px;border-radius:7px;transition:background 0.15s;}
+.hamburger:hover{background:var(--surface);}
+.hamburger span{display:block;width:18px;height:2px;background:var(--text2);border-radius:2px;transition:all 0.2s;}
+.mobile-nav-overlay{display:none;position:fixed;inset:0;background:var(--overlay);z-index:500;backdrop-filter:blur(8px);}
+.mobile-nav-overlay.active{display:block;}
+.mobile-nav-panel{position:fixed;top:0;right:0;height:100%;width:230px;background:var(--bg2);border-left:1px solid var(--border2);padding:52px 16px 24px;display:flex;flex-direction:column;gap:4px;z-index:501;transform:translateX(100%);transition:transform 0.25s cubic-bezier(0.16,1,0.3,1);}
+.mobile-nav-overlay.active .mobile-nav-panel{transform:none;}
+.mobile-nav-panel a,.mnav-btn{display:block;padding:11px 14px;border-radius:9px;font-size:0.9rem;color:var(--text2);text-decoration:none;transition:all 0.12s;background:none;border:none;width:100%;text-align:left;cursor:pointer;font-family:var(--font);}
+.mobile-nav-panel a:hover,.mnav-btn:hover{color:var(--text);background:var(--surface);}
+.mobile-nav-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;transition:all 0.15s;}
+.mobile-nav-close:hover{color:var(--text);background:var(--surface);}
+/* TIMESTAMPS */
+.msg-ts{font-size:0.67rem;color:var(--text4);margin-left:8px;opacity:0;transition:opacity 0.15s;font-family:var(--mono);}
+.msg-row:hover .msg-ts{opacity:1;}
+/* CHAT EMPTY */
+.chat-empty{padding:24px 14px;font-size:0.78rem;color:var(--text3);line-height:1.75;text-align:center;}
+
 @media(max-width:720px){
   .featured-inner,.clawcow-inner{grid-template-columns:1fr;}
   .stats-inner{grid-template-columns:1fr;}
@@ -374,15 +422,21 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
   .prin-grid{grid-template-columns:1fr;}
   .prin-item{border-right:none;}
   .top-strip{padding:12px 20px;}
+  .strip-links{display:none;}
+  .hamburger{display:flex;}
   .manifesto,.principles,.cta-section,.featured,.clawcow-section,.stats-row{padding-left:20px;padding-right:20px;}
   .manifesto,.principles{padding:56px 20px;}
+  .how-steps{grid-template-columns:1fr;}
+  .how-step{border-right:none;border-bottom:1px solid var(--border);}
+  .how-step:last-child{border-bottom:none;}
+  .how-section{padding:56px 20px;}
 }
 </style>
 </head>
 <body>
 
-<button class="corner-btn" id="themeToggle">&#9790;</button>
-<button class="corner-btn" id="settingsBtnGlobal">&#9881;</button>
+<button class="corner-btn" id="themeToggle" aria-label="Toggle theme">&#9790;</button>
+<button class="corner-btn" id="settingsBtnGlobal" aria-label="Open settings">&#9881;</button>
 
 <!-- ══════════════════════ LANDING ══════════════════════ -->
 <div id="landing">
@@ -401,6 +455,7 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
     <div class="strip-cta">
       <button class="s-btn s-btn-ghost" onclick="openModal('login')">Sign in</button>
       <button class="s-btn s-btn-fill" onclick="launchOnline()">Try ClawCow Agent</button>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" onclick="openMobileNav()"><span></span><span></span><span></span></button>
     </div>
   </div>
 
@@ -412,10 +467,39 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
     <p class="hero-sub">A population of 48 evolved neural bots that run on your hardware — no API keys, no subscriptions, no server farm in Virginia. The more you train it, the smarter it gets.</p>
     <div class="hero-actions">
       <button class="h-btn h-btn-main" onclick="launchOnline()">Try ClawCow Agent</button>
-      <a class="h-btn h-btn-gh" href="https://github.com/belugaman9981/AcumenAI" target="_blank">★ GitHub</a>
+      <a class="h-btn h-btn-gh" href="https://github.com/belugaman9981/AcumenAI" target="_blank" rel="noopener noreferrer">★ GitHub</a>
       <a class="h-btn h-btn-sec" href="#features">See how it works</a>
     </div>
   </section>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-section">
+    <div class="how-inner">
+      <div class="how-label">Get started in minutes</div>
+      <h2 class="how-head">Three steps to your own AI</h2>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="how-step-num">01</div>
+          <h4>Clone &amp; install</h4>
+          <p>Grab the repo and install dependencies with pip. No CUDA, no containers, no exotic setup.</p>
+          <div class="how-code"><button class="how-copy" onclick="copyHowCode(this)">Copy</button><pre><code>git clone https://github.com/belugaman9981/AcumenAI
+cd AcumenAI/local-ai-agent
+pip install -r requirements.txt</code></pre></div>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">02</div>
+          <h4>Start the brain server</h4>
+          <p>Fire up the local API that powers ClawCow Agent. Leave it running in the background.</p>
+          <div class="how-code"><button class="how-copy" onclick="copyHowCode(this)">Copy</button><pre><code>python brain_server.py</code></pre></div>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">03</div>
+          <h4>Open and chat</h4>
+          <p>Open <code style="font-family:var(--mono);font-size:0.85em;color:var(--cl)">index.html</code> in your browser. Sign up locally, connect GitHub if you like, and start training your brain.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- FEATURED: ClawCow highlight -->
   <div class="featured" id="features">
@@ -467,7 +551,7 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
               <line x1="335" y1="155" x2="394" y2="130"/>
             </g>
             <!-- Bright active connection -->
-            <g stroke="rgba(212,104,74,0.6)" stroke-width="1.5" fill="none">
+            <g stroke="rgba(212,104,74,0.6)" stroke-width="1.5" fill="none" class="neural-active-path">
               <line x1="65" y1="110" x2="145" y2="120"/><line x1="155" y1="120" x2="235" y2="95"/><line x1="245" y1="95" x2="325" y2="110"/><line x1="335" y1="110" x2="394" y2="130"/>
             </g>
             <!-- Text label -->
@@ -587,7 +671,7 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
       <p>Download ClawCow Agent, throw it some Wikipedia articles, and run it for an hour. See for yourself what an AI looks like when it doesn't forget.</p>
       <div class="cta-btns">
         <button class="h-btn h-btn-main" onclick="launchOnline()">Get ClawCow Agent</button>
-        <a class="h-btn h-btn-gh" href="https://github.com/belugaman9981/AcumenAI" target="_blank">★ GitHub</a>
+        <a class="h-btn h-btn-gh" href="https://github.com/belugaman9981/AcumenAI" target="_blank" rel="noopener noreferrer">★ GitHub</a>
       </div>
     </div>
   </div>
@@ -595,11 +679,23 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
   <footer>
     <div class="footer-brand"><strong>AcumenAI</strong> &nbsp;·&nbsp; ClawCow Agent &nbsp;·&nbsp; MIT License</div>
     <div class="footer-links">
-      <a href="https://github.com/belugaman9981/AcumenAI" target="_blank">GitHub</a>
+      <a href="https://github.com/belugaman9981/AcumenAI" target="_blank" rel="noopener noreferrer" rel="noopener noreferrer">GitHub</a>
       <a href="#features">Features</a>
       <a href="#principles">Principles</a>
     </div>
   </footer>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="if(event.target===this)closeMobileNav()">
+  <div class="mobile-nav-panel">
+    <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu">✕</button>
+    <a href="#features" onclick="closeMobileNav()">Features</a>
+    <a href="#principles" onclick="closeMobileNav()">Principles</a>
+    <a href="https://github.com/belugaman9981/AcumenAI" target="_blank" rel="noopener noreferrer" onclick="closeMobileNav()">GitHub</a>
+    <button class="mnav-btn" onclick="openModal('login');closeMobileNav()">Sign in</button>
+    <button class="mnav-btn" onclick="launchOnline();closeMobileNav()">Try ClawCow Agent</button>
+  </div>
 </div>
 
 <!-- APP -->
@@ -638,6 +734,7 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
         <div class="pill" id="repoCtxPill">🔗 <span id="repoCtxName">Context</span></div>
         <div class="pill" id="repoWorkedPill">🐄 Worked</div>
       </div>
+      <button class="topbar-action" id="exportBtn" onclick="exportChat()" title="Export conversation">↓ Export</button>
       <button class="topbar-action" id="settingsBtn">⚙ Settings</button>
     </div>
     <div id="messages"></div>
@@ -708,7 +805,7 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
     <div class="modal-sub" style="margin-bottom:18px;">Power ClawCow Agent with a real repo</div>
     <div class="gh-step active" id="ghStep1">
       <h3>Step 1 — Personal Access Token</h3>
-      <p>Go to <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank">github.com/settings/tokens</a> and generate a token with <strong>repo</strong> scope.</p>
+      <p>Go to <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" rel="noopener noreferrer">github.com/settings/tokens</a> and generate a token with <strong>repo</strong> scope.</p>
       <div class="form-field"><label>Token</label><input type="password" id="ghToken" placeholder="ghp_…" autocomplete="off"></div>
       <div class="gh-err" id="ghTokenError" style="color:#f87171;"></div>
       <button class="modal-btn" onclick="connectGitHub()">Verify &amp; Continue →</button>
@@ -727,8 +824,8 @@ footer{padding:28px 40px;border-top:1px solid var(--border);display:flex;justify
     <button class="modal-x" onclick="closeModals()">✕</button>
     <div class="modal-logo" style="margin-bottom:4px;">🐙 Commit via ClawCow</div>
     <div class="modal-sub" id="commitRepoLabel" style="margin-bottom:16px;"></div>
-    <div class="form-field"><label>File path</label><input type="text" id="commitPath" placeholder="e.g. src/output.py"></div>
-    <div class="form-field"><label>Commit message</label><input type="text" id="commitMsg" placeholder="describe your change"></div>
+    <div class="form-field"><label>File path</label><input type="text" id="commitPath" placeholder="e.g. src/output.py" autocomplete="off"></div>
+    <div class="form-field"><label>Commit message</label><input type="text" id="commitMsg" placeholder="describe your change" autocomplete="off"></div>
     <div class="form-field"><label>Branch</label><input type="text" id="commitBranch" readonly style="color:var(--text3);"></div>
     <div class="form-field"><label>Preview</label><pre class="commit-preview" id="commitPreview"></pre></div>
     <div class="commit-err" id="commitError"></div>
@@ -844,28 +941,28 @@ async function loadFileTree(){if(!activeRepo||!ghToken)return;const body=$('rpBo
 function fileIcon(p){const ext=p.split('.').pop().toLowerCase();const map={py:'🐍',js:'🟨',ts:'🔷',jsx:'⚛️',tsx:'⚛️',html:'🌐',css:'🎨',json:'📋',md:'📝',txt:'📄',sh:'⚙️',yml:'⚙️',yaml:'⚙️',env:'🔒',gitignore:'🙈',rs:'🦀',go:'🐹',java:'☕',cpp:'⚡',c:'⚡',rb:'💎',php:'🐘',sql:'🗄️'};return map[ext]||'📄';}
 async function readFile(path){if(!activeRepo||!ghToken)return;try{const r=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/contents/${encodeURIComponent(path)}`,{headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});const d=await r.json();const content=d.encoding==='base64'?atob(d.content.replace(/\n/g,'')):d.content;appendMessage('ai',`📂 **${path}**\n\`\`\`\n${content.slice(0,3000)}${content.length>3000?'\n…(truncated)':''}\n\`\`\``);}catch(e){appendMessage('ai','Could not read file: '+e.message);}}
 function addActivity(entry){activity.unshift({...entry,ts:new Date().toLocaleTimeString()});if(activity.length>50)activity.pop();if(currentUser)localStorage.setItem('acumen_activity_'+currentUser,JSON.stringify(activity));if(currentRpTab==='activity')renderActivity();}
-function renderActivity(){const body=$('rpBody');if(!activity.length){body.innerHTML='<div class="act-empty">🐄 No activity yet.<br><br>When ClawCow commits or opens a PR, it will appear here.</div>';return;}body.innerHTML=activity.map(a=>`<div class="activity-item"><div class="act-badge ${a.type}">${a.type==='commit'?'🐙 Commit':a.type==='pr'?'🔀 PR':'🌿 Branch'}</div><div class="act-title">${esc(a.title)}</div><div class="act-meta">${a.ts} · ${esc(a.repo||'')}</div>${a.url?`<a class="act-link" href="${a.url}" target="_blank">View on GitHub →</a>`:''}</div>`).join('');}
+function renderActivity(){const body=$('rpBody');if(!activity.length){body.innerHTML='<div class="act-empty">🐄 No activity yet.<br><br>When ClawCow commits or opens a PR, it will appear here.</div>';return;}body.innerHTML=activity.map(a=>`<div class="activity-item"><div class="act-badge ${a.type}">${a.type==='commit'?'🐙 Commit':a.type==='pr'?'🔀 PR':'🌿 Branch'}</div><div class="act-title">${esc(a.title)}</div><div class="act-meta">${a.ts} · ${esc(a.repo||'')}</div>${a.url?`<a class="act-link" href="${a.url}" target="_blank" rel="noopener noreferrer">View on GitHub →</a>`:''}</div>`).join('');}
 async function ensureClawcowBranch(){if(!activeRepo||!ghToken||clawcowBranch)return;const branchName='clawcow/'+Date.now().toString(36);try{const r1=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/git/refs/heads/${activeRepo.default_branch}`,{headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});const d1=await r1.json();const sha=d1.object.sha;const r2=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/git/refs`,{method:'POST',headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({ref:`refs/heads/${branchName}`,sha})});if(r2.ok){clawcowBranch=branchName;if(currentUser)localStorage.setItem('acumen_gh_branch_'+currentUser,clawcowBranch);addActivity({type:'branch',title:'Created branch '+branchName,repo:activeRepo.full_name,url:`https://github.com/${activeRepo.full_name}/tree/${branchName}`});}}catch(e){console.warn('Branch create failed:',e);clawcowBranch='main';}}
 function openCommitModal(code,lang){if(!activeRepo){openModal('github');return;}pendingCommitCode=code;pendingCommitLang=lang;$('commitRepoLabel').textContent=activeRepo.full_name;$('commitPath').value=lang?`clawcow_output.${lang}`:'clawcow_output.txt';$('commitMsg').value='🤖 ClawCow Agent: add '+(lang||'file');$('commitBranch').value=clawcowBranch||'clawcow/changes';$('commitPreview').textContent=code.slice(0,400)+(code.length>400?'\n…':'');$('commitError').textContent='';$('commitDoBtn').textContent='🐙 Commit + Open PR';$('commitModal').classList.add('active');}
-async function doCommit(){const path=$('commitPath').value.trim();const msg=$('commitMsg').value.trim()||'🤖 ClawCow Agent: update';const branch=clawcowBranch||activeRepo.default_branch;const clawcowAuthor={name:'ClawCow Agent',email:'clawcow-agent@users.noreply.github.com'};if(!path){$('commitError').textContent='Please enter a file path.';$('commitError').style.color='#f87171';return;}$('commitDoBtn').textContent='Committing…';$('commitDoBtn').disabled=true;$('commitError').textContent='';try{let existingSha=null;try{const re=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/contents/${encodeURIComponent(path)}?ref=${branch}`,{headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});if(re.ok){const de=await re.json();existingSha=de.sha;}}catch(e){}const body={message:msg,content:btoa(unescape(encodeURIComponent(pendingCommitCode))),branch,author:clawcowAuthor,committer:clawcowAuthor};if(existingSha)body.sha=existingSha;const rc=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/contents/${encodeURIComponent(path)}`,{method:'PUT',headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});if(!rc.ok){const e=await rc.json();throw new Error(e.message);}const dc=await rc.json();const commitUrl=dc.commit.html_url;addActivity({type:'commit',title:msg,repo:activeRepo.full_name,url:commitUrl});showToast(`🐙 Committed! <a href="${commitUrl}" target="_blank">View commit →</a>`);try{const rp=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/pulls`,{method:'POST',headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({title:'🤖 ClawCow Agent: '+msg.replace('🤖 ClawCow Agent: ',''),body:`This pull request was opened automatically by **ClawCow Agent** (AcumenAI).\n\n**Changes:** ${path}\n**Commit message:** ${msg}\n\n---\n*🤖 Generated by [ClawCow Agent](https://github.com/belugaman9981/AcumenAI)*`,head:branch,base:activeRepo.default_branch})});if(rp.ok){const dp=await rp.json();addActivity({type:'pr',title:dp.title,repo:activeRepo.full_name,url:dp.html_url});showToast(`🔀 PR opened! <a href="${dp.html_url}" target="_blank">View PR #${dp.number} →</a>`);}}catch(e){console.warn('PR failed:',e);}$('commitModal').classList.remove('active');appendMessage('ai',`🐙 Done! Committed \`${path}\` to \`${branch}\`.\n\nClawCow Agent is listed as author. A pull request has been opened for review.`);}catch(e){$('commitError').textContent='Error: '+e.message;$('commitError').style.color='#f87171';}finally{$('commitDoBtn').textContent='🐙 Commit + Open PR';$('commitDoBtn').disabled=false;}}
+async function doCommit(){const path=$('commitPath').value.trim();const msg=$('commitMsg').value.trim()||'🤖 ClawCow Agent: update';const branch=clawcowBranch||activeRepo.default_branch;const clawcowAuthor={name:'ClawCow Agent',email:'clawcow-agent@users.noreply.github.com'};if(!path){$('commitError').textContent='Please enter a file path.';$('commitError').style.color='#f87171';return;}$('commitDoBtn').textContent='Committing…';$('commitDoBtn').disabled=true;$('commitError').textContent='';try{let existingSha=null;try{const re=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/contents/${encodeURIComponent(path)}?ref=${branch}`,{headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});if(re.ok){const de=await re.json();existingSha=de.sha;}}catch(e){}const body={message:msg,content:btoa(unescape(encodeURIComponent(pendingCommitCode))),branch,author:clawcowAuthor,committer:clawcowAuthor};if(existingSha)body.sha=existingSha;const rc=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/contents/${encodeURIComponent(path)}`,{method:'PUT',headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});if(!rc.ok){const e=await rc.json();throw new Error(e.message);}const dc=await rc.json();const commitUrl=dc.commit.html_url;addActivity({type:'commit',title:msg,repo:activeRepo.full_name,url:commitUrl});showToast(`🐙 Committed! <a href="${commitUrl}" target="_blank" rel="noopener noreferrer">View commit →</a>`);;try{const rp=await fetch(`https://api.github.com/repos/${activeRepo.full_name}/pulls`,{method:'POST',headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({title:'🤖 ClawCow Agent: '+msg.replace('🤖 ClawCow Agent: ',''),body:`This pull request was opened automatically by **ClawCow Agent** (AcumenAI).\n\n**Changes:** ${path}\n**Commit message:** ${msg}\n\n---\n*🤖 Generated by [ClawCow Agent](https://github.com/belugaman9981/AcumenAI)*`,head:branch,base:activeRepo.default_branch})});if(rp.ok){const dp=await rp.json();addActivity({type:'pr',title:dp.title,repo:activeRepo.full_name,url:dp.html_url});showToast(`🔀 PR opened! <a href="${dp.html_url}" target="_blank" rel="noopener noreferrer">View PR #${dp.number} →</a>`);;}}catch(e){console.warn('PR failed:',e);}$('commitModal').classList.remove('active');appendMessage('ai',`🐙 Done! Committed \`${path}\` to \`${branch}\`.\n\nClawCow Agent is listed as author. A pull request has been opened for review.`);}catch(e){$('commitError').textContent='Error: '+e.message;$('commitError').style.color='#f87171';}finally{$('commitDoBtn').textContent='🐙 Commit + Open PR';$('commitDoBtn').disabled=false;}}
 function showToast(html,ms=6000){const t=$('commitToast');t.innerHTML=html;t.classList.add('active');setTimeout(()=>t.classList.remove('active'),ms);}
 function loadChats(){const r=localStorage.getItem('acumen_chats_'+currentUser);chats=r?JSON.parse(r):[];}
 function saveChats(){localStorage.setItem('acumen_chats_'+currentUser,JSON.stringify(chats));}
-function renderChatList(){const l=$('chatList');l.innerHTML='';chats.forEach(c=>{const el=document.createElement('div');el.className='chat-item'+(c.id===activeChatId?' active':'');el.innerHTML=`<span class="chat-ttl">${esc(c.title)}</span><button class="del" onclick="event.stopPropagation();deleteChat('${c.id}')">&times;</button>`;el.addEventListener('click',()=>openChat(c.id));l.appendChild(el);});}
+function renderChatList(){const l=$('chatList');l.innerHTML='';if(!chats.length){l.innerHTML='<div class="chat-empty">No conversations yet.<br>Click <strong>+ New chat</strong> to begin.</div>';return;}chats.forEach(c=>{const el=document.createElement('div');el.className='chat-item'+(c.id===activeChatId?' active':'');el.innerHTML=`<span class="chat-ttl">${esc(c.title)}</span><button class="del" onclick="event.stopPropagation();deleteChat('${c.id}')">&times;</button>`;el.addEventListener('click',()=>openChat(c.id));l.appendChild(el);});}
 function deleteChat(id){chats=chats.filter(c=>c.id!==id);saveChats();if(activeChatId===id){activeChatId=null;showWelcome();}renderChatList();}
 $('newChatBtn').addEventListener('click',()=>{activeChatId=null;showWelcome();renderChatList();$('chatTitle').textContent='New conversation';});
 function createChat(msg){const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);const title=msg.length>40?msg.slice(0,40)+'…':msg;const chat={id,title,messages:[]};chats.unshift(chat);activeChatId=id;saveChats();renderChatList();$('chatTitle').textContent=title;return chat;}
 function openChat(id){activeChatId=id;const c=chats.find(x=>x.id===id);$('chatTitle').textContent=c.title;renderMessages(c.messages);renderChatList();}
 function showWelcome(){$('messages').innerHTML=`<div class="welcome"><div class="welcome-icon">🐄</div><div class="welcome-product-tag">✦ AcumenAI · ClawCow Agent</div><h2>How can I help you?</h2><div class="welcome-sub" id="welcomeSub">${activeRepo?'Connected to '+activeRepo.full_name:'Local intelligence · No cloud · No API keys'}</div><div class="chips"><div class="chip" onclick="useSuggestion(this)"><strong>Write code</strong>Help me write a Python script</div><div class="chip" onclick="useSuggestion(this)"><strong>Debug an issue</strong>Find and fix a bug in my code</div><div class="chip" onclick="useSuggestion(this)"><strong>Explain a concept</strong>How does async/await work?</div><div class="chip chip-gh" id="ghChip" onclick="openModal('github')"><strong>🐙 ${activeRepo?'Switch repo':'Connect GitHub'}</strong>${activeRepo?activeRepo.full_name:'Commit real changes to a repo'}</div></div></div>`;}
-function renderMessages(msgs){const c=$('messages');c.innerHTML='';msgs.forEach(m=>c.appendChild(makeMsgEl(m.role,m.text)));c.scrollTop=c.scrollHeight;}
-function makeMsgEl(role,text){const d=document.createElement('div');d.className='msg-row';const init=role==='user'?(currentUser?currentUser[0].toUpperCase():'U'):'C';d.innerHTML=`<div class="avatar ${role==='user'?'user':'ai'}">${init}</div><div class="msg-body"><div class="msg-name">${role==='user'?(currentUser||'You'):'ClawCow Agent'}</div><div class="msg-text">${renderMsgText(text)}</div></div>`;return d;}
-function appendMessage(role,text){const w=document.querySelector('.welcome');if(w)w.remove();const c=$('messages');c.appendChild(makeMsgEl(role,text));c.scrollTop=c.scrollHeight;}
+function renderMessages(msgs){const c=$('messages');c.innerHTML='';msgs.forEach(m=>c.appendChild(makeMsgEl(m.role,m.text,m.ts)));c.scrollTop=c.scrollHeight;}
+function makeMsgEl(role,text,ts){const d=document.createElement('div');d.className='msg-row';const init=role==='user'?(currentUser?currentUser[0].toUpperCase():'U'):'C';const tsStr=ts?new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';d.innerHTML=`<div class="avatar ${role==='user'?'user':'ai'}">${init}</div><div class="msg-body"><div class="msg-name">${role==='user'?(currentUser||'You'):'ClawCow Agent'}<span class="msg-ts">${tsStr}</span></div><div class="msg-text">${renderMsgText(text)}</div></div>`;return d;}
+function appendMessage(role,text,ts){const w=document.querySelector('.welcome');if(w)w.remove();const c=$('messages');c.appendChild(makeMsgEl(role,text,ts||Date.now()));c.scrollTop=c.scrollHeight;}
 function renderMsgText(text){let h=esc(text);h=h.replace(/```(\w*)\n([\s\S]*?)```/g,(match,lang,code)=>{const id='cb_'+Math.random().toString(36).slice(2,8);const ghBtn=activeRepo?`<button class="code-action-btn gh" onclick="openCommitModal(document.getElementById('${id}').textContent,'${lang||'txt'}')">🐙 Commit</button>`:'<button class="code-action-btn gh" onclick="openModal(\'github\')">🐙 Connect &amp; Commit</button>';return `<div class="msg-code-wrap"><div class="msg-code-header"><span class="msg-code-lang">${lang||'code'}</span><div class="msg-code-actions"><button class="code-action-btn" onclick="copyCode('${id}')">📋 Copy</button>${ghBtn}</div></div><pre class="msg-code-pre"><code id="${id}">${code}</code></pre></div>`;});h=h.replace(/`([^`]+)`/g,'<code>$1</code>');h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');h=h.replace(/\*(.+?)\*/g,'<em>$1</em>');h=h.replace(/\n/g,'<br>');return h;}
 function copyCode(id){const el=document.getElementById(id);if(!el)return;navigator.clipboard.writeText(el.textContent).then(()=>showToast('📋 Copied to clipboard',2000));}
 $('sendBtn').addEventListener('click',sendMessage);
 $('msgInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
 $('msgInput').addEventListener('input',()=>{const el=$('msgInput');el.style.height='auto';el.style.height=Math.min(el.scrollHeight,200)+'px';});
-function sendMessage(){const input=$('msgInput'),text=input.value.trim();if(!text)return;let chat=chats.find(c=>c.id===activeChatId);if(!chat)chat=createChat(text);chat.messages.push({role:'user',text});appendMessage('user',text);saveChats();input.value='';input.style.height='auto';$('typingIndicator').classList.add('active');$('sendBtn').disabled=true;generateReply(text).then(reply=>{chat.messages.push({role:'ai',text:reply});$('typingIndicator').classList.remove('active');appendMessage('ai',reply);saveChats();$('sendBtn').disabled=false;});}
+function sendMessage(){const input=$('msgInput'),text=input.value.trim();if(!text)return;let chat=chats.find(c=>c.id===activeChatId);if(!chat)chat=createChat(text);const now=Date.now();chat.messages.push({role:'user',text,ts:now});appendMessage('user',text,now);saveChats();input.value='';input.style.height='auto';$('typingIndicator').classList.add('active');$('sendBtn').disabled=true;generateReply(text).then(reply=>{const rts=Date.now();chat.messages.push({role:'ai',text:reply,ts:rts});$('typingIndicator').classList.remove('active');appendMessage('ai',reply,rts);saveChats();$('sendBtn').disabled=false;});}
 const LOCAL_API='http://localhost:5820'; 
 let serverOnline=false;
 function getConfiguredServerPath(){return (localStorage.getItem('acumen_server_path')||'').trim();}
@@ -886,8 +983,31 @@ async function learnNow(){try{$('learnDot').className='learn-dot busy';$('learnT
 setInterval(pollLearnStatus,3000);pollLearnStatus();
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function useSuggestion(el){const bodyNode=el.querySelector('strong').nextSibling;const text=bodyNode?bodyNode.textContent.trim():el.textContent.trim();$('msgInput').value=text;sendMessage();}
+// Escape key closes modals
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModals();});
+// Mobile nav
+function openMobileNav(){$('mobileNavOverlay').classList.add('active');document.body.style.overflow='hidden';}
+function closeMobileNav(){$('mobileNavOverlay').classList.remove('active');document.body.style.overflow='';}
+// Export chat as markdown
+function exportChat(){const chat=chats.find(c=>c.id===activeChatId);if(!chat||!chat.messages.length){showToast('Nothing to export yet.',2200);return;}const lines=chat.messages.map(m=>{const name=m.role==='user'?(currentUser||'You'):'ClawCow Agent';const time=m.ts?` _(${new Date(m.ts).toLocaleString()})_`:'';return `### ${name}${time}\n\n${m.text}`;});const md=`# ${chat.title}\n\n${lines.join('\n\n---\n\n')}`;const blob=new Blob([md],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=chat.title.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.md';a.click();URL.revokeObjectURL(a.href);}
+// Copy how-it-works code snippets
+function copyHowCode(btn){const code=btn.closest('.how-code').querySelector('code').textContent;navigator.clipboard.writeText(code).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',1800);});}
 // Scroll-reveal
 (()=>{const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('reveal-visible');io.unobserve(e.target);}});},{threshold:0.07,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.featured,.stats-row,.manifesto,.clawcow-section,.principles,.cta-section,footer').forEach(el=>{el.classList.add('reveal-target');io.observe(el);});})();
+
+// Count-up animation for stat numbers
+(()=>{
+  const stats=[{el:document.querySelector('.stats-inner .stat-item:first-child .stat-num'),end:100,suffix:'%',dur:1200},
+               {el:document.querySelector('.stats-inner .stat-item:nth-child(2) .stat-num'),end:45,suffix:'s',dur:900}];
+  function easeOut(t){return 1-Math.pow(1-t,3);}
+  function animateStat(el,end,suffix,dur){
+    let start=null;
+    function step(ts){if(!start)start=ts;const p=Math.min((ts-start)/dur,1);el.textContent=Math.round(easeOut(p)*end)+suffix;if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  }
+  const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const s=stats.find(x=>x.el&&e.target.contains(x.el));if(s&&s.el){animateStat(s.el,s.end,s.suffix,s.dur);io.unobserve(e.target);}}});},{threshold:0.3});
+  document.querySelectorAll('.stats-inner .stat-item').forEach(el=>io.observe(el));
+})();
 refreshServerCommandUI();
 initAuth();
 </script>
