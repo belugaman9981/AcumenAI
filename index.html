@@ -730,8 +730,37 @@ footer{
 .msg-row:hover .msg-ts{opacity:1;}
 .chat-empty{padding:24px 14px;font-size:0.78rem;color:var(--text3);line-height:1.75;text-align:center;}
 
+/* ── COMMAND PALETTE ── */
+.cmd-overlay{display:none;position:fixed;inset:0;z-index:2000;background:var(--overlay);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);align-items:flex-start;justify-content:center;padding-top:12vh;}
+.cmd-overlay.active{display:flex;}
+.cmd-box{width:100%;max-width:560px;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04);animation:cmdIn 0.22s var(--ease-spring) both;}
+@keyframes cmdIn{from{opacity:0;transform:scale(0.96) translateY(-10px);}to{opacity:1;transform:none;}}
+.cmd-search-row{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);}
+.cmd-search-icon{font-size:1.1rem;color:var(--text3);flex-shrink:0;font-style:normal;}
+.cmd-input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:0.96rem;font-family:var(--font);caret-color:var(--cl);}
+.cmd-input::placeholder{color:var(--text3);}
+.cmd-esc-hint{background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;font-size:0.68rem;color:var(--text3);font-family:var(--mono);flex-shrink:0;}
+.cmd-body{max-height:380px;overflow-y:auto;padding:6px;}
+.cmd-body::-webkit-scrollbar{width:3px;}.cmd-body::-webkit-scrollbar-thumb{background:var(--border2);}
+.cmd-section-label{font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text4);padding:10px 10px 5px;font-family:var(--mono);display:flex;align-items:center;gap:8px;}
+.cmd-section-label::after{content:'›';font-size:0.8rem;}
+.cmd-item{display:flex;align-items:center;gap:12px;padding:9px 11px;border-radius:9px;cursor:pointer;transition:background 0.12s;position:relative;}
+.cmd-item:hover,.cmd-item.selected{background:var(--surface2);}
+.cmd-item.selected{background:var(--mix-dim);}
+.cmd-item-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);}
+.cmd-item.cmd-action .cmd-item-icon{background:var(--cl-dim);border-color:rgba(212,104,74,0.2);}
+.cmd-item-body{flex:1;min-width:0;}
+.cmd-item-title{font-size:0.86rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmd-item-meta{font-size:0.72rem;color:var(--text3);font-family:var(--mono);margin-top:1px;}
+.cmd-item-kbd{font-size:0.72rem;color:var(--text4);font-family:var(--mono);flex-shrink:0;}
+.cmd-footer{display:flex;gap:16px;padding:8px 14px;border-top:1px solid var(--border);background:rgba(0,0,0,0.15);}
+.cmd-footer span{font-size:0.7rem;color:var(--text3);display:flex;align-items:center;gap:4px;}
+kbd{display:inline-flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:1px 5px;font-size:0.67rem;font-family:var(--mono);color:var(--text3);min-width:18px;}
+
 @media(max-width:720px){
-  .featured-inner,.clawcow-inner{grid-template-columns:1fr;}
+  .cmd-overlay{padding-top:0;align-items:flex-end;}
+  .cmd-box{border-radius:16px 16px 0 0;max-width:100%;}
+}
   .stats-inner{grid-template-columns:1fr;}
   .stat-item{border-right:none;border-bottom:1px solid var(--border);}
   .prin-grid{grid-template-columns:1fr;}
@@ -1206,6 +1235,24 @@ pip install -r requirements.txt</code></pre></div>
 
 <div id="commitToast"></div>
 
+<!-- COMMAND PALETTE -->
+<div id="cmdPalette" class="cmd-overlay" onclick="if(event.target===this)closeCmdPalette()">
+  <div class="cmd-box">
+    <div class="cmd-search-row">
+      <span class="cmd-search-icon">⌕</span>
+      <input id="cmdInput" class="cmd-input" placeholder="Search or start a chat…" autocomplete="off" oninput="filterCmd()" onkeydown="cmdKey(event)">
+      <kbd class="cmd-esc-hint">esc</kbd>
+    </div>
+    <div class="cmd-body" id="cmdBody"></div>
+    <div class="cmd-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> Select</span>
+      <span><kbd>↵</kbd> Open</span>
+      <span><kbd>Tab</kbd> Actions</span>
+      <span><kbd>Ctrl</kbd><kbd>K</kbd> Open menu</span>
+    </div>
+  </div>
+</div>
+
 <script>
 const $ = id => document.getElementById(id);
 
@@ -1310,7 +1357,38 @@ function copyCode(id){const el=document.getElementById(id);if(!el)return;navigat
 $('sendBtn').addEventListener('click',sendMessage);
 $('msgInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
 $('msgInput').addEventListener('input',()=>{const el=$('msgInput');el.style.height='auto';el.style.height=Math.min(el.scrollHeight,200)+'px';});
-function sendMessage(){const input=$('msgInput'),text=input.value.trim();if(!text)return;let chat=chats.find(c=>c.id===activeChatId);if(!chat)chat=createChat(text);const now=Date.now();chat.messages.push({role:'user',text,ts:now});appendMessage('user',text,now);saveChats();input.value='';input.style.height='auto';$('typingIndicator').classList.add('active');$('sendBtn').disabled=true;generateReply(text).then(reply=>{const rts=Date.now();chat.messages.push({role:'ai',text:reply,ts:rts});$('typingIndicator').classList.remove('active');appendMessage('ai',reply,rts);saveChats();$('sendBtn').disabled=false;});}
+function sendMessage(){
+  const input=$('msgInput'),text=input.value.trim();if(!text)return;
+  const isNewChat=!chats.find(c=>c.id===activeChatId);
+  let chat=chats.find(c=>c.id===activeChatId);
+  if(!chat)chat=createChat(text);
+  const now=Date.now();
+  chat.messages.push({role:'user',text,ts:now});
+  appendMessage('user',text,now);
+  saveChats();
+  input.value='';input.style.height='auto';
+  $('typingIndicator').classList.add('active');
+  $('sendBtn').disabled=true;
+
+  // Generate AI title for new chats in background
+  if(isNewChat){
+    generateChatTitle(text).then(title=>{
+      if(title&&chat){
+        chat.title=title;
+        $('chatTitle').textContent=title;
+        saveChats();renderChatList();
+      }
+    });
+  }
+
+  generateReply(text).then(reply=>{
+    const rts=Date.now();
+    chat.messages.push({role:'ai',text:reply,ts:rts});
+    $('typingIndicator').classList.remove('active');
+    appendMessage('ai',reply,rts);
+    saveChats();$('sendBtn').disabled=false;
+  });
+}
 
 const LOCAL_API='http://localhost:5820';
 let serverOnline=false;
@@ -1379,7 +1457,142 @@ setInterval(pollLearnStatus,3000);pollLearnStatus();
 
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function useSuggestion(el){const bodyNode=el.querySelector('strong').nextSibling;const text=bodyNode?bodyNode.textContent.trim():el.textContent.trim();$('msgInput').value=text;sendMessage();}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModals();});
+
+// ── COMMAND PALETTE ──
+let cmdSelectedIdx=0;
+let cmdItems=[];
+
+function openCmdPalette(){
+  if(!currentUser)return;
+  $('cmdPalette').classList.add('active');
+  $('cmdInput').value='';
+  renderCmdItems('');
+  setTimeout(()=>$('cmdInput').focus(),40);
+}
+function closeCmdPalette(){
+  $('cmdPalette').classList.remove('active');
+}
+
+function relativeTime(ts){
+  if(!ts)return '';
+  const diff=Date.now()-ts;
+  const days=Math.floor(diff/864e5);
+  if(days===0)return 'Today';
+  if(days===1)return 'Yesterday';
+  if(days<7)return 'This week';
+  if(days<14)return 'Last week';
+  if(days<31)return 'Past month';
+  return 'Older';
+}
+
+function renderCmdItems(query){
+  const body=$('cmdBody');
+  cmdItems=[];
+  let html='';
+  const q=query.toLowerCase().trim();
+
+  // Quick actions
+  if(!q){
+    html+=`<div class="cmd-section-label">Quick actions</div>`;
+    cmdItems.push({type:'action',label:'New chat',icon:'＋',meta:'Start a fresh conversation',key:'Enter',fn:()=>{closeCmdPalette();$('newChatBtn').click();}});
+    cmdItems.push({type:'action',label:'Connect GitHub',icon:'🐙',meta:'Link a repo to ClawCow',fn:()=>{closeCmdPalette();openModal('github');}});
+    cmdItems.push({type:'action',label:'Brain dashboard',icon:'🧠',meta:'View AI stats & train',fn:()=>{closeCmdPalette();openBrainDashboard();}});
+    cmdItems.push({type:'action',label:'Settings',icon:'⚙',meta:'Server, PDF, cache options',fn:()=>{closeCmdPalette();openSettings();}});
+    cmdItems.forEach((it,i)=>{
+      html+=`<div class="cmd-item cmd-action${i===cmdSelectedIdx?' selected':''}" data-idx="${i}" onclick="runCmdItem(${i})">
+        <div class="cmd-item-icon">${it.icon}</div>
+        <div class="cmd-item-body"><div class="cmd-item-title">${esc(it.label)}</div><div class="cmd-item-meta">${esc(it.meta)}</div></div>
+        ${it.key?`<span class="cmd-item-kbd">${it.key}</span>`:''}
+      </div>`;
+    });
+  }
+
+  // Recent / filtered chats
+  const filtered=chats.filter(c=>!q||c.title.toLowerCase().includes(q));
+  if(filtered.length){
+    html+=`<div class="cmd-section-label">Recents</div>`;
+    filtered.slice(0,8).forEach(c=>{
+      const idx=cmdItems.length;
+      cmdItems.push({type:'chat',label:c.title,meta:relativeTime(c.messages?.[c.messages.length-1]?.ts),fn:()=>{closeCmdPalette();openChat(c.id);}});
+      html+=`<div class="cmd-item${idx===cmdSelectedIdx?' selected':''}" data-idx="${idx}" onclick="runCmdItem(${idx})">
+        <div class="cmd-item-icon">💬</div>
+        <div class="cmd-item-body"><div class="cmd-item-title">${esc(c.title)}</div><div class="cmd-item-meta">${relativeTime(c.messages?.[c.messages.length-1]?.ts)}</div></div>
+      </div>`;
+    });
+  }
+
+  // If typing, also offer to start new chat with that text
+  if(q){
+    const idx=cmdItems.length;
+    cmdItems.push({type:'action',label:`Start chat: "${query}"`,icon:'＋',meta:'New conversation',fn:()=>{closeCmdPalette();$('newChatBtn').click();setTimeout(()=>{$('msgInput').value=query;sendMessage();},80);}});
+    html+=`<div class="cmd-section-label">Actions</div>
+    <div class="cmd-item cmd-action${idx===cmdSelectedIdx?' selected':''}" data-idx="${idx}" onclick="runCmdItem(${idx})">
+      <div class="cmd-item-icon">＋</div>
+      <div class="cmd-item-body"><div class="cmd-item-title">${esc('Start: '+query)}</div><div class="cmd-item-meta">New conversation</div></div>
+    </div>`;
+  }
+
+  if(!html)html='<div style="padding:24px;text-align:center;font-size:0.82rem;color:var(--text3)">No results</div>';
+  body.innerHTML=html;
+  cmdSelectedIdx=Math.min(cmdSelectedIdx,Math.max(0,cmdItems.length-1));
+  highlightCmd();
+}
+
+function filterCmd(){
+  cmdSelectedIdx=0;
+  renderCmdItems($('cmdInput').value);
+}
+
+function highlightCmd(){
+  document.querySelectorAll('#cmdBody .cmd-item').forEach((el,i)=>{
+    el.classList.toggle('selected',i===cmdSelectedIdx);
+    if(i===cmdSelectedIdx)el.scrollIntoView({block:'nearest'});
+  });
+}
+
+function cmdKey(e){
+  if(e.key==='ArrowDown'){e.preventDefault();cmdSelectedIdx=Math.min(cmdSelectedIdx+1,cmdItems.length-1);highlightCmd();}
+  else if(e.key==='ArrowUp'){e.preventDefault();cmdSelectedIdx=Math.max(cmdSelectedIdx-1,0);highlightCmd();}
+  else if(e.key==='Enter'){e.preventDefault();runCmdItem(cmdSelectedIdx);}
+  else if(e.key==='Escape'){closeCmdPalette();}
+}
+
+function runCmdItem(idx){
+  const item=cmdItems[idx];
+  if(item&&item.fn)item.fn();
+}
+
+// ── AI-GENERATED CHAT TITLE ──
+async function generateChatTitle(firstMessage){
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:20,
+        messages:[{role:'user',content:`Summarize this message as a short 3-5 word chat title. No punctuation, no quotes. Just the title.\n\nMessage: ${firstMessage.slice(0,200)}`}]
+      })
+    });
+    if(!resp.ok)return null;
+    const data=await resp.json();
+    const title=(data.content?.[0]?.text||'').trim().replace(/["""'']/g,'');
+    return title.length>2&&title.length<60?title:null;
+  }catch(e){return null;}
+}
+
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){
+    e.preventDefault();
+    if($('cmdPalette').classList.contains('active'))closeCmdPalette();
+    else openCmdPalette();
+    return;
+  }
+  if(e.key==='Escape'){
+    if($('cmdPalette').classList.contains('active')){closeCmdPalette();return;}
+    closeModals();
+  }
+});
 function openMobileNav(){$('mobileNavOverlay').classList.add('active');document.body.style.overflow='hidden';}
 function closeMobileNav(){$('mobileNavOverlay').classList.remove('active');document.body.style.overflow='';}
 function exportChat(){const chat=chats.find(c=>c.id===activeChatId);if(!chat||!chat.messages.length){showToast('Nothing to export yet.',2200);return;}const lines=chat.messages.map(m=>{const name=m.role==='user'?(currentUser||'You'):'ClawCow Agent';const time=m.ts?` _(${new Date(m.ts).toLocaleString()})_`:'';return `### ${name}${time}\n\n${m.text}`;});const md=`# ${chat.title}\n\n${lines.join('\n\n---\n\n')}`;const blob=new Blob([md],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=chat.title.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.md';a.click();URL.revokeObjectURL(a.href);}
@@ -1426,3 +1639,4 @@ initAuth();
 </script>
 </body>
 </html>
+
