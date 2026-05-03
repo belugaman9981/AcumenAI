@@ -629,7 +629,8 @@ footer{
 .typing-dots span:nth-child(3){animation-delay:.36s;}
 @keyframes td{0%,80%,100%{transform:scale(0.5);opacity:0.25;}40%{transform:scale(1.1);opacity:1;}}
 
-.input-bar{padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;}
+.source-legend{font-size:0.68rem;color:var(--text4);font-family:var(--mono);text-align:center;margin-bottom:8px;letter-spacing:0.03em;}
+.input-bar{padding:10px 20px 14px;border-top:1px solid var(--border);flex-shrink:0;}
 .input-wrap{
   display:flex;align-items:flex-end;gap:8px;
   background:var(--bg2);border:1px solid var(--border2);
@@ -729,8 +730,37 @@ footer{
 .msg-row:hover .msg-ts{opacity:1;}
 .chat-empty{padding:24px 14px;font-size:0.78rem;color:var(--text3);line-height:1.75;text-align:center;}
 
+/* ── COMMAND PALETTE ── */
+.cmd-overlay{display:none;position:fixed;inset:0;z-index:2000;background:var(--overlay);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);align-items:flex-start;justify-content:center;padding-top:12vh;}
+.cmd-overlay.active{display:flex;}
+.cmd-box{width:100%;max-width:560px;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04);animation:cmdIn 0.22s var(--ease-spring) both;}
+@keyframes cmdIn{from{opacity:0;transform:scale(0.96) translateY(-10px);}to{opacity:1;transform:none;}}
+.cmd-search-row{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);}
+.cmd-search-icon{font-size:1.1rem;color:var(--text3);flex-shrink:0;font-style:normal;}
+.cmd-input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:0.96rem;font-family:var(--font);caret-color:var(--cl);}
+.cmd-input::placeholder{color:var(--text3);}
+.cmd-esc-hint{background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;font-size:0.68rem;color:var(--text3);font-family:var(--mono);flex-shrink:0;}
+.cmd-body{max-height:380px;overflow-y:auto;padding:6px;}
+.cmd-body::-webkit-scrollbar{width:3px;}.cmd-body::-webkit-scrollbar-thumb{background:var(--border2);}
+.cmd-section-label{font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text4);padding:10px 10px 5px;font-family:var(--mono);display:flex;align-items:center;gap:8px;}
+.cmd-section-label::after{content:'›';font-size:0.8rem;}
+.cmd-item{display:flex;align-items:center;gap:12px;padding:9px 11px;border-radius:9px;cursor:pointer;transition:background 0.12s;position:relative;}
+.cmd-item:hover,.cmd-item.selected{background:var(--surface2);}
+.cmd-item.selected{background:var(--mix-dim);}
+.cmd-item-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);}
+.cmd-item.cmd-action .cmd-item-icon{background:var(--cl-dim);border-color:rgba(212,104,74,0.2);}
+.cmd-item-body{flex:1;min-width:0;}
+.cmd-item-title{font-size:0.86rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmd-item-meta{font-size:0.72rem;color:var(--text3);font-family:var(--mono);margin-top:1px;}
+.cmd-item-kbd{font-size:0.72rem;color:var(--text4);font-family:var(--mono);flex-shrink:0;}
+.cmd-footer{display:flex;gap:16px;padding:8px 14px;border-top:1px solid var(--border);background:rgba(0,0,0,0.15);}
+.cmd-footer span{font-size:0.7rem;color:var(--text3);display:flex;align-items:center;gap:4px;}
+kbd{display:inline-flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:1px 5px;font-size:0.67rem;font-family:var(--mono);color:var(--text3);min-width:18px;}
+
 @media(max-width:720px){
-  .featured-inner,.clawcow-inner{grid-template-columns:1fr;}
+  .cmd-overlay{padding-top:0;align-items:flex-end;}
+  .cmd-box{border-radius:16px 16px 0 0;max-width:100%;}
+}
   .stats-inner{grid-template-columns:1fr;}
   .stat-item{border-right:none;border-bottom:1px solid var(--border);}
   .prin-grid{grid-template-columns:1fr;}
@@ -763,8 +793,8 @@ footer{
       AcumenAI &nbsp;/&nbsp; ClawCow Agent
     </div>
     <div class="strip-links">
-      <a href="#features">Features</a>
-      <a href="#principles">Principles</a>
+      <a href="#features">How it works</a>
+      <a href="#principles">Our promises</a>
       <a href="https://github.com/belugaman9981/AcumenAI" target="_blank" rel="noopener noreferrer">GitHub</a>
     </div>
     <div class="strip-cta">
@@ -781,43 +811,43 @@ footer{
     <div class="hero-orb hero-orb-1"></div>
     <div class="hero-orb hero-orb-2"></div>
 
-    <div class="hero-eyebrow"><span class="eyebrow-live"></span>Flagship Agent · AcumenAI</div>
+    <div class="hero-eyebrow"><span class="eyebrow-live"></span>Free & open source · AcumenAI</div>
     <h1>
-      <span class="hero-line-1">Local AI that</span>
-      <span class="hero-line-2"><span class="line-italic">thinks and learns for itself</span></span>
+      <span class="hero-line-1">Your own AI that</span>
+      <span class="hero-line-2"><span class="line-italic">gets smarter over time</span></span>
     </h1>
-    <p class="hero-sub">A population of 48 evolved neural bots that run on your hardware — no API keys, no subscriptions, no server farm in Virginia. The more you train it, the smarter it gets.</p>
+    <p class="hero-sub">ClawCow Agent is an AI chatbot that runs entirely on your computer. No monthly fee, no account required, no data sent anywhere. Just download, run, and start chatting — it learns as you use it.</p>
     <div class="hero-actions">
-      <button class="h-btn h-btn-main" onclick="launchOnline()">Try ClawCow Agent <span class="btn-arrow">→</span></button>
-      <a class="h-btn h-btn-gh" href="https://github.com/belugaman9981/AcumenAI" target="_blank" rel="noopener noreferrer">★ GitHub</a>
-      <a class="h-btn h-btn-sec" href="#features">See how it works</a>
+      <button class="h-btn h-btn-main" onclick="launchOnline()">Try it now <span class="btn-arrow">→</span></button>
+      <a class="h-btn h-btn-gh" href="https://github.com/belugaman9981/AcumenAI" target="_blank" rel="noopener noreferrer">★ View on GitHub</a>
+      <a class="h-btn h-btn-sec" href="#features">How does it work?</a>
     </div>
   </section>
 
   <!-- HOW IT WORKS -->
   <div class="how-section" id="features">
     <div class="how-inner">
-      <div class="section-label">Get started in minutes</div>
-      <h2 class="section-head">Three steps to your own AI</h2>
+      <div class="section-label">Up and running in under a minute</div>
+      <h2 class="section-head">Three steps. That's it.</h2>
       <div class="how-steps reveal-stagger">
         <div class="how-step reveal-child">
-          <div class="how-step-num">01</div>
-          <h4>Clone &amp; install</h4>
-          <p>Grab the repo and install dependencies with pip. No CUDA, no containers, no exotic setup.</p>
+          <div class="how-step-num">Step 1</div>
+          <h4>Download the project</h4>
+          <p>Copy the commands below and paste them into your terminal. This downloads the project and installs everything it needs. Python must be installed — that's the only requirement.</p>
           <div class="how-code"><button class="how-copy" onclick="copyHowCode(this)">Copy</button><pre><code>git clone https://github.com/belugaman9981/AcumenAI
 cd AcumenAI/local-ai-agent
 pip install -r requirements.txt</code></pre></div>
         </div>
         <div class="how-step reveal-child">
-          <div class="how-step-num">02</div>
-          <h4>Start the brain server</h4>
-          <p>Fire up the local API that powers ClawCow Agent. Leave it running in the background.</p>
+          <div class="how-step-num">Step 2</div>
+          <h4>Start the AI in the background</h4>
+          <p>Run this command to start the AI. Keep this terminal window open while you use ClawCow — it's what makes the AI work. You can minimize it.</p>
           <div class="how-code"><button class="how-copy" onclick="copyHowCode(this)">Copy</button><pre><code>python brain_server.py</code></pre></div>
         </div>
         <div class="how-step reveal-child">
-          <div class="how-step-num">03</div>
-          <h4>Open and chat</h4>
-          <p>Open <code style="font-family:var(--mono);font-size:0.85em;color:var(--cl)">index.html</code> in your browser. Sign up locally, connect GitHub if you like, and start training your brain.</p>
+          <div class="how-step-num">Step 3</div>
+          <h4>Open and start chatting</h4>
+          <p>Open <code style="font-family:var(--mono);font-size:0.85em;color:var(--cl)">index.html</code> in any browser. Create a free local account (nothing is sent online), then start chatting. The AI learns from every conversation.</p>
         </div>
       </div>
     </div>
@@ -827,10 +857,10 @@ pip install -r requirements.txt</code></pre></div>
   <div class="featured reveal-target">
     <div class="featured-inner">
       <div class="feat-left">
-        <div class="feat-eyebrow"><span class="feat-eyebrow-line"></span>Flagship Agent · ClawCow</div>
-        <h2><em>ClawCow</em><br>Agent</h2>
-        <p>ClawCow is AcumenAI's flagship agent — a self-improving system that crawls Wikipedia, reads your codebase, writes and commits code to GitHub, and opens pull requests, all from your local machine. No API key, no cloud, no data leaving your desk.</p>
-        <a class="feat-explore-btn" onclick="launchOnline()">Launch agent <span class="arrow">→</span></a>
+        <div class="feat-eyebrow"><span class="feat-eyebrow-line"></span>What is ClawCow?</div>
+        <h2>Your <em>private</em><br>AI assistant</h2>
+        <p>ClawCow is an AI chatbot you install on your own computer. Unlike online AI tools, it never sends your conversations anywhere. It can read Wikipedia to teach itself new things, look through your code files, and even write and save code to GitHub — all from your own machine.</p>
+        <a class="feat-explore-btn" onclick="launchOnline()">Open the app <span class="arrow">→</span></a>
       </div>
       <div class="feat-right">
         <div class="feat-neural">
@@ -872,67 +902,66 @@ pip install -r requirements.txt</code></pre></div>
           </svg>
         </div>
         <div class="feat-right-label">
-          <h4>Evolutionary brain — generation 0</h4>
-          <p>Train it. Watch it evolve. It's yours.</p>
+          <h4>How ClawCow thinks — visualized</h4>
+          <p>The glowing line shows information flowing through the AI as it answers your question.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- STATS -->
   <div class="stats-row">
     <div class="stats-inner reveal-stagger">
       <div class="stat-item reveal-child">
         <div class="stat-num" data-count="100" data-suffix="%">100%</div>
-        <div class="stat-label">Local</div>
-        <div class="stat-sub">Runs on your CPU — no data leaves your machine</div>
+        <div class="stat-label">Private by design</div>
+        <div class="stat-sub">Everything stays on your computer — nothing is ever uploaded or shared</div>
       </div>
       <div class="stat-item reveal-child">
         <div class="stat-num" data-count="45" data-suffix="s">45s</div>
-        <div class="stat-label">Quick-start time</div>
-        <div class="stat-sub">From <code style="font-family:var(--mono);font-size:0.8em;color:var(--cl)">pip install</code> to first reply</div>
+        <div class="stat-label">To first reply</div>
+        <div class="stat-sub">From install to your first answer in under a minute</div>
       </div>
       <div class="stat-item reveal-child">
-        <div class="stat-num">Infinite</div>
-        <div class="stat-label">Knowledge capacity</div>
-        <div class="stat-sub">Wikipedia articles · PDFs · raw text — no cap</div>
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Things it can learn</div>
+        <div class="stat-sub">Feed it Wikipedia pages, PDFs, or your own files — no limit on knowledge</div>
       </div>
     </div>
   </div>
 
   <!-- MANIFESTO -->
   <div class="manifesto reveal-target">
-    <div class="man-label">Our belief · AcumenAI</div>
-    <h2>Intelligence should belong to the person using it —<br><em>not a server farm in Virginia.</em></h2>
-    <p>AcumenAI was built out of frustration with platforms that phone home, train on your data, and keep the results to themselves. A model that runs entirely on your hardware is fundamentally more trustworthy — and fundamentally more yours.</p>
-    <p>Our evolutionary brain is built on small-population neural evolution: a method that compounds prediction accuracy across generations, seeded by the world's largest open knowledge base, and constrained only by iteration speed and the CPU in front of you.</p>
+    <div class="man-label">Why we built this</div>
+    <h2>Most AI tools are watching you.<br><em>ClawCow isn't.</em></h2>
+    <p>Every time you use ChatGPT, Claude, or Gemini, your conversation goes to a company's server. They can read it, store it, and use it to train their next model. That's the trade-off you make for a smart AI — but it doesn't have to be.</p>
+    <p>ClawCow runs on your own machine. It has no internet connection unless you ask it to search. It doesn't phone home. Your conversations are yours, stored in a file on your own computer, readable only by you.</p>
   </div>
 
   <!-- CLAWCOW SECTION -->
   <div class="clawcow-section reveal-target">
     <div class="clawcow-inner">
       <div class="cc-left">
-        <div class="cc-eyebrow">Flagship Agent · ClawCow</div>
+        <div class="cc-eyebrow">What ClawCow can do</div>
         <h2><span class="cc-name-highlight">ClawCow<br>Agent</span></h2>
-        <p class="cc-desc">A self-evolving agent that crawls Wikipedia, ingests PDFs, annotates the web, and makes understanding every idea on the planet fundamentally more useful — all without leaving your desk.</p>
-        <button class="h-btn h-btn-main" onclick="launchOnline()" style="width:fit-content;">Try ClawCow Agent <span class="btn-arrow">→</span></button>
+        <p class="cc-desc">An AI assistant that actually gets better the more you use it. Teach it things, point it at your work, and watch it become genuinely useful — without ever needing an internet connection or a subscription.</p>
+        <button class="h-btn h-btn-main" onclick="launchOnline()" style="width:fit-content;">Open ClawCow <span class="btn-arrow">→</span></button>
       </div>
       <div class="cc-features reveal-stagger">
         <div class="cc-feat reveal-child">
           <div class="cc-feat-num">01</div>
-          <div class="cc-feat-body"><h4>Evolutionary Brain</h4><p>48 neural bots that compete and breed. Feed them anything — the population learns to predict better over generations.</p></div>
+          <div class="cc-feat-body"><h4>It learns new things automatically</h4><p>ClawCow reads Wikipedia articles in the background to build up its knowledge. You can point it at specific topics or let it browse on its own.</p></div>
         </div>
         <div class="cc-feat reveal-child">
           <div class="cc-feat-num">02</div>
-          <div class="cc-feat-body"><h4>Auto Wikipedia Crawler</h4><p>Random or targeted crawls keep the brain growing in the background. Knowledge compounds — automatically, always.</p></div>
+          <div class="cc-feat-body"><h4>It can search the web when needed</h4><p>When you ask about something current — like today's news or a specific website — it searches DuckDuckGo and gives you a real answer.</p></div>
         </div>
         <div class="cc-feat reveal-child">
           <div class="cc-feat-num">03</div>
-          <div class="cc-feat-body"><h4>Web Search</h4><p>Volatile questions route to DuckDuckGo. Smart caching means repeated queries never hit the network twice.</p></div>
+          <div class="cc-feat-body"><h4>It understands your documents</h4><p>Drop a PDF into ClawCow and it reads it, learns from it, and can answer questions about it. Great for research, manuals, or anything you've downloaded.</p></div>
         </div>
         <div class="cc-feat reveal-child">
           <div class="cc-feat-num">04</div>
-          <div class="cc-feat-body"><h4>Code Researcher</h4><p>Connect any GitHub repo and let ClawCow read files, write code, and commit changes — then open a pull request with your name on it.</p></div>
+          <div class="cc-feat-body"><h4>It can write and save code to GitHub</h4><p>Connect your GitHub account and ClawCow can read your code files, write changes, save them to a branch, and open a pull request — no copy-pasting required.</p></div>
         </div>
       </div>
     </div>
@@ -940,38 +969,38 @@ pip install -r requirements.txt</code></pre></div>
 
   <!-- PRINCIPLES -->
   <div class="principles" id="principles">
-    <div class="prin-label">What we stand for</div>
-    <h2 class="prin-head">Built on a few hard principles.<br><em>We make choices that let you assume these.</em></h2>
+    <div class="prin-label">Our promises to you</div>
+    <h2 class="prin-head">Simple rules we never break.<br><em>No fine print.</em></h2>
     <div class="prin-grid reveal-stagger">
       <div class="prin-item reveal-child">
         <div class="prin-num">01</div>
-        <h4>Your data stays yours</h4>
-        <p>Everything — conversations, brain state, training data — lives on your machine. We never see it. No telemetry, no silent uploads.</p>
+        <h4>We never see your conversations</h4>
+        <p>Your chats, your files, and everything ClawCow learns stays on your computer. There is no server receiving your data — not even ours.</p>
       </div>
       <div class="prin-item reveal-child">
         <div class="prin-num">02</div>
-        <h4>Open by default</h4>
-        <p>The full source is on GitHub with an MIT license. Fork it, modify it, run it on air-gapped hardware. We don't mind.</p>
+        <h4>The code is fully open source</h4>
+        <p>Everything is on GitHub under the MIT license. You can read every line, modify it, or run it on a computer with no internet access at all.</p>
       </div>
       <div class="prin-item reveal-child">
         <div class="prin-num">03</div>
-        <h4>Continuous learning</h4>
-        <p>The brain keeps evolving in the background while you chat. Leave it running overnight and come back to a smarter agent.</p>
+        <h4>It keeps learning while you use it</h4>
+        <p>Leave ClawCow running and it keeps reading and improving in the background. Come back tomorrow and it'll know more than it did today.</p>
       </div>
       <div class="prin-item reveal-child">
         <div class="prin-num">04</div>
-        <h4>No subscription required</h4>
-        <p>One download, zero recurring cost. Run it on your laptop or your rack server. AcumenAI doesn't charge you to think.</p>
+        <h4>Free forever — no subscription</h4>
+        <p>Download it once and it works forever. We don't charge a monthly fee, require a credit card, or limit how many questions you can ask.</p>
       </div>
       <div class="prin-item reveal-child">
         <div class="prin-num">05</div>
-        <h4>Hardware-accessible</h4>
-        <p>Runs on Python 3.11+ with pure pip dependencies. No CUDA, no containers, no exotic setup — just clone and go.</p>
+        <h4>Works on any normal computer</h4>
+        <p>You only need Python installed. No gaming GPU, no Docker, no special hardware. If your laptop can run Python, it can run ClawCow.</p>
       </div>
       <div class="prin-item reveal-child">
         <div class="prin-num">06</div>
-        <h4>Research first</h4>
-        <p>Every design decision traces back to a real outcome. We'd rather be the most curious than the most capitalized.</p>
+        <h4>Built to understand, not to impress</h4>
+        <p>We care more about ClawCow giving you genuinely useful answers than about hitting benchmarks. Every feature exists because it helps you.</p>
       </div>
     </div>
   </div>
@@ -979,12 +1008,12 @@ pip install -r requirements.txt</code></pre></div>
   <!-- CTA -->
   <div class="cta-section reveal-target">
     <div class="cta-inner">
-      <div class="cta-label">Ready to start</div>
-      <h2>Ready to run an AI<br>that <em>actually learns?</em></h2>
-      <p>Download ClawCow Agent, throw it some Wikipedia articles, and run it for an hour. See for yourself what an AI looks like when it doesn't forget.</p>
+      <div class="cta-label">Ready to try it?</div>
+      <h2>An AI you own,<br><em>not one you rent.</em></h2>
+      <p>Download ClawCow, open the chat, and ask it anything. No sign-up, no credit card, no data shared. If you don't like it, just delete the folder — nothing else to uninstall.</p>
       <div class="cta-btns">
-        <button class="h-btn h-btn-main" onclick="launchOnline()">Get ClawCow Agent <span class="btn-arrow">→</span></button>
-        <a class="h-btn h-btn-gh" href="https://github.com/belugaman9981/AcumenAI" target="_blank" rel="noopener noreferrer">★ GitHub</a>
+        <button class="h-btn h-btn-main" onclick="launchOnline()">Open ClawCow now <span class="btn-arrow">→</span></button>
+        <a class="h-btn h-btn-gh" href="https://github.com/belugaman9981/AcumenAI" target="_blank" rel="noopener noreferrer">★ View source on GitHub</a>
       </div>
     </div>
   </div>
@@ -1055,6 +1084,7 @@ pip install -r requirements.txt</code></pre></div>
       <div class="typing-dots"><span></span><span></span><span></span></div>
     </div>
     <div class="input-bar">
+      <div class="source-legend">🧠 local brain &nbsp;·&nbsp; ☁️ cloud backup &nbsp;·&nbsp; 🔍 web search &nbsp;·&nbsp; 📦 cached</div>
       <div class="input-wrap">
         <textarea id="msgInput" rows="1" placeholder="Message ClawCow Agent…"></textarea>
         <button id="sendBtn">➤</button>
@@ -1205,6 +1235,24 @@ pip install -r requirements.txt</code></pre></div>
 
 <div id="commitToast"></div>
 
+<!-- COMMAND PALETTE -->
+<div id="cmdPalette" class="cmd-overlay" onclick="if(event.target===this)closeCmdPalette()">
+  <div class="cmd-box">
+    <div class="cmd-search-row">
+      <span class="cmd-search-icon">⌕</span>
+      <input id="cmdInput" class="cmd-input" placeholder="Search or start a chat…" autocomplete="off" oninput="filterCmd()" onkeydown="cmdKey(event)">
+      <kbd class="cmd-esc-hint">esc</kbd>
+    </div>
+    <div class="cmd-body" id="cmdBody"></div>
+    <div class="cmd-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> Select</span>
+      <span><kbd>↵</kbd> Open</span>
+      <span><kbd>Tab</kbd> Actions</span>
+      <span><kbd>Ctrl</kbd><kbd>K</kbd> Open menu</span>
+    </div>
+  </div>
+</div>
+
 <script>
 const $ = id => document.getElementById(id);
 
@@ -1227,7 +1275,7 @@ function switchModal(t){closeModals();openModal(t);}
 ['loginModal','signupModal','githubModal','settingsModal','brainModal','commitModal'].forEach(id=>{$(id).addEventListener('click',e=>{if(e.target===$(id))$(id).classList.remove('active');});});
 
 function togglePass(id,btn){const i=$(id);if(i.type==='password'){i.type='text';btn.innerHTML='&#128064;';}else{i.type='password';btn.innerHTML='&#128065;';}}
-function checkPwMatch(){const p1=$('signupPass').value,p2=$('signupPass2').value,icon=$('pwMatchIcon'),msg=$('pwMatchMsg'),inp=$('signupPass2');if(!p2){icon.textContent='';icon.className='pw-match';inp.className='';msg.textContent='';return;}if(p1===p2){icon.textContent='✓';icon.className='pw-match ok';inp.classList.add('ok');inp.classList.remove('err');msg.textContent='';}else{icon.textContent='✗';icon.className='pw-match err';inp.classList.add('err');inp.classList.remove('ok');msg.textContent='Passwords do not match.';}}
+function checkPwMatch(){const p1=$('signupPass').value,p2=$('signupPass2').value,icon=$('pwMatchIcon'),msg=$('pwMatchMsg'),inp=$('signupPass2');if(!p2){icon.textContent='';icon.className='pw-match';inp.className='';msg.textContent='';return;}if(p1===p2){icon.textContent='✓';icon.className='pw-match ok';inp.classList.add('ok');inp.classList.remove('err');msg.textContent='';}else{icon.textContent='✗';icon.className='pw-match err';inp.classList.add('err');inp.classList.remove('ok');msg.textContent='Passwords do not match';}}
 
 let currentUser=null,chats=[],activeChatId=null;
 let ghToken=null,ghUser=null,activeRepo=null,allRepos=[],selectedRepo=null;
@@ -1299,7 +1347,7 @@ function deleteChat(id){chats=chats.filter(c=>c.id!==id);saveChats();if(activeCh
 $('newChatBtn').addEventListener('click',()=>{activeChatId=null;showWelcome();renderChatList();$('chatTitle').textContent='New conversation';});
 function createChat(msg){const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);const title=msg.length>40?msg.slice(0,40)+'…':msg;const chat={id,title,messages:[]};chats.unshift(chat);activeChatId=id;saveChats();renderChatList();$('chatTitle').textContent=title;return chat;}
 function openChat(id){activeChatId=id;const c=chats.find(x=>x.id===id);$('chatTitle').textContent=c.title;renderMessages(c.messages);renderChatList();}
-function showWelcome(){$('messages').innerHTML=`<div class="welcome"><div class="welcome-icon">🐄</div><div class="welcome-product-tag">✦ AcumenAI · ClawCow Agent</div><h2>How can I help you?</h2><div class="welcome-sub" id="welcomeSub">${activeRepo?'Connected to '+activeRepo.full_name:'Local intelligence · No cloud · No API keys'}</div><div class="chips"><div class="chip" onclick="useSuggestion(this)"><strong>Write code</strong>Help me write a Python script</div><div class="chip" onclick="useSuggestion(this)"><strong>Debug an issue</strong>Find and fix a bug in my code</div><div class="chip" onclick="useSuggestion(this)"><strong>Explain a concept</strong>How does async/await work?</div><div class="chip chip-gh" id="ghChip" onclick="openModal('github')"><strong>🐙 ${activeRepo?'Switch repo':'Connect GitHub'}</strong>${activeRepo?activeRepo.full_name:'Commit real changes to a repo'}</div></div></div>`;}
+function showWelcome(){$('messages').innerHTML=`<div class="welcome"><div class="welcome-icon">🐄</div><div class="welcome-product-tag">✦ AcumenAI · ClawCow Agent</div><h2>What can I help you with?</h2><div class="welcome-sub" id="welcomeSub">${activeRepo?'Connected to '+activeRepo.full_name:'Running privately on your computer — nothing is sent online'}</div><div class="chips"><div class="chip" onclick="useSuggestion(this)"><strong>Write me some code</strong>Help me write a Python script</div><div class="chip" onclick="useSuggestion(this)"><strong>Fix a bug</strong>Find and fix a bug in my code</div><div class="chip" onclick="useSuggestion(this)"><strong>Explain something</strong>How does async/await work?</div><div class="chip chip-gh" id="ghChip" onclick="openModal('github')"><strong>🐙 ${activeRepo?'Switch repo':'Link my GitHub'}</strong>${activeRepo?activeRepo.full_name:'Let ClawCow read and edit your code'}</div></div></div>`;}
 function renderMessages(msgs){const c=$('messages');c.innerHTML='';msgs.forEach(m=>c.appendChild(makeMsgEl(m.role,m.text,m.ts)));c.scrollTop=c.scrollHeight;}
 function makeMsgEl(role,text,ts){const d=document.createElement('div');d.className='msg-row';const init=role==='user'?(currentUser?currentUser[0].toUpperCase():'U'):'C';const tsStr=ts?new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';d.innerHTML=`<div class="avatar ${role==='user'?'user':'ai'}">${init}</div><div class="msg-body"><div class="msg-name">${role==='user'?(currentUser||'You'):'ClawCow Agent'}<span class="msg-ts">${tsStr}</span></div><div class="msg-text">${renderMsgText(text)}</div></div>`;return d;}
 function appendMessage(role,text,ts){const w=document.querySelector('.welcome');if(w)w.remove();const c=$('messages');c.appendChild(makeMsgEl(role,text,ts||Date.now()));c.scrollTop=c.scrollHeight;}
@@ -1309,7 +1357,38 @@ function copyCode(id){const el=document.getElementById(id);if(!el)return;navigat
 $('sendBtn').addEventListener('click',sendMessage);
 $('msgInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
 $('msgInput').addEventListener('input',()=>{const el=$('msgInput');el.style.height='auto';el.style.height=Math.min(el.scrollHeight,200)+'px';});
-function sendMessage(){const input=$('msgInput'),text=input.value.trim();if(!text)return;let chat=chats.find(c=>c.id===activeChatId);if(!chat)chat=createChat(text);const now=Date.now();chat.messages.push({role:'user',text,ts:now});appendMessage('user',text,now);saveChats();input.value='';input.style.height='auto';$('typingIndicator').classList.add('active');$('sendBtn').disabled=true;generateReply(text).then(reply=>{const rts=Date.now();chat.messages.push({role:'ai',text:reply,ts:rts});$('typingIndicator').classList.remove('active');appendMessage('ai',reply,rts);saveChats();$('sendBtn').disabled=false;});}
+function sendMessage(){
+  const input=$('msgInput'),text=input.value.trim();if(!text)return;
+  const isNewChat=!chats.find(c=>c.id===activeChatId);
+  let chat=chats.find(c=>c.id===activeChatId);
+  if(!chat)chat=createChat(text);
+  const now=Date.now();
+  chat.messages.push({role:'user',text,ts:now});
+  appendMessage('user',text,now);
+  saveChats();
+  input.value='';input.style.height='auto';
+  $('typingIndicator').classList.add('active');
+  $('sendBtn').disabled=true;
+
+  // Generate AI title for new chats in background
+  if(isNewChat){
+    generateChatTitle(text).then(title=>{
+      if(title&&chat){
+        chat.title=title;
+        $('chatTitle').textContent=title;
+        saveChats();renderChatList();
+      }
+    });
+  }
+
+  generateReply(text).then(reply=>{
+    const rts=Date.now();
+    chat.messages.push({role:'ai',text:reply,ts:rts});
+    $('typingIndicator').classList.remove('active');
+    appendMessage('ai',reply,rts);
+    saveChats();$('sendBtn').disabled=false;
+  });
+}
 
 const LOCAL_API='http://localhost:5820';
 let serverOnline=false;
@@ -1323,7 +1402,53 @@ function openSettings(){$('settingsModal').classList.add('active');refreshServer
 
 $('themeMenuBtn').addEventListener('click',()=>{document.body.classList.toggle('light');localStorage.setItem('acumen_theme',document.body.classList.contains('light')?'light':'dark');const isDark=!document.body.classList.contains('light');$('themeMenuBtn').textContent=(isDark?'🌙':'☀️')+' Toggle theme';});
 
-async function generateReply(msg){let ctx=msg;if(activeRepo)ctx=`[GitHub repo: ${activeRepo.full_name} | branch: ${clawcowBranch||activeRepo.default_branch} | url: ${activeRepo.html_url}]\n\n${msg}`;if(!serverOnline)return '⚠️ Brain server is offline.\n\nRun:\n```bash\n'+getServerRunCommand()+'\n```\nThen refresh this page.';try{const resp=await fetch(LOCAL_API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:ctx})});if(!resp.ok)throw new Error('Server error '+resp.status);const data=await resp.json();const reply=data.reply||'(no reply)';const src=data.source||'brain';return reply+(src==='live search'?' 🔍':src==='cached search'?' 📦':' 🧠');}catch(e){return 'Error connecting to brain server: '+e.message;}}
+async function generateReply(msg){
+  let ctx=msg;
+  if(activeRepo)ctx=`[GitHub repo: ${activeRepo.full_name} | branch: ${clawcowBranch||activeRepo.default_branch} | url: ${activeRepo.html_url}]\n\n${msg}`;
+
+  // Try local brain server first
+  if(serverOnline){
+    try{
+      const resp=await fetch(LOCAL_API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:ctx})});
+      if(!resp.ok)throw new Error('Server error '+resp.status);
+      const data=await resp.json();
+      const reply=data.reply||'(no reply)';
+      const src=data.source||'brain';
+      return reply+(src==='live search'?' 🔍':src==='cached search'?' 📦':' 🧠');
+    }catch(e){
+      console.warn('Local brain failed, falling back to Claude:',e);
+    }
+  }
+
+  // Fallback: Claude API
+  try{
+    // Build conversation history for context
+    const currentChat=chats.find(c=>c.id===activeChatId);
+    const history=(currentChat?.messages||[]).slice(-10).map(m=>({
+      role:m.role==='user'?'user':'assistant',
+      content:m.text
+    }));
+    // Remove last message since we're sending it fresh
+    if(history.length>0&&history[history.length-1].role==='user')history.pop();
+
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`You are ClawCow Agent, a helpful AI assistant built by AcumenAI. You are running as a cloud fallback because the user's local brain server is offline. Be helpful, concise, and friendly. If the user asks about their local brain server, let them know you're the cloud backup and they can start it with: python brain_server.py${activeRepo?`\n\nThe user has connected a GitHub repo: ${activeRepo.full_name}. Be aware of this context when helping with code.`:''}`,
+        messages:[...history,{role:'user',content:ctx}]
+      })
+    });
+    if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||'API error');}
+    const data=await resp.json();
+    const text=data.content?.[0]?.text||'(no reply)';
+    return text+' ☁️';
+  }catch(e){
+    return `Something went wrong: ${e.message}\n\nTo use your local AI, run:\n\`\`\`bash\n${getServerRunCommand()}\n\`\`\``;
+  }
+}
 async function uploadPDF(){const input=$('pdfUploadInput'),status=$('pdfUploadStatus');if(!input.files.length){status.textContent='Please choose a PDF first.';return;}if(!serverOnline){status.textContent='Server is offline.';return;}const fd=new FormData();fd.append('file',input.files[0]);status.textContent='Uploading…';try{const r=await fetch(LOCAL_API+'/pdf',{method:'POST',body:fd});const d=await r.json();status.textContent=d.result||d.error||'Done!';status.style.color=d.error?'#f87171':'var(--gh)';}catch(e){status.textContent='Error: '+e.message;status.style.color='#f87171';}}
 async function pollLearnStatus(){if(!serverOnline){$('learnDot').className='learn-dot paused';$('learnText').textContent='Auto-learn: server offline';$('learnStats').textContent='';return;}try{const r=await fetch(LOCAL_API+'/autolearn/status');const d=await r.json();$('learnToggle').textContent=d.running?'Pause':'Resume';if(!d.running){$('learnDot').className='learn-dot paused';$('learnText').textContent='Auto-learn paused';}else if(d.busy){$('learnDot').className='learn-dot busy';$('learnText').textContent='Learning: '+d.phase+'…';}else if(d.paused_for_chat){$('learnDot').className='learn-dot paused';$('learnText').textContent='Paused '+d.next_in+'s after chat…';}else{$('learnDot').className='learn-dot active';$('learnText').textContent='Active — next in '+d.next_in+'s';}$('learnStats').textContent=d.total_articles+' articles · '+d.total_train_gens+' gens';}catch(e){$('learnDot').className='learn-dot paused';$('learnText').textContent='Auto-learn: server offline';}}
 async function toggleLearn(){try{await fetch(LOCAL_API+'/autolearn/toggle',{method:'POST'});pollLearnStatus();}catch(e){}}
@@ -1332,7 +1457,142 @@ setInterval(pollLearnStatus,3000);pollLearnStatus();
 
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function useSuggestion(el){const bodyNode=el.querySelector('strong').nextSibling;const text=bodyNode?bodyNode.textContent.trim():el.textContent.trim();$('msgInput').value=text;sendMessage();}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModals();});
+
+// ── COMMAND PALETTE ──
+let cmdSelectedIdx=0;
+let cmdItems=[];
+
+function openCmdPalette(){
+  if(!currentUser)return;
+  $('cmdPalette').classList.add('active');
+  $('cmdInput').value='';
+  renderCmdItems('');
+  setTimeout(()=>$('cmdInput').focus(),40);
+}
+function closeCmdPalette(){
+  $('cmdPalette').classList.remove('active');
+}
+
+function relativeTime(ts){
+  if(!ts)return '';
+  const diff=Date.now()-ts;
+  const days=Math.floor(diff/864e5);
+  if(days===0)return 'Today';
+  if(days===1)return 'Yesterday';
+  if(days<7)return 'This week';
+  if(days<14)return 'Last week';
+  if(days<31)return 'Past month';
+  return 'Older';
+}
+
+function renderCmdItems(query){
+  const body=$('cmdBody');
+  cmdItems=[];
+  let html='';
+  const q=query.toLowerCase().trim();
+
+  // Quick actions
+  if(!q){
+    html+=`<div class="cmd-section-label">Quick actions</div>`;
+    cmdItems.push({type:'action',label:'New chat',icon:'＋',meta:'Start a fresh conversation',key:'Enter',fn:()=>{closeCmdPalette();$('newChatBtn').click();}});
+    cmdItems.push({type:'action',label:'Connect GitHub',icon:'🐙',meta:'Link a repo to ClawCow',fn:()=>{closeCmdPalette();openModal('github');}});
+    cmdItems.push({type:'action',label:'Brain dashboard',icon:'🧠',meta:'View AI stats & train',fn:()=>{closeCmdPalette();openBrainDashboard();}});
+    cmdItems.push({type:'action',label:'Settings',icon:'⚙',meta:'Server, PDF, cache options',fn:()=>{closeCmdPalette();openSettings();}});
+    cmdItems.forEach((it,i)=>{
+      html+=`<div class="cmd-item cmd-action${i===cmdSelectedIdx?' selected':''}" data-idx="${i}" onclick="runCmdItem(${i})">
+        <div class="cmd-item-icon">${it.icon}</div>
+        <div class="cmd-item-body"><div class="cmd-item-title">${esc(it.label)}</div><div class="cmd-item-meta">${esc(it.meta)}</div></div>
+        ${it.key?`<span class="cmd-item-kbd">${it.key}</span>`:''}
+      </div>`;
+    });
+  }
+
+  // Recent / filtered chats
+  const filtered=chats.filter(c=>!q||c.title.toLowerCase().includes(q));
+  if(filtered.length){
+    html+=`<div class="cmd-section-label">Recents</div>`;
+    filtered.slice(0,8).forEach(c=>{
+      const idx=cmdItems.length;
+      cmdItems.push({type:'chat',label:c.title,meta:relativeTime(c.messages?.[c.messages.length-1]?.ts),fn:()=>{closeCmdPalette();openChat(c.id);}});
+      html+=`<div class="cmd-item${idx===cmdSelectedIdx?' selected':''}" data-idx="${idx}" onclick="runCmdItem(${idx})">
+        <div class="cmd-item-icon">💬</div>
+        <div class="cmd-item-body"><div class="cmd-item-title">${esc(c.title)}</div><div class="cmd-item-meta">${relativeTime(c.messages?.[c.messages.length-1]?.ts)}</div></div>
+      </div>`;
+    });
+  }
+
+  // If typing, also offer to start new chat with that text
+  if(q){
+    const idx=cmdItems.length;
+    cmdItems.push({type:'action',label:`Start chat: "${query}"`,icon:'＋',meta:'New conversation',fn:()=>{closeCmdPalette();$('newChatBtn').click();setTimeout(()=>{$('msgInput').value=query;sendMessage();},80);}});
+    html+=`<div class="cmd-section-label">Actions</div>
+    <div class="cmd-item cmd-action${idx===cmdSelectedIdx?' selected':''}" data-idx="${idx}" onclick="runCmdItem(${idx})">
+      <div class="cmd-item-icon">＋</div>
+      <div class="cmd-item-body"><div class="cmd-item-title">${esc('Start: '+query)}</div><div class="cmd-item-meta">New conversation</div></div>
+    </div>`;
+  }
+
+  if(!html)html='<div style="padding:24px;text-align:center;font-size:0.82rem;color:var(--text3)">No results</div>';
+  body.innerHTML=html;
+  cmdSelectedIdx=Math.min(cmdSelectedIdx,Math.max(0,cmdItems.length-1));
+  highlightCmd();
+}
+
+function filterCmd(){
+  cmdSelectedIdx=0;
+  renderCmdItems($('cmdInput').value);
+}
+
+function highlightCmd(){
+  document.querySelectorAll('#cmdBody .cmd-item').forEach((el,i)=>{
+    el.classList.toggle('selected',i===cmdSelectedIdx);
+    if(i===cmdSelectedIdx)el.scrollIntoView({block:'nearest'});
+  });
+}
+
+function cmdKey(e){
+  if(e.key==='ArrowDown'){e.preventDefault();cmdSelectedIdx=Math.min(cmdSelectedIdx+1,cmdItems.length-1);highlightCmd();}
+  else if(e.key==='ArrowUp'){e.preventDefault();cmdSelectedIdx=Math.max(cmdSelectedIdx-1,0);highlightCmd();}
+  else if(e.key==='Enter'){e.preventDefault();runCmdItem(cmdSelectedIdx);}
+  else if(e.key==='Escape'){closeCmdPalette();}
+}
+
+function runCmdItem(idx){
+  const item=cmdItems[idx];
+  if(item&&item.fn)item.fn();
+}
+
+// ── AI-GENERATED CHAT TITLE ──
+async function generateChatTitle(firstMessage){
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:20,
+        messages:[{role:'user',content:`Summarize this message as a short 3-5 word chat title. No punctuation, no quotes. Just the title.\n\nMessage: ${firstMessage.slice(0,200)}`}]
+      })
+    });
+    if(!resp.ok)return null;
+    const data=await resp.json();
+    const title=(data.content?.[0]?.text||'').trim().replace(/["""'']/g,'');
+    return title.length>2&&title.length<60?title:null;
+  }catch(e){return null;}
+}
+
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){
+    e.preventDefault();
+    if($('cmdPalette').classList.contains('active'))closeCmdPalette();
+    else openCmdPalette();
+    return;
+  }
+  if(e.key==='Escape'){
+    if($('cmdPalette').classList.contains('active')){closeCmdPalette();return;}
+    closeModals();
+  }
+});
 function openMobileNav(){$('mobileNavOverlay').classList.add('active');document.body.style.overflow='hidden';}
 function closeMobileNav(){$('mobileNavOverlay').classList.remove('active');document.body.style.overflow='';}
 function exportChat(){const chat=chats.find(c=>c.id===activeChatId);if(!chat||!chat.messages.length){showToast('Nothing to export yet.',2200);return;}const lines=chat.messages.map(m=>{const name=m.role==='user'?(currentUser||'You'):'ClawCow Agent';const time=m.ts?` _(${new Date(m.ts).toLocaleString()})_`:'';return `### ${name}${time}\n\n${m.text}`;});const md=`# ${chat.title}\n\n${lines.join('\n\n---\n\n')}`;const blob=new Blob([md],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=chat.title.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.md';a.click();URL.revokeObjectURL(a.href);}
@@ -1379,3 +1639,4 @@ initAuth();
 </script>
 </body>
 </html>
+
