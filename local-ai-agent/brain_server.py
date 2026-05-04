@@ -192,7 +192,7 @@ def brain_feedback():
 # ── PDF upload ─────────────────────────────────────────────────────────────────
 
 @app.route("/pdf", methods=["POST"])
-def pdf_upload(): 
+def pdf_upload():
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
     f = request.files["file"]
