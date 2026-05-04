@@ -48,6 +48,7 @@ def add_cors_headers(response):
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     return response
+    
 
 @app.route("/<path:path>", methods=["OPTIONS"])
 @app.route("/", methods=["OPTIONS"])
