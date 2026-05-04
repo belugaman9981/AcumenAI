@@ -1,4 +1,3 @@
-
 """
 brain_server.py — Local HTTP bridge between the website and the ClawCow Agent brain.
 
