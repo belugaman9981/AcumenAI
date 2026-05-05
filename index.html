@@ -1390,7 +1390,7 @@ function sendMessage(){
   });
 }
 
-const LOCAL_API='http://localhost:5820';
+const LOCAL_API='http://127.0.0.1:5820';
 let serverOnline=false;
 function getConfiguredServerPath(){return (localStorage.getItem('acumen_server_path')||'').trim();}
 function getServerRunCommand(){const cfg=getConfiguredServerPath();if(!cfg)return 'python brain_server.py';const clean=cfg.replace(/^"+|"+$/g,'').replace(/\\/g,'/').replace(/\/+$/,'');if(clean.toLowerCase().endsWith('brain_server.py'))return `python "${clean}"`;return `python "${clean}/brain_server.py"`;}
@@ -1405,48 +1405,15 @@ $('themeMenuBtn').addEventListener('click',()=>{document.body.classList.toggle('
 async function generateReply(msg){
   let ctx=msg;
   if(activeRepo)ctx=`[GitHub repo: ${activeRepo.full_name} | branch: ${clawcowBranch||activeRepo.default_branch} | url: ${activeRepo.html_url}]\n\n${msg}`;
-
-  // Try local brain server first
-  if(serverOnline){
-    try{
-      const resp=await fetch(LOCAL_API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:ctx})});
-      if(!resp.ok)throw new Error('Server error '+resp.status);
-      const data=await resp.json();
-      const reply=data.reply||'(no reply)';
-      const src=data.source||'brain';
-      return reply+(src==='live search'?' 🔍':src==='cached search'?' 📦':' 🧠');
-    }catch(e){
-      console.warn('Local brain failed, falling back to Claude:',e);
-    }
-  }
-
-  // Fallback: Claude API
   try{
-    // Build conversation history for context
-    const currentChat=chats.find(c=>c.id===activeChatId);
-    const history=(currentChat?.messages||[]).slice(-10).map(m=>({
-      role:m.role==='user'?'user':'assistant',
-      content:m.text
-    }));
-    // Remove last message since we're sending it fresh
-    if(history.length>0&&history[history.length-1].role==='user')history.pop();
-
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:`You are ClawCow Agent, a helpful AI assistant built by AcumenAI. You are running as a cloud fallback because the user's local brain server is offline. Be helpful, concise, and friendly. If the user asks about their local brain server, let them know you're the cloud backup and they can start it with: python brain_server.py${activeRepo?`\n\nThe user has connected a GitHub repo: ${activeRepo.full_name}. Be aware of this context when helping with code.`:''}`,
-        messages:[...history,{role:'user',content:ctx}]
-      })
-    });
-    if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||'API error');}
+    const resp=await fetch(LOCAL_API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:ctx})});
+    if(!resp.ok)throw new Error('Server error '+resp.status);
     const data=await resp.json();
-    const text=data.content?.[0]?.text||'(no reply)';
-    return text+' ☁️';
+    const reply=data.reply||'(no reply)';
+    const src=data.source||'brain';
+    return reply+(src==='live search'?' 🔍':src==='cached search'?' 📦':' 🧠');
   }catch(e){
-    return `Something went wrong: ${e.message}\n\nTo use your local AI, run:\n\`\`\`bash\n${getServerRunCommand()}\n\`\`\``;
+    return `⚠️ Could not reach the brain server.\n\nMake sure this is running in PowerShell:\n\`\`\`bash\ncd G:\\Python\\AcumenAI\\local-ai-agent\npython brain_server.py\n\`\`\`\n\nError: ${e.message}`;
   }
 }
 async function uploadPDF(){const input=$('pdfUploadInput'),status=$('pdfUploadStatus');if(!input.files.length){status.textContent='Please choose a PDF first.';return;}if(!serverOnline){status.textContent='Server is offline.';return;}const fd=new FormData();fd.append('file',input.files[0]);status.textContent='Uploading…';try{const r=await fetch(LOCAL_API+'/pdf',{method:'POST',body:fd});const d=await r.json();status.textContent=d.result||d.error||'Done!';status.style.color=d.error?'#f87171':'var(--gh)';}catch(e){status.textContent='Error: '+e.message;status.style.color='#f87171';}}
@@ -1639,4 +1606,3 @@ initAuth();
 </script>
 </body>
 </html>
-
