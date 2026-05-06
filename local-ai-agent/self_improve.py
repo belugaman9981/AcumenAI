@@ -35,7 +35,7 @@ class PromptEvolver:
 
     # ── persistence ─────────────────────────────────────────
 
-    def _load(self) -> None:
+    def _load(self) -> None: 
         if PROMPT_HISTORY_FILE.exists():
             try:
                 data = json.loads(PROMPT_HISTORY_FILE.read_text(encoding="utf-8"))
