@@ -43,7 +43,7 @@ class PromptEvolver:
                 if self.prompt_history:
                     self.current_prompt = self.prompt_history[-1].get("prompt", self.default_prompt)
             except Exception:
-                pass
+                pass 
 
         if FEEDBACK_LOG_FILE.exists():
             try:
