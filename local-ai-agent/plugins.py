@@ -26,7 +26,7 @@ from pathlib import Path
 
 from rich.console import Console
 
-console = Console()
+console = Console() 
 
 PLUGINS_DIR = Path(__file__).parent / "plugins"
 
