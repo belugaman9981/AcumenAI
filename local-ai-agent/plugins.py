@@ -2,7 +2,7 @@
 plugins.py — Auto-loading plugin system for AcumenAI.
 
 Drop any .py file into the `plugins/` folder next to this file.
-Each plugin must define a `register(tools_dict)` function that adds
+Each plugin must define a `register(tools_dict)` function that adds 
 its tools to the shared tool registry.
 
 Example plugin file (plugins/my_tool.py):
