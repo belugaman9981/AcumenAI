@@ -7,7 +7,7 @@ All intelligence comes from the evolving brain of 48 bots.
 Usage:
     python main.py                   # Start chatting
     python main.py --no-background   # Disable GitHub background crawler
-    python main.py --discoveries     # Show what the crawler found
+    python main.py --discoveries     # Show what the crawler found 
 """
 
 from __future__ import annotations
