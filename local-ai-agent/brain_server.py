@@ -2,7 +2,7 @@
 brain_server.py — Local HTTP bridge between the website and the ClawCow Agent brain.
 
 Run this alongside the website:
-    python brain_server.py
+    python brain_server.py 
 
 Then open index.html in your browser — the chat connects here automatically.
 No API keys. No external services. All local.
