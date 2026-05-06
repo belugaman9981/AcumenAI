@@ -1,5 +1,5 @@
 """
-brain.py - evolutionary local learning engine for AcumenAI.
+brain.py - evolutionary local learning engine for AcumenAI. 
 
 OPTIMIZED VERSION — same API, drastically lower RAM usage:
   - N-gram tables live in SQLite (not Python dicts) → huge memory savings
