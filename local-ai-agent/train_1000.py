@@ -1,4 +1,4 @@
-from pathlib import Path
+from pathlib import Path 
 from brain import EvolutionBrain
 
 b = EvolutionBrain(Path('brain_state.json'))
