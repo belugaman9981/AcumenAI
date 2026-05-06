@@ -85,7 +85,7 @@ HELP_TEXT = """
 
   [yellow]/pdf <path>[/yellow]          Ingest a PDF file into the brain
   [yellow]/pdf-dir <path>[/yellow]      Ingest all PDFs in a folder
-  [yellow]/pdf-train[/yellow]           Ingest PDFs then auto-train
+  [yellow]/pdf-train[/yellow]           Ingest PDFs then auto-train 
 
 [bold cyan]Search cache:[/bold cyan]
 
