@@ -38,7 +38,7 @@ class PromptEvolver:
     def _load(self) -> None: 
         if PROMPT_HISTORY_FILE.exists():
             try:
-                data = json.loads(PROMPT_HISTORY_FILE.read_text(encoding="utf-8"))
+                data = json.loads(PROMPT_HISTORY_FILE.read_text(encoding="utf-8")) 
                 self.prompt_history = data.get("versions", [])
                 if self.prompt_history:
                     self.current_prompt = self.prompt_history[-1].get("prompt", self.default_prompt)
