@@ -51,7 +51,7 @@ def load_plugins(tools_dict: dict) -> list[str]:
             sys.modules[f"plugin_{name}"] = mod
             spec.loader.exec_module(mod)
 
-            if hasattr(mod, "register") and callable(mod.register):
+            if hasattr(mod, "register") and callable(mod.register): 
                 before = set(tools_dict.keys())
                 mod.register(tools_dict)
                 added = set(tools_dict.keys()) - before
