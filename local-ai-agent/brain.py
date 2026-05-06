@@ -3,7 +3,7 @@ brain.py - evolutionary local learning engine for AcumenAI.
 
 OPTIMIZED VERSION — same API, drastically lower RAM usage:
   - N-gram tables live in SQLite (not Python dicts) → huge memory savings
-  - Raw text corpus is stored on disk, not held in RAM
+  - Raw text corpus is stored on disk, not held in RAM 
   - Word map is capped at MAX_WORD_MAP_ENTRIES entries
   - Bot char_bias / word_bias limited to TOP_BIAS_WORDS most-common words
   - Corpus is rebuilt incrementally (append-only) instead of full rebuild
