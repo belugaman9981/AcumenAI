@@ -40,7 +40,7 @@ def load_plugins(tools_dict: dict) -> list[str]:
 
     loaded = []
     for py_file in sorted(PLUGINS_DIR.glob("*.py")):
-        if py_file.name.startswith("_"):
+        if py_file.name.startswith("_"): 
             continue
         name = py_file.stem
         try:
