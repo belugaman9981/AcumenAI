@@ -61,7 +61,7 @@ def get_agent() -> CodingAgent:
     global _agent
     if _agent is None:
         _agent = CodingAgent()
-    return _agent
+    return _agent 
 
 
 # ── Health ─────────────────────────────────────────────────────────────────────
