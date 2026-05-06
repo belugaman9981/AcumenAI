@@ -1,4 +1,3 @@
-
 """
 background.py — Background GitHub crawler.
 
