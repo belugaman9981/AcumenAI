@@ -777,6 +777,19 @@ kbd{display:inline-flex;align-items:center;justify-content:center;background:var
   .how-section{padding:64px 20px;}
   .hero{padding:80px 20px 60px;}
 }
+/* ── OS PICKER MODAL ── */
+.os-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0;}
+.os-card{padding:22px 10px 18px;border-radius:14px;border:2px solid var(--border);background:var(--bg3);cursor:pointer;text-align:center;transition:all 0.2s var(--ease-out);position:relative;}
+.os-card:hover{border-color:rgba(139,92,246,0.5);background:var(--mx-dim,rgba(139,92,246,0.08));transform:translateY(-2px);}
+.os-card.selected{border-color:#8b5cf6;background:rgba(139,92,246,0.1);}
+.os-card-icon{font-size:2rem;display:block;margin-bottom:9px;}
+.os-card-name{font-size:0.86rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+.os-card-detail{font-size:0.67rem;color:var(--text3);font-family:var(--mono);}
+.os-card-check{position:absolute;top:8px;right:8px;width:17px;height:17px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:0.6rem;transition:all 0.18s;}
+.os-card.selected .os-card-check{background:#8b5cf6;border-color:#8b5cf6;color:#fff;}
+.os-remember{display:flex;align-items:center;gap:8px;margin:2px 0 18px;font-size:0.81rem;color:var(--text2);cursor:pointer;justify-content:center;user-select:none;}
+.os-remember input{accent-color:#8b5cf6;width:14px;height:14px;cursor:pointer;flex-shrink:0;}
+.os-perm-note{font-size:0.73rem;color:var(--text3);text-align:center;margin-top:10px;}
 </style>
 </head>
 <body>
@@ -1236,6 +1249,42 @@ pip install -r requirements.txt</code></pre></div>
 
 <div id="commitToast"></div>
 
+<!-- OS PICKER MODAL -->
+<div class="modal-bg" id="osPickerModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-logo" style="font-size:1.25rem;margin-bottom:5px">Choose your platform</div>
+    <div class="modal-sub">So ClawCow shows the right commands for your system</div>
+    <div class="os-grid">
+      <div class="os-card" id="osCardMac" onclick="selectOsCard('mac')">
+        <div class="os-card-check" id="osCheckMac"></div>
+        <span class="os-card-icon">🍎</span>
+        <div class="os-card-name">macOS</div>
+        <div class="os-card-detail">python3 / pip3</div>
+      </div>
+      <div class="os-card" id="osCardWindows" onclick="selectOsCard('windows')">
+        <div class="os-card-check" id="osCheckWindows"></div>
+        <span class="os-card-icon">🪟</span>
+        <div class="os-card-name">Windows</div>
+        <div class="os-card-detail">python / pip</div>
+      </div>
+      <div class="os-card" id="osCardLinux" onclick="selectOsCard('linux')">
+        <div class="os-card-check" id="osCheckLinux"></div>
+        <span class="os-card-icon">🐧</span>
+        <div class="os-card-name">Linux</div>
+        <div class="os-card-detail">python3 / pip3</div>
+      </div>
+    </div>
+    <label class="os-remember">
+      <input type="checkbox" id="osRememberCheck">
+      Remember this — don't ask again on next login
+    </label>
+    <button class="modal-btn" id="osPickerConfirm" onclick="confirmOsPick()" disabled style="opacity:0.4">
+      Confirm →
+    </button>
+    <p class="os-perm-note">You can change this anytime in ⚙ Settings</p>
+  </div>
+</div>
+
 <!-- COMMAND PALETTE -->
 <div id="cmdPalette" class="cmd-overlay" onclick="if(event.target===this)closeCmdPalette()">
   <div class="cmd-box">
@@ -1309,6 +1358,8 @@ function showApp(){
   if(a)try{activity=JSON.parse(a);}catch(e){}
   if(r)try{activeRepo=JSON.parse(r);applyActiveRepo();}catch(e){}
   renderChatList();showWelcome();
+  // Show OS picker on every login unless permanently saved
+  setTimeout(()=>{ if(shouldShowOsPicker()) showOsPicker(); }, 380);
 }
 
 // Brain dashboard
@@ -1602,8 +1653,110 @@ function copyHowCode(btn){const code=btn.closest('.how-code').querySelector('cod
   document.querySelectorAll('.stat-item').forEach(el=>io.observe(el));
 })();
 
+// ── OS SYSTEM ────────────────────────────────────────────────
+const OS_PERM_KEY = 'acumen_os_permanent';
+const OS_SESS_KEY = 'acumen_os_session';
+const OS_INFO = {
+  mac:     { icon:'🍎', label:'macOS',   python:'python3', pip:'pip3',  cmd:'python3 brain_server.py' },
+  windows: { icon:'🪟', label:'Windows', python:'python',  pip:'pip',   cmd:'python brain_server.py'  },
+  linux:   { icon:'🐧', label:'Linux',   python:'python3', pip:'pip3',  cmd:'python3 brain_server.py' },
+};
+let _chosenOS = null;
+let _osPending = null;
+
+function browserGuessOS(){
+  const ua = navigator.userAgent||'';
+  if(/Mac/.test(ua) && !/iPhone|iPad/.test(ua)) return 'mac';
+  if(/Win/.test(ua)) return 'windows';
+  return 'linux';
+}
+function getOS(){
+  if(_chosenOS) return _chosenOS;
+  const perm = localStorage.getItem(OS_PERM_KEY);
+  if(perm && OS_INFO[perm]) return perm;
+  const sess = sessionStorage.getItem(OS_SESS_KEY);
+  if(sess && OS_INFO[sess]) return sess;
+  return browserGuessOS();
+}
+function shouldShowOsPicker(){
+  return !localStorage.getItem(OS_PERM_KEY) && !sessionStorage.getItem(OS_SESS_KEY);
+}
+
+function selectOsCard(os){
+  _osPending = os;
+  ['mac','windows','linux'].forEach(o=>{
+    const n=o.charAt(0).toUpperCase()+o.slice(1);
+    $('osCard'+n).classList.toggle('selected', o===os);
+    $('osCheck'+n).textContent = o===os ? '✓' : '';
+  });
+  const btn=$('osPickerConfirm');
+  btn.disabled=false; btn.style.opacity='1';
+}
+function confirmOsPick(){
+  if(!_osPending) return;
+  _chosenOS = _osPending;
+  if($('osRememberCheck').checked){
+    localStorage.setItem(OS_PERM_KEY, _chosenOS);
+    sessionStorage.removeItem(OS_SESS_KEY);
+  } else {
+    sessionStorage.setItem(OS_SESS_KEY, _chosenOS);
+    localStorage.removeItem(OS_PERM_KEY);
+  }
+  $('osPickerModal').classList.remove('active');
+  applyOSToUI();
+}
+function showOsPicker(){
+  _osPending = null;
+  // pre-select current
+  const cur = getOS();
+  selectOsCard(cur);
+  $('osRememberCheck').checked = !!localStorage.getItem(OS_PERM_KEY);
+  $('osPickerModal').classList.add('active');
+}
+function applyOSToUI(){
+  const info = OS_INFO[getOS()];
+  // Update settings server command
+  const sc = $('serverStartCmd');
+  if(sc && !getConfiguredServerPath()) sc.textContent = info.cmd;
+  // Update how-it-works code blocks
+  document.querySelectorAll('.how-code code').forEach(el=>{
+    if(el.textContent.includes('brain_server.py')){
+      el.textContent = info.cmd;
+    }
+    if(el.textContent.includes('pip install')){
+      el.textContent = el.textContent.replace(/^pip\d?/m, info.pip);
+    }
+  });
+}
+
+// ── SETTINGS: add Change Platform button ──
+function openSettings(){
+  $('settingsModal').classList.add('active');
+  refreshServerCommandUI();
+  const s=$('serverPathStatus');if(s)s.textContent='';
+  checkServer();
+  // Show current OS in settings
+  const info = OS_INFO[getOS()];
+  let osBadge = $('settingsOsBadge');
+  if(!osBadge){
+    const section = $('settingsModal').querySelector('.settings-section');
+    if(section){
+      const row = document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;';
+      row.innerHTML=`<span id="settingsOsBadge" style="font-size:0.82rem;color:var(--text2)">${info.icon} ${info.label}</span>
+        <button onclick="showOsPicker()" style="padding:4px 12px;border-radius:100px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:0.76rem;font-weight:600;cursor:pointer;font-family:var(--font);transition:all 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text2)'">Change platform ✎</button>`;
+      section.insertBefore(row, section.firstChild);
+    }
+  } else {
+    osBadge.textContent = info.icon+' '+info.label;
+  }
+}
+
 refreshServerCommandUI();
 initAuth();
+
+// Apply OS commands on page load
+applyOSToUI();
 </script>
 </body>
 </html>
