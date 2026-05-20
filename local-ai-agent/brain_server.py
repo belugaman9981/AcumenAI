@@ -243,4 +243,3 @@ if __name__ == "__main__":
     print("=" * 50)
     print("\nOpen index.html in your browser to start chatting!\n")
     app.run(host="127.0.0.1", port=5820, debug=False)
-
