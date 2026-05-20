@@ -153,14 +153,27 @@ nav {
 }
 .hero-card-right {
   position: relative;
-  background: linear-gradient(135deg, #1e1b28 0%, #0e0c14 100%);
+  background: linear-gradient(160deg, #080610 0%, #0a0414 60%, #100810 100%);
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 
 /* Animated neural web */
 .neural-canvas {
   position: absolute; inset: 0;
-  opacity: 0.7;
+  opacity: 1;
+}
+/* scanline overlay */
+.hero-card-right::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none; z-index: 2;
 }
 
 /* ── STATS ──────────────────────────────────────── */
@@ -520,66 +533,266 @@ footer a:hover { color: var(--ink); }
 </footer>
 
 <script>
-// ── Neural canvas animation ──────────────────────────────
+// ── Neural network canvas ─────────────────────────────
 const canvas = document.getElementById('neuralCanvas');
 const ctx    = canvas.getContext('2d');
-let nodes = [], W, H, raf;
+let W, H, raf;
+
+// Network architecture: input → hidden1 → hidden2 → output
+const LAYER_DEFS = [4, 6, 6, 3];
+const COLORS = {
+  nodeBase:   '#1a0a2e',
+  nodeBorder: 'rgba(160,80,255,0.5)',
+  nodeGlow:   '#a050ff',
+  nodeActive: '#ff7030',
+  edgeBase:   'rgba(120,60,200,0.12)',
+  edgeFire:   '#ff6020',
+  pulse:      '#ff7030',
+  pulseTrail: 'rgba(255,100,40,0.0)',
+};
+
+let layers = [];
+let pulses = [];
+let frameCount = 0;
+
+function buildNetwork() {
+  layers = [];
+  const padX = W * 0.12;
+  const usableW = W - padX * 2;
+  const usableH = H;
+
+  LAYER_DEFS.forEach((count, li) => {
+    const x = padX + (li / (LAYER_DEFS.length - 1)) * usableW;
+    const nodes = [];
+    for (let ni = 0; ni < count; ni++) {
+      const y = (usableH / (count + 1)) * (ni + 1);
+      nodes.push({
+        x, y,
+        r: li === 0 || li === LAYER_DEFS.length - 1 ? 5 : 4.5,
+        activation: Math.random(),
+        glow: 0,
+        pulsePhase: Math.random() * Math.PI * 2,
+      });
+    }
+    layers.push(nodes);
+  });
+}
+
+// Edge weights (random but fixed)
+let weights = [];
+function buildWeights() {
+  weights = [];
+  for (let li = 0; li < layers.length - 1; li++) {
+    const layerWeights = [];
+    for (let ni = 0; ni < layers[li].length; ni++) {
+      const nodeWeights = [];
+      for (let nj = 0; nj < layers[li + 1].length; nj++) {
+        nodeWeights.push(Math.random() * 0.8 + 0.2); // 0.2–1.0
+      }
+      layerWeights.push(nodeWeights);
+    }
+    weights.push(layerWeights);
+  }
+}
+
+function spawnPulse() {
+  // Pick a random input node to fire from
+  const fromLayer = 0;
+  const fromNode  = Math.floor(Math.random() * layers[fromLayer].length);
+  // Choose a path through the network
+  const path = [{ li: fromLayer, ni: fromNode }];
+  for (let li = 1; li < layers.length; li++) {
+    const ni = Math.floor(Math.random() * layers[li].length);
+    path.push({ li, ni });
+  }
+  pulses.push({ path, t: 0, speed: 0.006 + Math.random() * 0.004, done: false });
+}
 
 function resize() {
   const r = canvas.getBoundingClientRect();
   W = canvas.width  = r.width;
   H = canvas.height = r.height;
+  buildNetwork();
+  buildWeights();
 }
 
-function initNodes() {
-  nodes = Array.from({ length: 38 }, () => ({
-    x:  Math.random() * W,
-    y:  Math.random() * H,
-    vx: (Math.random() - 0.5) * 0.45,
-    vy: (Math.random() - 0.5) * 0.45,
-    r:  Math.random() * 2.5 + 1,
-  }));
-}
-
-function draw() {
-  ctx.clearRect(0, 0, W, H);
-  nodes.forEach(n => {
-    n.x += n.vx; n.y += n.vy;
-    if (n.x < 0 || n.x > W) n.vx *= -1;
-    if (n.y < 0 || n.y > H) n.vy *= -1;
-  });
-
-  // Draw edges
-  for (let i = 0; i < nodes.length; i++) {
-    for (let j = i + 1; j < nodes.length; j++) {
-      const dx = nodes[i].x - nodes[j].x;
-      const dy = nodes[i].y - nodes[j].y;
-      const d  = Math.sqrt(dx * dx + dy * dy);
-      if (d < 120) {
-        const alpha = (1 - d / 120) * 0.4;
+function drawEdges() {
+  for (let li = 0; li < layers.length - 1; li++) {
+    for (let ni = 0; ni < layers[li].length; ni++) {
+      for (let nj = 0; nj < layers[li + 1].length; nj++) {
+        const a = layers[li][ni];
+        const b = layers[li + 1][nj];
+        const w = weights[li][ni][nj];
         ctx.beginPath();
-        ctx.strokeStyle = `rgba(200,87,58,${alpha})`;
-        ctx.lineWidth = 0.8;
-        ctx.moveTo(nodes[i].x, nodes[i].y);
-        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = `rgba(110,50,180,${0.07 + w * 0.1})`;
+        ctx.lineWidth   = 0.6 + w * 0.4;
         ctx.stroke();
       }
     }
   }
+}
 
-  // Draw nodes
-  nodes.forEach(n => {
+function drawPulses() {
+  pulses.forEach(p => {
+    if (p.done) return;
+
+    // Total segments = path.length - 1
+    const segs   = p.path.length - 1;
+    const tTotal = p.t; // 0..1 across full path
+    const segF   = tTotal * segs;
+    const segIdx = Math.min(Math.floor(segF), segs - 1);
+    const segT   = segF - segIdx;
+
+    const fromStep = p.path[segIdx];
+    const toStep   = p.path[segIdx + 1];
+    const from = layers[fromStep.li][fromStep.ni];
+    const to   = layers[toStep.li][toStep.ni];
+
+    const px = from.x + (to.x - from.x) * segT;
+    const py = from.y + (to.y - from.y) * segT;
+
+    // Draw the fired edge segment
     ctx.beginPath();
-    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(200,87,58,0.7)';
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.strokeStyle = `rgba(255,100,30,${0.25 * (1 - segT * 0.5)})`;
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+
+    // Pulse glow
+    const grad = ctx.createRadialGradient(px, py, 0, px, py, 14);
+    grad.addColorStop(0,   'rgba(255,120,30,0.9)');
+    grad.addColorStop(0.3, 'rgba(255,80,20,0.4)');
+    grad.addColorStop(1,   'rgba(255,60,10,0)');
+    ctx.beginPath();
+    ctx.arc(px, py, 14, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
     ctx.fill();
+
+    // Bright core
+    ctx.beginPath();
+    ctx.arc(px, py, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff8f0';
+    ctx.fill();
+
+    // Light up destination node when pulse arrives
+    if (segT > 0.85) {
+      layers[toStep.li][toStep.ni].glow = Math.max(
+        layers[toStep.li][toStep.ni].glow,
+        (segT - 0.85) / 0.15
+      );
+    }
+
+    p.t += p.speed;
+    if (p.t >= 1) p.done = true;
   });
+
+  pulses = pulses.filter(p => !p.done);
+}
+
+function drawNodes() {
+  const t = frameCount * 0.018;
+  layers.forEach((layer, li) => {
+    layer.forEach((n, ni) => {
+      // Idle ambient pulse
+      const pulse = 0.5 + 0.5 * Math.sin(t + n.pulsePhase);
+      const isIO  = li === 0 || li === layers.length - 1;
+      const r     = n.r + pulse * 1.2;
+      const glow  = Math.max(n.glow, pulse * 0.3);
+
+      // Outer glow ring
+      const outerSize = r + 8 + glow * 12;
+      const glowGrad = ctx.createRadialGradient(n.x, n.y, r * 0.5, n.x, n.y, outerSize);
+      if (n.glow > 0.1) {
+        glowGrad.addColorStop(0,   `rgba(255,110,30,${0.5 * n.glow})`);
+        glowGrad.addColorStop(0.5, `rgba(255,80,20,${0.2 * n.glow})`);
+        glowGrad.addColorStop(1,    'rgba(255,60,10,0)');
+      } else {
+        glowGrad.addColorStop(0,   `rgba(140,60,220,${0.35 * pulse})`);
+        glowGrad.addColorStop(1,    'rgba(100,40,180,0)');
+      }
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, outerSize, 0, Math.PI * 2);
+      ctx.fillStyle = glowGrad;
+      ctx.fill();
+
+      // Node fill
+      const fillGrad = ctx.createRadialGradient(n.x - r*0.3, n.y - r*0.3, 0, n.x, n.y, r * 1.4);
+      if (n.glow > 0.1) {
+        fillGrad.addColorStop(0, '#ff9060');
+        fillGrad.addColorStop(1, '#c04010');
+      } else if (isIO) {
+        fillGrad.addColorStop(0, '#7030c8');
+        fillGrad.addColorStop(1, '#3a1068');
+      } else {
+        fillGrad.addColorStop(0, '#5020a0');
+        fillGrad.addColorStop(1, '#200850');
+      }
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = fillGrad;
+      ctx.fill();
+
+      // Border ring
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      ctx.strokeStyle = n.glow > 0.1
+        ? `rgba(255,150,60,${0.6 + n.glow * 0.4})`
+        : `rgba(180,90,255,${0.35 + pulse * 0.3})`;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Decay glow
+      n.glow = Math.max(0, n.glow - 0.025);
+    });
+  });
+}
+
+function drawGrid() {
+  // Subtle hex/grid background
+  ctx.strokeStyle = 'rgba(120,60,180,0.04)';
+  ctx.lineWidth = 0.5;
+  const spacing = 28;
+  for (let x = 0; x < W; x += spacing) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += spacing) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+}
+
+function drawLabel() {
+  ctx.font = '500 10px "DM Mono", monospace';
+  ctx.fillStyle = 'rgba(180,120,255,0.35)';
+  ctx.letterSpacing = '0.12em';
+  ctx.textAlign = 'center';
+  ctx.fillText('EVOLUTIONARY BRAIN · 48 BOTS', W / 2, H - 14);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  frameCount++;
+
+  drawGrid();
+  drawEdges();
+  drawPulses();
+  drawNodes();
+  drawLabel();
+
+  // Spawn new pulses periodically
+  if (frameCount % 38 === 0) spawnPulse();
+  if (frameCount % 60 === 0) spawnPulse(); // extra burst sometimes
 
   raf = requestAnimationFrame(draw);
 }
 
-window.addEventListener('resize', () => { resize(); initNodes(); });
-resize(); initNodes(); draw();
+window.addEventListener('resize', () => { resize(); });
+resize();
+// Stagger initial pulses
+setTimeout(()=>{ spawnPulse(); spawnPulse(); spawnPulse(); }, 200);
+draw();
 
 
 // ── Scroll fade-in ───────────────────────────────────────
