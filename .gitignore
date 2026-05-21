@@ -11,4 +11,5 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.json
 .Python
