@@ -71,10 +71,11 @@ def get_agent() -> CodingAgent:
 
 # ── Auto-learn background thread ───────────────────────────────────────────────
 
-AUTOLEARN_INTERVAL  = 30   # seconds between learn cycles
+AUTOLEARN_INTERVAL  = 60   # seconds between learn cycles
 CHAT_PAUSE_SECONDS  = 15   # pause learning briefly after a chat message
 WIKI_ROUNDS         = 2    # wiki crawl rounds per cycle
 TRAIN_GENS          = 10   # training generations per cycle
+WIKI_REQUEST_DELAY  = 3.0  # seconds between Wikipedia requests to avoid 429s
 
 _al = {
     "running":        True,
@@ -134,7 +135,8 @@ def _autolearn_loop():
         try:
             agent = get_agent()
 
-            # Step 1: crawl Wikipedia
+            # Step 1: crawl Wikipedia (with a polite delay)
+            time.sleep(WIKI_REQUEST_DELAY)
             result = auto_crawl_wiki(agent.brain, rounds=WIKI_ROUNDS, per_round=2)
             articles_added = 0
             try:
@@ -337,6 +339,7 @@ def autolearn_now():
             _al["phase"] = "crawling"
         try:
             agent = get_agent()
+            time.sleep(WIKI_REQUEST_DELAY)
             result = auto_crawl_wiki(agent.brain, rounds=1, per_round=2)
             import re
             m = re.search(r"(\d+)\s+article", str(result))
@@ -412,3 +415,4 @@ if __name__ == "__main__":
     print("=" * 50)
     print("\nOpen index.html in your browser to start chatting!\n")
     app.run(host="127.0.0.1", port=5820, debug=False)
+
