@@ -456,6 +456,24 @@ footer{
 .learn-btns{display:flex;gap:6px;margin-top:8px;}
 .learn-btns button{flex:1;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:0.73rem;font-weight:600;cursor:pointer;font-family:var(--font);transition:all 0.15s;}
 .learn-btns button:hover{border-color:var(--mx);color:var(--mx);}
+.turbo-btn.turbo-on{border-color:var(--cl)!important;color:var(--cl)!important;background:var(--cl-dim)!important;animation:livepulse 1.2s infinite;}
+
+/* ── AUTO-LAUNCH OVERLAY ── */
+#autoLaunchOverlay{position:fixed;inset:0;z-index:9990;background:rgba(6,4,14,0.92);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+#autoLaunchOverlay.visible{opacity:1;pointer-events:all;}
+.al-box{background:var(--bg2);border:1px solid var(--border2);border-radius:22px;padding:40px 36px;max-width:480px;width:calc(100% - 40px);text-align:center;position:relative;}
+.al-icon{font-size:2.6rem;margin-bottom:12px;}
+.al-title{font-size:1.2rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
+.al-sub{font-size:0.84rem;color:var(--text2);margin-bottom:22px;line-height:1.6;}
+.al-cmd{background:var(--code-bg);border:1px solid var(--border2);border-radius:12px;padding:13px 16px;font-family:var(--mono);font-size:0.82rem;color:var(--cl);text-align:left;margin-bottom:16px;word-break:break-all;position:relative;}
+.al-copy-btn{position:absolute;top:8px;right:8px;padding:3px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg2);color:var(--text3);font-size:0.67rem;cursor:pointer;font-family:var(--font);transition:all 0.15s;}
+.al-copy-btn:hover{color:var(--text);background:var(--surface);}
+.al-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+.al-dl-btn{padding:9px 20px;border-radius:100px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:0.81rem;font-weight:600;cursor:pointer;font-family:var(--font);transition:all 0.2s;}
+.al-dl-btn:hover{border-color:var(--cl);color:var(--cl);background:var(--cl-dim);}
+.al-dismiss{padding:9px 20px;border-radius:100px;background:var(--grad3);color:#fff;border:none;font-size:0.81rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all 0.2s;}
+.al-dismiss:hover{opacity:0.88;}
+.al-waiting{font-size:0.74rem;color:var(--text3);font-family:var(--mono);margin-top:14px;}
 /* GitHub modal */
 .gh-step{display:none;text-align:left;}.gh-step.active{display:block;}
 .gh-step h3{font-size:0.95rem;font-weight:700;margin-bottom:8px;}
@@ -1219,13 +1237,17 @@ pip install -r requirements.txt</code></pre></div>
         <button onclick="saveServerPath()">Save</button>
       </div>
       <div class="settings-note" id="serverPathStatus"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+        <span style="font-size:0.81rem;color:var(--text2)">🚀 Auto-launch prompt when offline</span>
+        <button id="autoLaunchToggleBtn" onclick="toggleAutoLaunch()" style="padding:4px 14px;border-radius:100px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:0.75rem;font-weight:600;cursor:pointer;font-family:var(--font);transition:all 0.15s;">Off</button>
+      </div>
     </div>
     <div class="settings-section">
       <h4>Auto-learn</h4>
       <div class="learn-box">
         <div class="learn-top"><div class="learn-dot" id="learnDot"></div><span class="learn-text" id="learnText">Checking…</span></div>
         <div class="learn-stats" id="learnStats"></div>
-        <div class="learn-btns"><button id="learnToggle" onclick="toggleLearn()">Pause</button><button onclick="learnNow()">Learn now</button></div>
+        <div class="learn-btns"><button id="learnToggle" onclick="toggleLearn()">Pause</button><button onclick="learnNow()">Learn now</button><button id="turboLearnBtn" class="turbo-btn" onclick="toggleTurboLearn()" title="Hammers learn cycles as fast as the server allows">⚡ Turbo</button></div>
       </div>
     </div>
     <div class="settings-section">
@@ -1300,6 +1322,24 @@ pip install -r requirements.txt</code></pre></div>
       <span><kbd>Tab</kbd> Actions</span>
       <span><kbd>Ctrl</kbd><kbd>K</kbd> Open menu</span>
     </div>
+  </div>
+</div>
+
+<!-- AUTO-LAUNCH OVERLAY -->
+<div id="autoLaunchOverlay">
+  <div class="al-box">
+    <div class="al-icon" id="alIcon">🖥️</div>
+    <div class="al-title">Start the brain server first</div>
+    <div class="al-sub" id="alSub">ClawCow needs <code style="font-family:var(--mono);font-size:0.85em;color:var(--cl)">brain_server.py</code> running in the background. Open <span id="alTermName">a terminal</span> and run:</div>
+    <div class="al-cmd" id="alCmdBox">
+      <span id="alCmdText">python brain_server.py</span>
+      <button class="al-copy-btn" id="alCopyBtn" onclick="alCopyCmd()">Copy</button>
+    </div>
+    <div class="al-actions">
+      <button class="al-dl-btn" onclick="alDownloadLauncher()">⬇ Download launcher script</button>
+      <button class="al-dismiss" onclick="alDismiss()">I've started it →</button>
+    </div>
+    <div class="al-waiting" id="alWaiting">⏳ Waiting for server… will close automatically once online</div>
   </div>
 </div>
 
@@ -1472,7 +1512,111 @@ async function uploadPDF(){const input=$('pdfUploadInput'),status=$('pdfUploadSt
 async function pollLearnStatus(){if(!serverOnline){$('learnDot').className='learn-dot paused';$('learnText').textContent='Auto-learn: server offline';$('learnStats').textContent='';return;}try{const r=await fetch(LOCAL_API+'/autolearn/status');const d=await r.json();$('learnToggle').textContent=d.running?'Pause':'Resume';if(!d.running){$('learnDot').className='learn-dot paused';$('learnText').textContent='Auto-learn paused';}else if(d.busy){$('learnDot').className='learn-dot busy';$('learnText').textContent='Learning: '+d.phase+'…';}else if(d.paused_for_chat){$('learnDot').className='learn-dot paused';$('learnText').textContent='Paused '+d.next_in+'s after chat…';}else{$('learnDot').className='learn-dot active';$('learnText').textContent='Active — next in '+d.next_in+'s';}$('learnStats').textContent=d.total_articles+' articles · '+d.total_train_gens+' gens';}catch(e){$('learnDot').className='learn-dot paused';$('learnText').textContent='Auto-learn: server offline';}}
 async function toggleLearn(){try{await fetch(LOCAL_API+'/autolearn/toggle',{method:'POST'});pollLearnStatus();}catch(e){}}
 async function learnNow(){try{$('learnDot').className='learn-dot busy';$('learnText').textContent='Learning now…';await fetch(LOCAL_API+'/autolearn/now',{method:'POST'});}catch(e){}}
-setInterval(pollLearnStatus,3000);pollLearnStatus();
+setInterval(pollLearnStatus,1500);pollLearnStatus();
+
+// ── TURBO LEARN ──────────────────────────────────────────────
+let _turboLearnInterval = null;
+let _turboLearnOn = localStorage.getItem('acumen_turbo_learn') === '1';
+function applyTurboBtn(){
+  const btn = $('turboLearnBtn');
+  if(!btn) return;
+  if(_turboLearnOn){ btn.classList.add('turbo-on'); btn.textContent='⚡ Turbo ON'; }
+  else { btn.classList.remove('turbo-on'); btn.textContent='⚡ Turbo'; }
+}
+function startTurboLearn(){
+  if(_turboLearnInterval) clearInterval(_turboLearnInterval);
+  _turboLearnInterval = setInterval(async()=>{ if(serverOnline){ await learnNow(); } },4000);
+}
+function stopTurboLearn(){
+  if(_turboLearnInterval){ clearInterval(_turboLearnInterval); _turboLearnInterval=null; }
+}
+function toggleTurboLearn(){
+  _turboLearnOn = !_turboLearnOn;
+  localStorage.setItem('acumen_turbo_learn', _turboLearnOn ? '1' : '0');
+  if(_turboLearnOn){ startTurboLearn(); showToast('⚡ Turbo learn ON — hammering cycles every 4s'); }
+  else { stopTurboLearn(); showToast('Turbo learn off'); }
+  applyTurboBtn();
+}
+if(_turboLearnOn) startTurboLearn();
+applyTurboBtn();
+
+// ── AUTO-LAUNCH ───────────────────────────────────────────────
+const AL_KEY = 'acumen_auto_launch';
+let _autoLaunchOn = localStorage.getItem(AL_KEY) === '1';
+let _alDismissed = false;
+
+function updateAutoLaunchBtn(){
+  const btn = $('autoLaunchToggleBtn');
+  if(!btn) return;
+  btn.textContent = _autoLaunchOn ? 'On' : 'Off';
+  btn.style.color = _autoLaunchOn ? 'var(--gh)' : 'var(--text2)';
+  btn.style.borderColor = _autoLaunchOn ? 'var(--gh)' : 'var(--border2)';
+}
+function toggleAutoLaunch(){
+  _autoLaunchOn = !_autoLaunchOn;
+  localStorage.setItem(AL_KEY, _autoLaunchOn ? '1' : '0');
+  updateAutoLaunchBtn();
+  if(_autoLaunchOn) showToast('🚀 Auto-launch enabled — will prompt when server is offline');
+  else { showToast('Auto-launch disabled'); hideAutoLaunchOverlay(); }
+}
+function showAutoLaunchOverlay(){
+  const os = getOS();
+  const info = OS_INFO[os];
+  const termNames = { mac:'Terminal', windows:'PowerShell', linux:'Terminal' };
+  const cmd = getConfiguredServerPath() ? getServerRunCommand() : info.cmd;
+  $('alIcon').textContent = info.icon;
+  $('alTermName').textContent = termNames[os] || 'a terminal';
+  $('alCmdText').textContent = cmd;
+  // Auto-copy for convenience
+  try{ navigator.clipboard.writeText(cmd); }catch(e){}
+  $('autoLaunchOverlay').classList.add('visible');
+}
+function hideAutoLaunchOverlay(){
+  $('autoLaunchOverlay').classList.remove('visible');
+}
+function alDismiss(){
+  _alDismissed = true;
+  hideAutoLaunchOverlay();
+}
+function alCopyCmd(){
+  const cmd = $('alCmdText').textContent;
+  navigator.clipboard.writeText(cmd).then(()=>{ $('alCopyBtn').textContent='Copied!'; setTimeout(()=>$('alCopyBtn').textContent='Copy',1800); });
+}
+function alDownloadLauncher(){
+  const os = getOS();
+  const info = OS_INFO[os];
+  const cmd = getConfiguredServerPath() ? getServerRunCommand() : info.cmd;
+  let content, filename, mime;
+  if(os === 'windows'){
+    content = `@echo off\r\ntitle ClawCow Brain Server\r\necho Starting ClawCow brain server...\r\n${cmd}\r\npause\r\n`;
+    filename = 'start_clawcow.bat';
+    mime = 'text/plain';
+  } else {
+    content = `#!/bin/bash\necho "Starting ClawCow brain server..."\n${cmd}\n`;
+    filename = 'start_clawcow.sh';
+    mime = 'text/x-shellscript';
+  }
+  const blob = new Blob([content], {type: mime});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  showToast('⬇ Launcher downloaded — run it to start the server' + (os!=='windows' ? ' (chmod +x start_clawcow.sh first)' : ''));
+}
+
+// Hook into checkServer to trigger overlay
+const _origCheckServer = checkServer;
+checkServer = async function(){
+  await _origCheckServer.call(this);
+  if(_autoLaunchOn && !serverOnline && !_alDismissed){
+    showAutoLaunchOverlay();
+  } else if(serverOnline){
+    _alDismissed = false;
+    hideAutoLaunchOverlay();
+  }
+};
+
+updateAutoLaunchBtn();
 
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function useSuggestion(el){const bodyNode=el.querySelector('strong').nextSibling;const text=bodyNode?bodyNode.textContent.trim():el.textContent.trim();$('msgInput').value=text;sendMessage();}
