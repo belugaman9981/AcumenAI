@@ -1330,13 +1330,13 @@ pip install -r requirements.txt</code></pre></div>
   <div class="al-box">
     <div class="al-icon" id="alIcon">🖥️</div>
     <div class="al-title">Start the brain server first</div>
-    <div class="al-sub" id="alSub">ClawCow needs <code style="font-family:var(--mono);font-size:0.85em;color:var(--cl)">brain_server.py</code> running in the background. Open <span id="alTermName">a terminal</span> and run:</div>
+    <div class="al-sub" id="alSub">ClawCow needs <code style="font-family:var(--mono);font-size:0.85em;color:var(--cl)">brain_server.py</code> running in the background. Open <span id="alTermName">a terminal</span> and run the command below — or download a launcher script that does everything automatically.</div>
     <div class="al-cmd" id="alCmdBox">
       <span id="alCmdText">python brain_server.py</span>
       <button class="al-copy-btn" id="alCopyBtn" onclick="alCopyCmd()">Copy</button>
     </div>
     <div class="al-actions">
-      <button class="al-dl-btn" onclick="alDownloadLauncher()">⬇ Download launcher script</button>
+      <button class="al-dl-btn" onclick="alDownloadLauncher()">⬇ Download auto-start launcher</button>
       <button class="al-dismiss" onclick="alDismiss()">I've started it →</button>
     </div>
     <div class="al-waiting" id="alWaiting">⏳ Waiting for server… will close automatically once online</div>
@@ -1585,23 +1585,42 @@ function alCopyCmd(){
 function alDownloadLauncher(){
   const os = getOS();
   const info = OS_INFO[os];
-  const cmd = getConfiguredServerPath() ? getServerRunCommand() : info.cmd;
+  const customPath = getConfiguredServerPath();
   let content, filename, mime;
+
   if(os === 'windows'){
-    content = `@echo off\r\ntitle ClawCow Brain Server\r\necho Starting ClawCow brain server...\r\n${cmd}\r\npause\r\n`;
+    // Resolve brain_server.py path relative to the bat file's own directory
+    const serverDir = customPath
+      ? `"${customPath.replace(/brain_server\.py$/i,'').replace(/[/\\]+$/,'').replace(/\//g,'\\')}"`.replace(/^""\s*"/, '"')
+      : `"%~dp0local-ai-agent"`;
+    const pyCmd = customPath ? `python "${customPath.replace(/\//g,'\\')}"`  : `python brain_server.py`;
+    content =
+`@echo off\r\ntitle ClawCow Launcher\r\necho ============================================\r\necho  ClawCow Agent — Auto Launcher\r\necho ============================================\r\necho.\r\necho Starting brain server in a new PowerShell window...\r\nstart "ClawCow Brain Server" powershell -NoExit -Command "cd ${serverDir}; ${pyCmd}"\r\necho Waiting for server to start...\r\ntimeout /t 4 /nobreak >nul\r\necho Opening ClawCow in your browser...\r\nstart "" "%~dp0index.html"\r\necho.\r\necho Done! You can minimise this window.\r\ntimeout /t 3 /nobreak >nul\r\nexit\r\n`;
     filename = 'start_clawcow.bat';
     mime = 'text/plain';
   } else {
-    content = `#!/bin/bash\necho "Starting ClawCow brain server..."\n${cmd}\n`;
+    const serverDir = customPath
+      ? `"${customPath.replace(/\/brain_server\.py$/i,'')}"`.replace(/^""\s*"/, '"')
+      : `"$SCRIPT_DIR/local-ai-agent"`;
+    const pyCmd = customPath ? `python3 "${customPath}"` : `${info.python} brain_server.py`;
+    const openCmd = os === 'mac'
+      ? `open "$SCRIPT_DIR/index.html"`
+      : `xdg-open "$SCRIPT_DIR/index.html" 2>/dev/null || python3 -m webbrowser "$SCRIPT_DIR/index.html"`;
+    content =
+`#!/bin/bash\nSCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"\necho "============================================"\necho " ClawCow Agent — Auto Launcher"\necho "============================================"\necho ""\necho "Starting brain server..."\ncd ${serverDir}\n${pyCmd} &\nSERVER_PID=$!\necho "Brain server started (PID $SERVER_PID)"\necho "Waiting for it to come online..."\nsleep 4\necho "Opening ClawCow in your browser..."\n${openCmd}\necho ""\necho "Done! Brain server is running in the background."\necho "To stop it: kill $SERVER_PID"\nwait $SERVER_PID\n`;
     filename = 'start_clawcow.sh';
     mime = 'text/x-shellscript';
   }
+
   const blob = new Blob([content], {type: mime});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = filename;
   a.click();
-  showToast('⬇ Launcher downloaded — run it to start the server' + (os!=='windows' ? ' (chmod +x start_clawcow.sh first)' : ''));
+  const note = os === 'windows'
+    ? '⬇ start_clawcow.bat downloaded — put it in your AcumenAI folder and double-click it to launch everything'
+    : `⬇ start_clawcow.sh downloaded — put it in your AcumenAI folder, run chmod +x start_clawcow.sh once, then run it to launch everything`;
+  showToast(note, 5000);
 }
 
 // Hook into checkServer to trigger overlay
