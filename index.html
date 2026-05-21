@@ -1525,7 +1525,7 @@ function applyTurboBtn(){
 }
 function startTurboLearn(){
   if(_turboLearnInterval) clearInterval(_turboLearnInterval);
-  _turboLearnInterval = setInterval(async()=>{ if(serverOnline){ await learnNow(); } },4000);
+  _turboLearnInterval = setInterval(async()=>{ if(serverOnline){ await learnNow(); } },35000);
 }
 function stopTurboLearn(){
   if(_turboLearnInterval){ clearInterval(_turboLearnInterval); _turboLearnInterval=null; }
