@@ -445,6 +445,13 @@ def reset():
     return jsonify({"ok": True})
 
 
+# ── Feedback / self-improve ────────────────────────────────────────────────────
+
+@app.route("/improve/stats", methods=["GET"])
+def improve_stats():
+    return jsonify({"result": get_agent().feedback_stats()})
+
+
 if __name__ == "__main__":
     print("=" * 50)
     print("  ClawCow Agent Local API Server")

@@ -28,6 +28,23 @@ _SESSION.headers["User-Agent"] = "AcumenAI-Brain/1.0 (local learning agent)"
 REQUEST_TIMEOUT = 15
 
 
+def _wiki_get(params: dict, retries: int = 3) -> requests.Response:
+    """GET wrapper with exponential backoff on 429 / transient errors."""
+    delay = 2.0
+    for attempt in range(retries):
+        resp = _SESSION.get(WIKI_API, params=params, timeout=REQUEST_TIMEOUT)
+        if resp.status_code == 429:
+            retry_after = int(resp.headers.get("Retry-After", delay))
+            console.print(f"[dim yellow]Wikipedia rate-limited — waiting {retry_after}s…[/dim yellow]")
+            time.sleep(retry_after)
+            delay *= 2
+            continue
+        resp.raise_for_status()
+        return resp
+    resp.raise_for_status()  # re-raise after final attempt
+    return resp  # unreachable but satisfies type checkers
+
+
 def _clean_wiki_text(raw: str) -> str:
     """Strip markup residue from Wikipedia plaintext extracts."""
     text = re.sub(r"\{\{[^}]*\}\}", "", raw)
@@ -52,8 +69,7 @@ def fetch_article(title: str, max_chars: int = 80_000) -> Optional[dict]:
         "format": "json",
     }
     try:
-        resp = _SESSION.get(WIKI_API, params=params, timeout=REQUEST_TIMEOUT)
-        resp.raise_for_status()
+        resp = _wiki_get(params)
         pages = resp.json().get("query", {}).get("pages", {})
         for pid, page in pages.items():
             if pid == "-1" or "missing" in page:
@@ -81,8 +97,7 @@ def search_articles(query: str, limit: int = 10) -> list[str]:
         "format": "json",
     }
     try:
-        resp = _SESSION.get(WIKI_API, params=params, timeout=REQUEST_TIMEOUT)
-        resp.raise_for_status()
+        resp = _wiki_get(params)
         results = resp.json().get("query", {}).get("search", [])
         return [r["title"] for r in results]
     except Exception as exc:
@@ -101,8 +116,7 @@ def fetch_random_articles(count: int = 5, max_chars: int = 80_000) -> list[dict]
     }
     articles = []
     try:
-        resp = _SESSION.get(WIKI_API, params=params, timeout=REQUEST_TIMEOUT)
-        resp.raise_for_status()
+        resp = _wiki_get(params)
         randoms = resp.json().get("query", {}).get("random", [])
         for item in randoms:
             art = fetch_article(item["title"], max_chars=max_chars)

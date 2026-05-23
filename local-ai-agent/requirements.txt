@@ -14,6 +14,7 @@ flask-cors>=4.0.0
 # PDF ingestion (WSJ articles, books, docs)
 pypdf>=3.0.0
 pdfplumber>=0.10.0
+pdfminer.six>=20221105
 
 # Screenshot analyzer
 Pillow>=10.0.0

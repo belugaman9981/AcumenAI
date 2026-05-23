@@ -79,11 +79,19 @@ def _classify_query(query: str) -> tuple[str, int]:
     q = query.lower()
 
     for kw in VOLATILE_KEYWORDS:
-        if kw in q:
+        # Multi-word phrases: substring match is fine.
+        # Single words: require word boundaries to avoid e.g. "price" in "priceless".
+        if " " in kw:
+            if kw in q:
+                return "volatile", TTL_VOLATILE
+        elif re.search(r"\b" + re.escape(kw) + r"\b", q):
             return "volatile", TTL_VOLATILE
 
     for kw in SEMI_STABLE_KEYWORDS:
-        if kw in q:
+        if " " in kw:
+            if kw in q:
+                return "semi_stable", TTL_SEMI_STABLE
+        elif re.search(r"\b" + re.escape(kw) + r"\b", q):
             return "semi_stable", TTL_SEMI_STABLE
 
     return "stable", TTL_STABLE

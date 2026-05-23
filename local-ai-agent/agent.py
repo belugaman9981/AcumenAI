@@ -24,6 +24,7 @@ import config
 from brain import EvolutionBrain
 from search_cache import smart_search, needs_live_search, cache_stats, clear_cache
 from pdf_ingest import ingest_pdf_to_brain, ingest_pdf_dir_to_brain
+from self_improve import PromptEvolver
 from wiki_ingest import (
     ingest_article_to_brain,
     ingest_search_to_brain,
@@ -138,6 +139,7 @@ class CodingAgent:
         self._last_user_message: str = ""
         self._last_reply: str = ""
         self._session_file: Optional[Path] = None
+        self.evolver = PromptEvolver(default_prompt="AcumenAI local brain")
         load_plugins(TOOLS)
         self._load_last_session()
 
@@ -211,8 +213,16 @@ class CodingAgent:
         if not self._last_user_message or not self._last_reply:
             return "No previous exchange to rate yet."
         self.brain.record_feedback(self._last_user_message, self._last_reply, liked=liked)
-        verdict = "liked ✓" if liked else "disliked ✗"
+        self.evolver.record_feedback(
+            liked=liked,
+            user_message=self._last_user_message,
+            agent_reply=self._last_reply,
+        )
+        verdict = "liked \u2713" if liked else "disliked \u2717"
         return f"Feedback saved: {verdict}. The brain will learn from this."
+
+    def feedback_stats(self) -> str:
+        return self.evolver.feedback_stats()
 
     def reset_history(self):
         self.history = []
