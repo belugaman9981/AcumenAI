@@ -55,9 +55,22 @@ from pdf_ingest import ingest_pdf_to_brain
 
 # Allow requests from localhost (browser file:// sends Origin: null)
 _CORS_ORIGINS = ["http://localhost:5820", "http://127.0.0.1:5820", "null"]
+_MAX_PDF_BYTES = 50 * 1024 * 1024  # 50 MB
 
 app = Flask(__name__)
 CORS(app, origins=_CORS_ORIGINS, supports_credentials=False)
+
+
+@app.errorhandler(Exception)
+def handle_exception(exc: Exception):
+    logger.error("Unhandled exception: %s", exc, exc_info=True)
+    return jsonify({"error": "Internal server error", "detail": str(exc)}), 500
+
+
+@app.errorhandler(404)
+def handle_404(exc):
+    return jsonify({"error": "Not found"}), 404
+
 
 @app.after_request
 def add_cors_headers(response):
@@ -400,8 +413,15 @@ def pdf_upload():
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
     f = request.files["file"]
-    if not f.filename.lower().endswith(".pdf"):
+    if not (f.filename or "").lower().endswith(".pdf"):
         return jsonify({"error": "Only PDF files are supported"}), 400
+
+    # Enforce file size limit before writing to disk
+    f.seek(0, 2)
+    size = f.tell()
+    f.seek(0)
+    if size > _MAX_PDF_BYTES:
+        return jsonify({"error": f"PDF too large (max {_MAX_PDF_BYTES // (1024 * 1024)} MB)"}), 400
 
     # Save to a temp file then ingest
     with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:

@@ -19,6 +19,7 @@ This module intentionally keeps learning local and user-controlled:
 from __future__ import annotations
 
 import json
+import logging
 import math
 import random
 import re
@@ -30,6 +31,8 @@ from collections import Counter, defaultdict
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger("brain")
 
 
 # ── Tuneable limits ────────────────────────────────────────────────────────────
@@ -364,7 +367,11 @@ class EvolutionBrain:
             self.feedback = payload.get("feedback", self.feedback)
             # Refresh in-memory vocab from DB
             self._word_vocab = self._db.top_vocab(2000)
-        except Exception:
+        except Exception as exc:
+            logger.error(
+                "Failed to load brain state from %s — starting fresh. Error: %s",
+                self.state_path, exc, exc_info=True,
+            )
             self.population = []
             self.image_samples = []
             self.text_corpus = []
