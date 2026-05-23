@@ -61,10 +61,18 @@ def _ensure_tesseract():
         try:
             import pytesseract as _pt
             _pytesseract = _pt
-            # Auto-detect Tesseract on Windows
-            win_path = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-            if os.name == "nt" and os.path.isfile(win_path):
-                _pt.pytesseract.tesseract_cmd = win_path
+            # Auto-detect Tesseract on Windows — check multiple common install paths
+            if os.name == "nt":
+                win_paths = [
+                    r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+                    r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+                    os.path.expanduser(r"~\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"),
+                ]
+                for path in win_paths:
+                    if os.path.isfile(path):
+                        _pt.pytesseract.tesseract_cmd = path
+                        break
+            # On macOS/Linux, tesseract is found via PATH — no explicit path needed
         except ImportError:
             raise RuntimeError("pytesseract not installed. Run: pip install pytesseract")
     return _pytesseract

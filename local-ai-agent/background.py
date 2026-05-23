@@ -12,6 +12,7 @@ don't interrupt the user's work.
 
 from __future__ import annotations
 
+import logging
 import random
 import sqlite3
 import textwrap
@@ -27,6 +28,7 @@ import config
 from tools import github_search, github_get_repo, github_user_repos, _github_headers
 
 console = Console()
+logger = logging.getLogger("background")
 
 # ── Persistent store ───────────────────────────────────────────────────────────
 
@@ -140,6 +142,7 @@ class BackgroundCrawler:
                 else:
                     self._crawl_notable_coders()
             except Exception as exc:
+                logger.error("Crawler cycle error: %s", exc, exc_info=True)
                 console.print(f"[dim red]Crawler error: {exc}[/dim red]")
 
             cycle += 1
@@ -175,8 +178,7 @@ class BackgroundCrawler:
             items = r.json().get("items", [])
         except Exception as exc:
             console.print(f"[dim red]Crawler fetch error: {exc}[/dim red]")
-            return
-
+                logger.error("Trending fetch error: %s", exc)
         for repo in items[:5]:  # Only deeply inspect 5 to save API calls
             if not self._idle.is_set() or self._stop.is_set():
                 return
@@ -204,6 +206,7 @@ class BackgroundCrawler:
             repos = r.json()
         except Exception as exc:
             console.print(f"[dim red]Crawler user repos error: {exc}[/dim red]")
+            logger.error("User repos fetch error (user=%s): %s", user, exc)
             return
 
         # Sort by stars

@@ -24,6 +24,7 @@ import config
 from brain import EvolutionBrain
 from search_cache import smart_search, needs_live_search, cache_stats, clear_cache
 from pdf_ingest import ingest_pdf_to_brain, ingest_pdf_dir_to_brain
+from self_improve import PromptEvolver
 from wiki_ingest import (
     ingest_article_to_brain,
     ingest_search_to_brain,
@@ -40,6 +41,7 @@ from tools import TOOLS
 
 console = Console()
 HISTORY_DIR = Path(__file__).parent / "chat_history"
+_MAX_SESSIONS = 20  # keep only the N most recent session files
 
 
 # ── Pure-brain response engine ─────────────────────────────────────────────────
@@ -137,6 +139,7 @@ class CodingAgent:
         self._last_user_message: str = ""
         self._last_reply: str = ""
         self._session_file: Optional[Path] = None
+        self.evolver = PromptEvolver(default_prompt="AcumenAI local brain")
         load_plugins(TOOLS)
         self._load_last_session()
 
@@ -163,6 +166,16 @@ class CodingAgent:
         HISTORY_DIR.mkdir(exist_ok=True)
         ts = time.strftime("%Y%m%d_%H%M%S")
         self._session_file = HISTORY_DIR / f"session_{ts}.json"
+        self._cleanup_old_sessions()
+
+    def _cleanup_old_sessions(self):
+        """Delete session files beyond the most recent _MAX_SESSIONS."""
+        files = sorted(HISTORY_DIR.glob("session_*.json"), reverse=True)
+        for old in files[_MAX_SESSIONS:]:
+            try:
+                old.unlink()
+            except Exception:
+                pass
 
     def _save_history(self):
         if self._session_file:
@@ -200,8 +213,16 @@ class CodingAgent:
         if not self._last_user_message or not self._last_reply:
             return "No previous exchange to rate yet."
         self.brain.record_feedback(self._last_user_message, self._last_reply, liked=liked)
-        verdict = "liked ✓" if liked else "disliked ✗"
+        self.evolver.record_feedback(
+            liked=liked,
+            user_message=self._last_user_message,
+            agent_reply=self._last_reply,
+        )
+        verdict = "liked \u2713" if liked else "disliked \u2717"
         return f"Feedback saved: {verdict}. The brain will learn from this."
+
+    def feedback_stats(self) -> str:
+        return self.evolver.feedback_stats()
 
     def reset_history(self):
         self.history = []

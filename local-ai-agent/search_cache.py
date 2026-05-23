@@ -58,6 +58,15 @@ def _save_cache(cache: dict) -> None:
     CACHE_FILE.write_text(json.dumps(cache, indent=2), encoding="utf-8")
 
 
+def _prune_cache(cache: dict) -> dict:
+    """Remove entries that have exceeded their TTL. Returns the pruned cache."""
+    now = time.time()
+    return {
+        k: v for k, v in cache.items()
+        if (now - v.get("fetched_at", 0)) < v.get("ttl_seconds", TTL_STABLE)
+    }
+
+
 def _cache_key(query: str) -> str:
     return query.lower().strip()
 
@@ -70,11 +79,19 @@ def _classify_query(query: str) -> tuple[str, int]:
     q = query.lower()
 
     for kw in VOLATILE_KEYWORDS:
-        if kw in q:
+        # Multi-word phrases: substring match is fine.
+        # Single words: require word boundaries to avoid e.g. "price" in "priceless".
+        if " " in kw:
+            if kw in q:
+                return "volatile", TTL_VOLATILE
+        elif re.search(r"\b" + re.escape(kw) + r"\b", q):
             return "volatile", TTL_VOLATILE
 
     for kw in SEMI_STABLE_KEYWORDS:
-        if kw in q:
+        if " " in kw:
+            if kw in q:
+                return "semi_stable", TTL_SEMI_STABLE
+        elif re.search(r"\b" + re.escape(kw) + r"\b", q):
             return "semi_stable", TTL_SEMI_STABLE
 
     return "stable", TTL_STABLE
@@ -139,7 +156,7 @@ def smart_search(query: str, max_results: int = 5) -> tuple[str, bool]:
             "ttl_seconds": ttl,
             "category": category,
         }
-        _save_cache(cache)
+        _save_cache(_prune_cache(cache))
 
     return result, False
 
@@ -196,6 +213,16 @@ def cache_stats() -> str:
         f"  Stable (30d):        {stable_count}\n"
         f"  Expired entries:     {expired}"
     )
+
+
+def prune_expired() -> int:
+    """Remove all expired entries from the cache. Returns count removed."""
+    cache = _load_cache()
+    pruned = _prune_cache(cache)
+    removed = len(cache) - len(pruned)
+    if removed:
+        _save_cache(pruned)
+    return removed
 
 
 def clear_cache() -> str:

@@ -27,6 +27,7 @@ import config
 # ── Safety: restrict file operations to a working directory ────────────────────
 WORKDIR = Path.cwd()
 _BLOCKED_EXTENSIONS = {".exe", ".bat", ".cmd", ".ps1", ".sh", ".vbs", ".msi"}
+_MAX_CODE_SIZE = 50_000  # 50 KB limit for run_code input
 
 # ── Shared helpers ─────────────────────────────────────────────────────────────
 
@@ -336,9 +337,11 @@ def analyze_code(code: str, language: str = "auto") -> str:
 # ── Tool: read_file ────────────────────────────────────────────────────────────
 
 def _safe_path(path_str: str) -> Path:
-    """Resolve a path and ensure it's within the working directory."""
-    p = (WORKDIR / path_str).resolve()
-    if not str(p).startswith(str(WORKDIR)):
+    """Resolve a path and ensure it stays within the working directory."""
+    try:
+        p = (WORKDIR / path_str).resolve()
+        p.relative_to(WORKDIR)  # raises ValueError if outside WORKDIR (symlink-safe)
+    except ValueError:
         raise ValueError(f"Path escapes working directory: {path_str}")
     if p.suffix.lower() in _BLOCKED_EXTENSIONS:
         raise ValueError(f"Blocked file extension: {p.suffix}")
@@ -418,6 +421,8 @@ def run_code(code: str, language: str = "python") -> str:
     Supported: python, node (JavaScript).
     Timeout: 15 seconds. No network or file-system side effects encouraged.
     """
+    if len(code) > _MAX_CODE_SIZE:
+        return f"Code too large (max {_MAX_CODE_SIZE:,} characters)."
     cmds = {
         "python": ["python", "-c", code],
         "node": ["node", "-e", code],

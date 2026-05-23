@@ -132,16 +132,20 @@ def listen(timeout: int = 8, phrase_limit: int = 30) -> str:
 
     console.print("[dim]Processing speech...[/dim]")
 
-    # Try Google (free, online) first, then offline fallback
+    # Try offline (Sphinx) first — keeps the agent fully local
     try:
-        text = recognizer.recognize_google(audio)
+        text = recognizer.recognize_sphinx(audio)
         return text
     except Exception:
         pass
 
-    # Try Sphinx (offline, less accurate) if available
+    # Fall back to Google (cloud, requires internet) — warn the user
     try:
-        text = recognizer.recognize_sphinx(audio)
+        console.print(
+            "[dim yellow]⚠ Offline STT unavailable — sending audio to Google "
+            "(install pocketsphinx for fully offline recognition)[/dim yellow]"
+        )
+        text = recognizer.recognize_google(audio)
         return text
     except Exception:
         pass
