@@ -40,6 +40,7 @@ from tools import TOOLS
 
 console = Console()
 HISTORY_DIR = Path(__file__).parent / "chat_history"
+_MAX_SESSIONS = 20  # keep only the N most recent session files
 
 
 # ── Pure-brain response engine ─────────────────────────────────────────────────
@@ -163,6 +164,16 @@ class CodingAgent:
         HISTORY_DIR.mkdir(exist_ok=True)
         ts = time.strftime("%Y%m%d_%H%M%S")
         self._session_file = HISTORY_DIR / f"session_{ts}.json"
+        self._cleanup_old_sessions()
+
+    def _cleanup_old_sessions(self):
+        """Delete session files beyond the most recent _MAX_SESSIONS."""
+        files = sorted(HISTORY_DIR.glob("session_*.json"), reverse=True)
+        for old in files[_MAX_SESSIONS:]:
+            try:
+                old.unlink()
+            except Exception:
+                pass
 
     def _save_history(self):
         if self._session_file:

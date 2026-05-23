@@ -5,6 +5,7 @@ rich>=13.7.0
 ddgs>=0.1.0
 duckduckgo-search>=6.1.0   # fallback if ddgs not available
 lxml>=5.1.0
+python-dotenv>=1.0.0
 
 # Web server (bridges the website to the local brain)
 flask>=3.0.0

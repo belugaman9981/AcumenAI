@@ -30,6 +30,7 @@ Endpoints:
 from __future__ import annotations
 
 import json
+import logging
 import os
 import tempfile
 import threading
@@ -39,17 +40,30 @@ from pathlib import Path
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+# ── Logging ────────────────────────────────────────────────────────────────────
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
+    datefmt="%H:%M:%S",
+)
+logger = logging.getLogger("brain_server")
+
 from agent import CodingAgent
-from search_cache import cache_stats, clear_cache
+from search_cache import cache_stats, clear_cache, prune_expired
 from wiki_ingest import ingest_random_to_brain, auto_crawl_wiki, ingest_search_to_brain
 from pdf_ingest import ingest_pdf_to_brain
 
+# Allow requests from localhost (browser file:// sends Origin: null)
+_CORS_ORIGINS = ["http://localhost:5820", "http://127.0.0.1:5820", "null"]
+
 app = Flask(__name__)
-CORS(app, origins="*", supports_credentials=False)
+CORS(app, origins=_CORS_ORIGINS, supports_credentials=False)
 
 @app.after_request
 def add_cors_headers(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
+    origin = request.headers.get("Origin", "")
+    if origin in _CORS_ORIGINS:
+        response.headers["Access-Control-Allow-Origin"] = origin
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     return response
@@ -60,12 +74,15 @@ def options_handler(path=""):
     return "", 204
 
 _agent: CodingAgent | None = None
+_agent_lock = threading.Lock()
 
 
 def get_agent() -> CodingAgent:
     global _agent
     if _agent is None:
-        _agent = CodingAgent()
+        with _agent_lock:
+            if _agent is None:  # double-checked locking
+                _agent = CodingAgent()
     return _agent
 
 
@@ -159,7 +176,7 @@ def _autolearn_loop():
                 _al["total_train_gens"] += TRAIN_GENS
 
         except Exception as e:
-            print(f"[autolearn] Error in cycle: {e}")
+            logger.error("[autolearn] Error in cycle: %s", e, exc_info=True)
         finally:
             with _al_lock:
                 _al["busy"] = False
@@ -194,6 +211,8 @@ def chat():
     message = (data.get("message") or "").strip()
     if not message:
         return jsonify({"error": "Empty message"}), 400
+    if len(message) > 5_000:
+        return jsonify({"error": "Message too long (max 5000 characters)"}), 400
 
     a = get_agent()
     from agent import _build_response
@@ -222,7 +241,10 @@ def brain_status():
 @app.route("/brain/train", methods=["POST"])
 def brain_train():
     data = request.get_json(force=True, silent=True) or {}
-    gens = int(data.get("generations", 10))
+    try:
+        gens = max(1, min(int(data.get("generations", 10)), 500))
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid generations value"}), 400
     result = get_agent().brain_train(generations=gens)
     return jsonify({"result": result})
 
@@ -238,7 +260,10 @@ def brain_init():
 @app.route("/brain/wiki-random", methods=["POST"])
 def brain_wiki_random():
     data = request.get_json(force=True, silent=True) or {}
-    count = int(data.get("count", 5))
+    try:
+        count = max(1, min(int(data.get("count", 5)), 20))
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid count value"}), 400
     result = ingest_random_to_brain(get_agent().brain, count=count)
     return jsonify({"result": result})
 
@@ -249,6 +274,8 @@ def brain_wiki_search():
     query = (data.get("query") or "").strip()
     if not query:
         return jsonify({"error": "No query provided"}), 400
+    if len(query) > 500:
+        return jsonify({"error": "Query too long (max 500 characters)"}), 400
     result = ingest_search_to_brain(get_agent().brain, query, max_articles=3)
     return jsonify({"result": result})
 
@@ -256,7 +283,10 @@ def brain_wiki_search():
 @app.route("/brain/wiki-crawl", methods=["POST"])
 def brain_wiki_crawl():
     data = request.get_json(force=True, silent=True) or {}
-    rounds = int(data.get("rounds", 5))
+    try:
+        rounds = max(1, min(int(data.get("rounds", 5)), 20))
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid rounds value"}), 400
     result = auto_crawl_wiki(get_agent().brain, rounds=rounds, per_round=3)
     return jsonify({"result": result})
 
@@ -264,7 +294,7 @@ def brain_wiki_crawl():
 @app.route("/brain/predict", methods=["POST"])
 def brain_predict():
     data = request.get_json(force=True, silent=True) or {}
-    prefix = (data.get("prefix") or "").strip()
+    prefix = (data.get("prefix") or "").strip()[:500]
     mode = data.get("mode", "words")
     a = get_agent()
     if mode == "chars":
@@ -289,6 +319,8 @@ def brain_ingest_text():
     text = (data.get("text") or "").strip()
     if not text:
         return jsonify({"error": "No text provided"}), 400
+    if len(text) > 500_000:
+        return jsonify({"error": "Text too large (max 500,000 characters)"}), 400
     a = get_agent()
     result = a.brain.add_text(text)
     return jsonify({"result": result})
@@ -351,7 +383,7 @@ def autolearn_now():
             with _al_lock:
                 _al["total_train_gens"] += TRAIN_GENS
         except Exception as e:
-            print(f"[autolearn/now] Error: {e}")
+            logger.error("[autolearn/now] Error: %s", e, exc_info=True)
         finally:
             with _al_lock:
                 _al["busy"] = False
@@ -397,6 +429,12 @@ def search_stats():
 @app.route("/search/clear", methods=["POST"])
 def search_clear():
     return jsonify({"result": clear_cache()})
+
+
+@app.route("/search/prune", methods=["POST"])
+def search_prune():
+    removed = prune_expired()
+    return jsonify({"result": f"Removed {removed} expired cache entries."})
 
 
 # ── Reset ──────────────────────────────────────────────────────────────────────
